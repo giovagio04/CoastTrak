@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('outings', function (Blueprint $table) {
-            $table->dropForeign(['start_stage_id']);
+            $table->dropForeign('outings_stage_id_foreign');
             $table->dropForeign(['end_stage_id']);
             $table->dropColumn('start_stage_id');
             $table->dropColumn('end_stage_id');

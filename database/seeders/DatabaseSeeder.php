@@ -81,7 +81,8 @@ class DatabaseSeeder extends Seeder
         // 5. Uscite Ufficiali
         $outing1 = Outing::create([
             'type' => 'official',
-            'stage_id' => $stage1->id,
+            'start_location' => $stage1->start_point,
+            'end_location' => $stage1->end_point,
             'guide_id' => $guide1->id,
             'date' => Carbon::now()->addDays(10),
             'meeting_point' => 'Piazza di Soverato, ore 8:00',
@@ -93,7 +94,8 @@ class DatabaseSeeder extends Seeder
         // Uscita passata (conclusa)
         $outingPast = Outing::create([
             'type' => 'official',
-            'stage_id' => $stage1->id,
+            'start_location' => $stage1->start_point,
+            'end_location' => $stage1->end_point,
             'guide_id' => $guide1->id,
             'date' => Carbon::now()->subDays(5),
             'meeting_point' => 'Piazza di Soverato',
@@ -119,7 +121,8 @@ class DatabaseSeeder extends Seeder
         // 7. Uscite tra utenti (create da user1 perché ha completato una tappa)
         $outingUser = Outing::create([
             'type' => 'user',
-            'stage_id' => $stage2->id,
+            'start_location' => $stage2->start_point,
+            'end_location' => $stage2->end_point,
             'organizer_id' => $user1->id,
             'date' => Carbon::now()->addDays(15),
             'meeting_point' => 'Piazza di Petrizzi',

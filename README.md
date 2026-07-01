@@ -1,58 +1,120 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🥾 CoastTrak - Kalabria Coast to Coast
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+**CoastTrak** è una piattaforma web dedicata alla promozione e alla gestione del cammino **"Kalabria Coast to Coast"**, un suggestivo percorso escursionistico di 55 km che attraversa l'entroterra calabrese collegando la costa ionica (**Soverato**) con quella tirrenica (**Pizzo Calabro**).
 
-## About Laravel
+La piattaforma permette di coordinare ed organizzare le escursioni (uscite) sul cammino, distinguendo tra eventi ufficiali ed eventi proposti direttamente dalla community (P2P), integrando un sistema di tracciamento dei progressi tramite una **Credenziale Digitale**.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## 🚀 Funzionalità Principali
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### 👥 Profilo Utenti e Permessi
+L'applicazione gestisce tre tipologie di utenti:
 
-## Learning Laravel
+1. **Utenti Non Registrati (Ospiti):**
+   * Esplorazione e visualizzazione delle escursioni pubbliche disponibili sul cammino.
+   * Visualizzazione dei dettagli di ciascuna escursione (data, punto di ritrovo, difficoltà, note).
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+2. **Utenti Registrati (Community):**
+   * Prenotazione e richiesta di partecipazione alle escursioni disponibili.
+   * **Credenziale Digitale:** Un sistema che certifica le tappe e i cammini completati.
+   * **Sblocco P2P (Peer-to-Peer):** Gli utenti esperti che hanno completato l'intero cammino (almeno una volta) sbloccano la possibilità di creare e proporre nuove uscite auto-organizzate per la community (soggette ad approvazione dell'amministratore).
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+3. **Amministratore (Admin):**
+   * Gestione del catalogo delle tappe ufficiali del cammino.
+   * Creazione e gestione delle uscite ufficiali condotte da guide esperte.
+   * Assegnazione e gestione delle guide professionali.
+   * Approvazione, rifiuto o annullamento delle uscite P2P proposte dagli utenti.
+   * Gestione completa degli utenti del sistema.
 
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
+---
 
-## Agentic Development
+## 🛠️ Stack Tecnologico
 
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+L'applicazione segue l'architettura **MVC (Model-View-Controller)**:
 
+* **Backend:** PHP 8.3 con il framework **Laravel 13.x**
+* **Database:** MySQL / SQLite
+* **Autenticazione:** **Laravel Breeze** (sessioni crittografate, hashing bcrypt, recupero password)
+* **Frontend:** HTML5, CSS3, **Bootstrap 5** per il responsive layout, **FontAwesome 6** per l'iconografia e JavaScript Vanilla per la dinamicità lato client.
+* **Templating Engine:** **Blade** (ereditarietà dei layout, protezione XSS automatica)
+
+---
+
+## 📂 Struttura del Codice Sorgente (Custom)
+
+I file principali sviluppati su misura per il progetto sono organizzati come segue:
+
+* **`app/Models/`**: Modelli Eloquent per la mappatura del database:
+  * [User.php](file:///c:/Users/Giovanni/Desktop/CoastTrak/app/Models/User.php): Gestione dei ruoli, permessi e controllo sblocco uscite P2P (`canCreateOuting`).
+  * [Outing.php](file:///c:/Users/Giovanni/Desktop/CoastTrak/app/Models/Outing.php): Modello delle uscite (ufficiali e P2P) con gestione delle tratte personalizzate (`start_location`, `end_location`).
+  * [Stage.php](file:///c:/Users/Giovanni/Desktop/CoastTrak/app/Models/Stage.php): Mappatura delle tappe ufficiali del percorso di 55km.
+  * [Guide.php](file:///c:/Users/Giovanni/Desktop/CoastTrak/app/Models/Guide.php): Mappatura delle guide escursionistiche.
+  * [ParticipationRequest.php](file:///c:/Users/Giovanni/Desktop/CoastTrak/app/Models/ParticipationRequest.php): Richieste di partecipazione degli utenti alle escursioni.
+  * [DigitalCredential.php](file:///c:/Users/Giovanni/Desktop/CoastTrak/app/Models/DigitalCredential.php): Certificazione di completamento tappe/cammini.
+* **`app/Http/Controllers/`**: Gestione del flusso logico:
+  * [OutingController.php](file:///c:/Users/Giovanni/Desktop/CoastTrak/app/Http/Controllers/OutingController.php) (Pubblico): Visualizzazione delle uscite disponibili.
+  * [UserOutingController.php](file:///c:/Users/Giovanni/Desktop/CoastTrak/app/Http/Controllers/UserOutingController.php): Proposta e creazione di uscite P2P.
+  * [ParticipationController.php](file:///c:/Users/Giovanni/Desktop/CoastTrak/app/Http/Controllers/ParticipationController.php): Richieste e cancellazioni di partecipazione.
+  * `Admin/`: Controller per il pannello amministratore (approvazione uscite, gestione guide e utenti).
+* **`routes/web.php`**: Definizione centralizzata di rotte pubbliche, protette e per amministratori.
+* **`resources/views/`**: Template Blade per le viste utente e amministratore.
+* **`database/migrations/` & `database/seeders/`**: Schema del database relazionale e popolamento dati di test.
+
+---
+
+## 💻 Installazione e Configurazione Locale
+
+Segui questi passaggi per avviare l'applicazione sul tuo server locale (es. tramite XAMPP o PHP CLI):
+
+### 1. Clonare il repository ed entrare nella cartella
 ```bash
-composer require laravel/boost --dev
-
-php artisan boost:install
+git clone https://github.com/giovagio04/CoastTrak.git
+cd CoastTrak
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+### 2. Configurare le dipendenze PHP
+Installa le dipendenze tramite Composer:
+```bash
+composer install
+```
 
-## Contributing
+### 3. Configurare l'ambiente (`.env`)
+Duplica il file di esempio `.env.example` creando il file `.env`:
+```bash
+cp .env.example .env
+```
+Apri il file `.env` ed inserisci le credenziali di connessione del tuo database locale (es. MySQL su XAMPP):
+```env
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=coasttrak
+DB_USERNAME=root
+DB_PASSWORD=
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### 4. Generare la chiave dell'applicazione e preparare il database
+Genera la chiave crittografica e applica le migrazioni popolando il database con i dati iniziali (Seeder):
+```bash
+php artisan key:generate
+php artisan migrate --seed
+```
 
-## Code of Conduct
+### 5. Configurare le dipendenze Frontend
+Installa i pacchetti NPM ed esegui la build degli asset:
+```bash
+npm install
+npm run build
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 6. Avviare il server di sviluppo
+Per avviare l'applicazione in modalità sviluppo (sia il server PHP che Vite):
+```bash
+npm run dev
+```
+In alternativa, puoi avviare manualmente il server Laravel con:
+```bash
+php artisan serve
+```
+L'applicazione sarà disponibile su `http://localhost:8000`.

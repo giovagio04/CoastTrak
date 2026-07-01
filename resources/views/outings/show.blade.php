@@ -62,7 +62,13 @@
                             @if($outing->type == 'official' && $outing->guide)
                                 <li class="mt-3"><i class="fa-solid fa-compass fa-fw text-info"></i> <strong>Guida Assegnata:</strong> {{ $outing->guide->name }}</li>
                             @elseif($outing->type == 'user' && $outing->organizer)
-                                <li class="mt-3"><i class="fa-solid fa-user-tie fa-fw text-info"></i> <strong>Organizzatore:</strong> {{ $outing->organizer->name }}</li>
+                                <li class="mt-3">
+                                    <i class="fa-solid fa-user-tie fa-fw text-info"></i> 
+                                    <strong>Organizzatore:</strong> {{ $outing->organizer->name }}
+                                    @if(auth()->check() && auth()->id() === $outing->organizer_id)
+                                        <span class="badge bg-secondary ms-1">Tu</span>
+                                    @endif
+                                </li>
                             @endif
                         </ul>
                     </div>

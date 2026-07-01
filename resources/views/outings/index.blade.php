@@ -41,6 +41,14 @@
                     
                     @if($outing->guide)
                         <p class="small text-muted mb-0"><i class="fa-solid fa-compass me-1"></i> Guida: {{ $outing->guide->name }}</p>
+                    @elseif($outing->organizer)
+                        <p class="small text-muted mb-0">
+                            <i class="fa-solid fa-user me-1"></i> 
+                            Organizzatore: {{ $outing->organizer->name }}
+                            @if(auth()->check() && auth()->id() === $outing->organizer_id)
+                                <span class="badge bg-secondary ms-1">Tu</span>
+                            @endif
+                        </p>
                     @endif
                 </div>
                 <div class="card-footer bg-white border-top-0 pb-4">

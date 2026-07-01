@@ -105,6 +105,11 @@
         
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link text-success-emphasis" href="{{ route('outings.index') }}">
+                        <i class="fa-solid fa-compass" style="color: #2e8b57;"></i> Esplora cammini
+                    </a>
+                </li>
             </ul>
             <ul class="navbar-nav">
                 @auth

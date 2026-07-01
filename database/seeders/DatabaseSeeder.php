@@ -39,6 +39,13 @@ class DatabaseSeeder extends Seeder
             'role' => 'user',
         ]);
 
+        $user3 = User::create([
+            'name' => 'Maria Bianchi',
+            'email' => 'maria@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'user',
+        ]);
+
         // 3. Tappe del cammino
         $stage1 = Stage::create([
             'number' => 1,
@@ -81,6 +88,7 @@ class DatabaseSeeder extends Seeder
         // 5. Uscite Ufficiali
         $outing1 = Outing::create([
             'type' => 'official',
+            'is_full_trail' => false,
             'start_location' => $stage1->start_point,
             'end_location' => $stage1->end_point,
             'guide_id' => $guide1->id,
@@ -94,6 +102,7 @@ class DatabaseSeeder extends Seeder
         // Uscita passata (conclusa)
         $outingPast = Outing::create([
             'type' => 'official',
+            'is_full_trail' => false,
             'start_location' => $stage1->start_point,
             'end_location' => $stage1->end_point,
             'guide_id' => $guide1->id,
@@ -118,9 +127,37 @@ class DatabaseSeeder extends Seeder
             'completed_at' => Carbon::now()->subDays(4)
         ]);
 
+        // Uscita completa passata (conclusa) per permettere a Maria di aver completato l'intero cammino
+        $outingFullPast = Outing::create([
+            'type' => 'official',
+            'is_full_trail' => true,
+            'start_location' => 'Soverato',
+            'end_location' => 'Pizzo',
+            'guide_id' => $guide1->id,
+            'date' => Carbon::now()->subDays(10),
+            'meeting_point' => 'Piazza di Soverato',
+            'max_participants' => 15,
+            'difficulty' => 'difficile',
+            'status' => 'concluded'
+        ]);
+
+        ParticipationRequest::create([
+            'outing_id' => $outingFullPast->id,
+            'user_id' => $user3->id,
+            'status' => 'accepted'
+        ]);
+
+        DigitalCredential::create([
+            'user_id' => $user3->id,
+            'stage_id' => null, // null indica il cammino completo
+            'outing_id' => $outingFullPast->id,
+            'completed_at' => Carbon::now()->subDays(9)
+        ]);
+
         // 7. Uscite tra utenti (create da user1 perché ha completato una tappa)
         $outingUser = Outing::create([
             'type' => 'user',
+            'is_full_trail' => false,
             'start_location' => $stage2->start_point,
             'end_location' => $stage2->end_point,
             'organizer_id' => $user1->id,

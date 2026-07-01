@@ -55,4 +55,38 @@ class UserController extends Controller
 
         return view('admin.users.show', compact('user'));
     }
+
+    /**
+     * Ban the specified user.
+     */
+    public function ban(Request $request, User $user)
+    {
+        if ($user->role === 'admin') {
+            return back()->with('error', 'Non è possibile bannare un amministratore.');
+        }
+
+        $request->validate([
+            'reason' => 'nullable|string|max:1000',
+        ]);
+
+        $user->update([
+            'is_banned' => true,
+            'ban_reason' => $request->reason,
+        ]);
+
+        return back()->with('success', 'Utente bannato con successo.');
+    }
+
+    /**
+     * Unban the specified user.
+     */
+    public function unban(User $user)
+    {
+        $user->update([
+            'is_banned' => false,
+            'ban_reason' => null,
+        ]);
+
+        return back()->with('success', 'Utente riabilitato con successo.');
+    }
 }

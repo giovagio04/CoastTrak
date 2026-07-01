@@ -10,6 +10,20 @@
     </div>
 </div>
 
+@if(session('success'))
+    <div class="alert alert-success alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+        <i class="fa-solid fa-circle-check me-2"></i> {{ session('success') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
+@if(session('error'))
+    <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0 mb-4" role="alert">
+        <i class="fa-solid fa-circle-exclamation me-2"></i> {{ session('error') }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+@endif
+
 <div class="row g-4">
     <!-- Colonna Sinistra: Info Profilo & Statistiche -->
     <div class="col-lg-4">
@@ -25,13 +39,22 @@
                 @endif
 
                 <h4 class="fw-bold mb-1">{{ $user->name }}</h4>
-                <div class="mb-3">
+                <div class="mb-2">
                     @if($user->role === 'admin')
                         <span class="badge bg-danger">Amministratore</span>
                     @else
                         <span class="badge bg-primary">Esploratore</span>
                     @endif
                 </div>
+
+                @if($user->is_banned)
+                    <div class="alert alert-danger p-2 mb-3 rounded-3 small">
+                        <div class="fw-bold text-danger mb-1"><i class="fa-solid fa-user-slash"></i> UTENTE BANNATO</div>
+                        <div class="text-dark text-start" style="font-size: 0.8rem;">
+                            <strong>Motivo:</strong> {{ $user->ban_reason ?? 'Nessun motivo specificato' }}
+                        </div>
+                    </div>
+                @endif
 
                 <hr class="my-3">
 
@@ -85,6 +108,22 @@
                         </p>
                     @endif
                 </div>
+
+                @if($user->role !== 'admin')
+                    <hr class="my-3">
+                    @if($user->is_banned)
+                        <form action="{{ route('admin.users.unban', $user->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="btn btn-success w-100 shadow-sm rounded-pill">
+                                <i class="fa-solid fa-unlock"></i> Sblocca Utente
+                            </button>
+                        </form>
+                    @else
+                        <button type="button" class="btn btn-danger w-100 shadow-sm rounded-pill" data-bs-toggle="modal" data-bs-target="#banModal">
+                            <i class="fa-solid fa-ban"></i> Banna Utente
+                        </button>
+                    @endif
+                @endif
             </div>
         </div>
     </div>
@@ -260,4 +299,35 @@
         </div>
     </div>
 </div>
+
+<!-- Modale Ban -->
+@if(!$user->is_banned && $user->role !== 'admin')
+<div class="modal fade" id="banModal" tabindex="-1" aria-labelledby="banModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold text-danger" id="banModalLabel"><i class="fa-solid fa-ban"></i> Banna Utente</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('admin.users.ban', $user->id) }}" method="POST">
+                @csrf
+                <div class="modal-body text-start">
+                    <p class="mb-3">Sei sicuro di voler bloccare l'accesso al sito per l'utente <strong>{{ $user->name }}</strong>? Questa operazione gli impedirà di effettuare il login e visualizzare i cammini.</p>
+                    <div class="mb-3">
+                        <label for="reason" class="form-label fw-bold">Motivazione del Ban (Verrà mostrata all'utente):</label>
+                        <textarea class="form-control" id="reason" name="reason" rows="3" placeholder="Scrivi il motivo del blocco (es. comportamento non appropriato)..." required></textarea>
+                    </div>
+                    <div class="alert alert-warning small py-2 mb-0">
+                        <i class="fa-solid fa-triangle-exclamation"></i> L'utente verrà disconnesso immediatamente da tutte le sue sessioni attive.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button type="submit" class="btn btn-danger">Conferma ed Esegui Ban</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
 @endsection

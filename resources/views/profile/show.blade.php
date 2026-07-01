@@ -21,6 +21,7 @@
     <!-- Riquadro Sinistro: Informazioni Profilo (col-md-8) -->
     <div class="col-md-8">
         <div class="card shadow-sm border-0 h-100 position-relative">
+            @if($user->id === auth()->id())
             <!-- Pennino e Ingranaggio in alto a sinistra -->
             <div class="position-absolute top-0 start-0 m-3 d-flex gap-2">
                 <a href="#" class="text-muted hover-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal" title="Modifica Profilo" style="transition: color 0.2s;">
@@ -30,6 +31,7 @@
                     <i class="fa-solid fa-gear fa-lg text-secondary"></i>
                 </a>
             </div>
+            @endif
             
             <div class="card-body p-4">
                 <div class="row align-items-center mb-4 mt-3">
@@ -90,16 +92,20 @@
                     </div>
                 </div>
 
-                @if($user->canCreateOuting())
+                @if($user->id === auth()->id() && $user->canCreateOuting())
                     <hr>
                     <p class="small text-success fw-bold"><i class="fa-solid fa-check-circle"></i> Hai completato il cammino! Puoi proporre uscite tra utenti.</p>
                     <a href="{{ route('user.outings.create') }}" class="btn btn-success w-100 mt-2">Proponi un'uscita</a>
+                @elseif($user->canCreateOuting())
+                    <hr>
+                    <p class="small text-success fw-bold"><i class="fa-solid fa-check-circle"></i> Questo utente ha completato il cammino e può proporre uscite.</p>
                 @endif
             </div>
         </div>
     </div>
 </div>
 
+@if($user->id === auth()->id())
 <!-- Modal di Modifica Profilo -->
 <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -314,9 +320,11 @@
         </div>
     </div>
 </div>
+@endif
 
 @section('scripts')
 <script>
+@if($user->id === auth()->id())
     document.addEventListener('DOMContentLoaded', function () {
         // Gestione apertura automatica dei modal in caso di errori Laravel
         @if($errors->userDeletion->isNotEmpty())
@@ -466,6 +474,7 @@
             });
         }
     });
+@endif
 </script>
 @endsection
 

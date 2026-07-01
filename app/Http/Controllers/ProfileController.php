@@ -21,6 +21,16 @@ class ProfileController extends Controller
         ]);
     }
 
+    /**
+     * Display the specified user's profile.
+     */
+    public function showUser(\App\Models\User $user): View
+    {
+        return view('profile.show', [
+            'user' => $user,
+        ]);
+    }
+
 
 
     /**

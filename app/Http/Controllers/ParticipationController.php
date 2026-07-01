@@ -56,4 +56,48 @@ class ParticipationController extends Controller
 
         return back()->with('success', 'Partecipazione annullata con successo.');
     }
+
+    public function approve(ParticipationRequest $participation)
+    {
+        $outing = $participation->outing;
+
+        // Verifica che l'utente corrente sia l'organizzatore dell'uscita
+        if ($outing->organizer_id !== auth()->id()) {
+            abort(403, 'Azione non autorizzata. Solo l\'organizzatore può approvare le richieste.');
+        }
+
+        // Verifica lo stato della richiesta
+        if ($participation->status !== 'pending') {
+            return back()->with('error', 'Questa richiesta è già stata elaborata.');
+        }
+
+        // Controllo posti disponibili (contiamo solo gli accettati)
+        $acceptedCount = $outing->participationRequests()->where('status', 'accepted')->count();
+        if ($acceptedCount >= $outing->max_participants) {
+            return back()->with('error', 'Impossibile approvare: l\'uscita ha raggiunto il numero massimo di partecipanti.');
+        }
+
+        $participation->update(['status' => 'accepted']);
+
+        return back()->with('success', 'Richiesta di partecipazione approvata con successo!');
+    }
+
+    public function reject(ParticipationRequest $participation)
+    {
+        $outing = $participation->outing;
+
+        // Verifica che l'utente corrente sia l'organizzatore dell'uscita
+        if ($outing->organizer_id !== auth()->id()) {
+            abort(403, 'Azione non autorizzata. Solo l\'organizzatore può rifiutare le richieste.');
+        }
+
+        // Verifica lo stato della richiesta
+        if ($participation->status !== 'pending') {
+            return back()->with('error', 'Questa richiesta è già stata elaborata.');
+        }
+
+        $participation->update(['status' => 'rejected']);
+
+        return back()->with('success', 'Richiesta di partecipazione rifiutata.');
+    }
 }

@@ -25,8 +25,11 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     Route::post('/outings/{outing}/participate', [\App\Http\Controllers\ParticipationController::class, 'store'])->name('participations.store');
     Route::delete('/participations/{participation}', [\App\Http\Controllers\ParticipationController::class, 'destroy'])->name('participations.destroy');
+    Route::post('/participations/{participation}/approve', [\App\Http\Controllers\ParticipationController::class, 'approve'])->name('participations.approve');
+    Route::post('/participations/{participation}/reject', [\App\Http\Controllers\ParticipationController::class, 'reject'])->name('participations.reject');
 
     Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
+    Route::get('/profiles/{user}', [ProfileController::class, 'showUser'])->name('profiles.show');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 

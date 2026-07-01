@@ -82,6 +82,45 @@
                 @endif
             </div>
         </div>
+
+        @if(auth()->check() && $outing->organizer_id === auth()->id() && $outing->type === 'user')
+            @php
+                $pendingRequests = $outing->participationRequests->where('status', 'pending');
+            @endphp
+
+            @if($pendingRequests->isNotEmpty())
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-4"><i class="fa-solid fa-users-gear text-primary me-2"></i>Gestione Richieste di Partecipazione</h5>
+                        <h6 class="fw-bold text-warning mb-3">Richieste in attesa ({{ $pendingRequests->count() }})</h6>
+                        <div class="list-group mb-0">
+                            @foreach($pendingRequests as $req)
+                                <div class="list-group-item list-group-item-action d-flex justify-content-between align-items-center border-0 border-bottom px-0 py-3">
+                                    <div>
+                                        <div class="fw-bold text-dark">{{ $req->user->name }}</div>
+                                        <small class="text-muted">{{ $req->user->email }}</small>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <form action="{{ route('participations.approve', $req->id) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-success rounded-pill px-3">
+                                                <i class="fa-solid fa-check me-1"></i> Accetta
+                                            </button>
+                                        </form>
+                                        <form action="{{ route('participations.reject', $req->id) }}" method="POST">
+                                            @csrf
+                                            <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3">
+                                                <i class="fa-solid fa-xmark me-1"></i> Rifiuta
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @endif
+        @endif
     </div>
 
     <div class="col-lg-4">
@@ -129,6 +168,41 @@
                     <a href="{{ route('login') }}" class="btn btn-outline-primary w-100 mb-2">Accedi</a>
                     <a href="{{ route('register') }}" class="btn btn-outline-secondary w-100">Registrati</a>
                 @endif
+        </div>
+    </div>
+
+    {{-- Nuova card: Partecipanti Iscritti --}}
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-body p-4">
+            <h5 class="fw-bold mb-3"><i class="fa-solid fa-users text-success me-2"></i>Partecipanti Iscritti</h5>
+            
+            @php
+                $acceptedParticipants = $outing->participationRequests->where('status', 'accepted');
+            @endphp
+
+            @if($acceptedParticipants->isEmpty())
+                <p class="text-muted mb-0 small">Nessun partecipante iscritto al momento.</p>
+            @else
+                <ul class="list-group list-group-flush mb-0">
+                    @foreach($acceptedParticipants as $req)
+                        <li class="list-group-item px-0 py-2 d-flex align-items-center justify-content-between border-0 @if(!$loop->last) border-bottom @endif">
+                            <div class="d-flex align-items-center">
+                                <i class="fa-solid fa-circle-user text-secondary me-2 fs-5"></i>
+                                @if(auth()->check())
+                                    <a href="{{ route('profiles.show', $req->user->id) }}" class="text-decoration-none fw-bold text-dark" onmouseover="this.style.color='#0d6efd'" onmouseout="this.style.color='#212529'" style="transition: color 0.2s;">
+                                        {{ $req->user->name }}
+                                    </a>
+                                @else
+                                    <span class="fw-bold text-dark">{{ $req->user->name }}</span>
+                                @endif
+                            </div>
+                            @if($req->user_id === $outing->organizer_id)
+                                <span class="badge bg-info text-white small" style="font-size: 0.7rem;">Organizzatore</span>
+                            @endif
+                        </li>
+                    @endforeach
+                </ul>
+            @endif
         </div>
     </div>
 </div>

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoastTrack - Cammino Kalabria Coast to Coast</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #f8f9fa;
+        }
+        
+        /* Navbar styling */
+        .navbar {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            padding: 15px 0;
+        }
+        .navbar-brand { 
+            font-weight: 800; 
+            color: #1a1a1a !important; 
+            font-size: 1.5rem;
+        }
+        .nav-link {
+            font-weight: 600;
+            color: #333 !important;
+            transition: color 0.3s;
+            margin-left: 15px;
+        }
+        .nav-link:hover {
+            color: #ff6b35 !important;
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 100vh;
+            min-height: 600px;
+            display: flex;
+            align-items: center;
+            color: white;
+            overflow: hidden;
+        }
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('{{ asset('img/hero.png') }}');
+            background-size: cover;
+            background-position: center;
+            z-index: 1;
+            transform: scale(1.05);
+            animation: breathe 20s infinite alternate ease-in-out;
+        }
+        @keyframes breathe {
+            0% { transform: scale(1.0); }
+            100% { transform: scale(1.1); }
+        }
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(0, 76, 140, 0.7) 0%, rgba(46, 139, 87, 0.4) 100%);
+            z-index: 2;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 3;
+            text-align: center;
+            margin-top: 50px;
+        }
+        .hero-title {
+            font-size: 5rem;
+            font-weight: 800;
+            text-shadow: 2px 2px 15px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+            line-height: 1.1;
+        }
+        .hero-subtitle {
+            font-size: 1.5rem;
+            font-weight: 300;
+            text-shadow: 1px 1px 10px rgba(0,0,0,0.5);
+            margin-bottom: 40px;
+        }
+        
+        /* Buttons */
+        .btn-custom {
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .btn-primary-custom {
+            background-color: #ff6b35;
+            color: white;
+            border: none;
+            box-shadow: 0 10px 20px rgba(255, 107, 53, 0.3);
+        }
+        .btn-primary-custom:hover {
+            background-color: #e55a2b;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 25px rgba(255, 107, 53, 0.4);
+        }
+        .btn-outline-custom {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border: 2px solid white;
+            backdrop-filter: blur(5px);
+        }
+        .btn-outline-custom:hover {
+            background-color: white;
+            color: #004c8c;
+            transform: translateY(-3px);
+        }
+
+        /* Feature Section */
+        .feature-section {
+            padding: 120px 0;
+            background-color: #f8f9fa;
+        }
+        .feature-card {
+            border: none;
+            border-radius: 20px;
+            overflow: hidden;
+            background: white;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
+            transition: all 0.4s ease;
+            height: 100%;
+        }
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 45px rgba(0,0,0,0.1);
+        }
+        .feature-icon {
+            font-size: 3.5rem;
+            color: #2e8b57;
+            margin-bottom: 20px;
+        }
+        
+        /* Split Section */
+        .split-section {
+            display: flex;
+            align-items: stretch;
+            background-color: #004c8c;
+            color: white;
+            padding: 0;
+            overflow: hidden;
+        }
+        .split-image {
+            background-image: url('{{ asset('img/hikers.png') }}');
+            background-size: cover;
+            background-position: center;
+            min-height: 600px;
+        }
+        .split-content {
+            padding: 100px 80px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .footer {
+            background-color: #1a1a1a;
+            color: #f8f9fa;
+            padding: 60px 0 30px;
+        }
+        
+        /* Animations */
+        .fade-up {
+            animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: translateY(40px);
+        }
+        .delay-1 { animation-delay: 0.2s; }
+        .delay-2 { animation-delay: 0.4s; }
+        .delay-3 { animation-delay: 0.6s; }
+        
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mobile tweaks */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 3rem; }
+            .split-content { padding: 50px 30px; }
+            .split-image { min-height: 300px; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg fixed-top shadow-sm">
+    <div class="container">
+        <a class="navbar-brand" href="{{ url('/') }}">
+            <i class="fa-solid fa-person-hiking" style="color: #2e8b57;"></i> CoastTrack
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+            </ul>
+            <ul class="navbar-nav">
+                @auth
+                    @if(auth()->user()->role === 'admin')
+                        <li class="nav-item">
+                            <a class="nav-link text-danger" href="{{ route('admin.outings.index') }}">Gestione Uscite</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-danger" href="{{ route('admin.users.index') }}">Gestione Utenti</a>
+                        </li>
+                        <li class="nav-item d-flex align-items-center ms-2">
+                            <form method="POST" action="{{ route('logout') }}" class="m-0">
+                                @csrf
+                                <button type="submit" class="btn btn-outline-danger btn-sm px-3">
+                                    Esci
+                                </button>
+                            </form>
+                        </li>
+                    @else
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ route('dashboard') }}">Area Personale</a>
+                        </li>
+                    @endif
+                @else
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('login') }}">Accedi</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('register') }}">Registrati</a>
+                    </li>
+                @endauth
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-overlay"></div>
+    <div class="container hero-content">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <h1 class="hero-title fade-up">Dal Mar Ionio<br>al Mar Tirreno</h1>
+                <p class="hero-subtitle fade-up delay-1">Unisciti al Cammino Kalabria Coast to Coast. Scopri la natura incontaminata, i borghi antichi e i sapori autentici del Mediterraneo.</p>
+                <div class="d-flex justify-content-center flex-wrap gap-3 fade-up delay-2">
+                    <a href="{{ route('outings.index') }}" class="btn btn-custom btn-primary-custom">Trova un'escursione</a>
+                    @guest
+                        <a href="{{ route('register') }}" class="btn btn-custom btn-outline-custom">Unisciti alla Community</a>
+                    @endguest
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="feature-section">
+    <div class="container">
+        <div class="text-center mb-5 fade-up">
+            <h2 class="display-5 fw-bold" style="color: #004c8c;">Vivi la Calabria a passo lento</h2>
+            <p class="lead text-muted mt-3">Un'app pensata per connettere amanti della natura e del trekking sul cammino più bello del sud Italia.</p>
+        </div>
+        
+        <div class="row g-4 mt-4">
+            <div class="col-md-4 fade-up delay-1">
+                <div class="card feature-card p-4 text-center">
+                    <div class="card-body">
+                        <i class="fa-solid fa-route feature-icon"></i>
+                        <h4 class="fw-bold mt-3">3 Tappe Mozzafiato</h4>
+                        <p class="text-muted mt-3">Da Soverato a Pizzo Calabro, 55 km di pura bellezza attraversando le montagne rigogliose delle Serre calabre.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 fade-up delay-2">
+                <div class="card feature-card p-4 text-center">
+                    <div class="card-body">
+                        <i class="fa-solid fa-compass feature-icon" style="color: #ff6b35;"></i>
+                        <h4 class="fw-bold mt-3">Uscite Ufficiali</h4>
+                        <p class="text-muted mt-3">Partecipa a escursioni sicure organizzate dall'amministrazione e guidate da esperti qualificati del territorio.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 fade-up delay-3">
+                <div class="card feature-card p-4 text-center">
+                    <div class="card-body">
+                        <i class="fa-solid fa-users-viewfinder feature-icon" style="color: #004c8c;"></i>
+                        <h4 class="fw-bold mt-3">Community Attiva</h4>
+                        <p class="text-muted mt-3">Completa le tappe, ottieni la Credenziale Digitale e proponi le tue uscite auto-organizzate agli altri esploratori.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="container-fluid p-0">
+    <div class="row g-0 split-section">
+        <div class="col-lg-6 split-content">
+            <h2 class="display-4 fw-bold mb-4">La tua prossima avventura inizia qui</h2>
+            <p class="lead mb-4" style="color: rgba(255,255,255,0.9);">CoastTrack non è solo un'app, è la porta d'accesso a un'esperienza trasformativa. Che tu sia un escursionista esperto o un principiante, troverai l'uscita giusta per te.</p>
+            <ul class="list-unstyled fs-5 mb-5" style="color: rgba(255,255,255,0.9);">
+                <li class="mb-3"><i class="fa-solid fa-check text-success me-3"></i> Gestione semplice delle prenotazioni</li>
+                <li class="mb-3"><i class="fa-solid fa-check text-success me-3"></i> Dashboard personale con storico tappe</li>
+                <li class="mb-3"><i class="fa-solid fa-check text-success me-3"></i> Accesso alle proposte "Tra Utenti"</li>
+            </ul>
+            <div>
+                <a href="{{ route('outings.index') }}" class="btn btn-custom btn-primary-custom px-5">Inizia a Esplorare</a>
+            </div>
+        </div>
+        <div class="col-lg-6 split-image"></div>
+    </div>
+</section>
+
+<footer class="footer">
+    <div class="container text-center">
+        <h3 class="fw-bold mb-3"><i class="fa-solid fa-person-hiking" style="color: #2e8b57;"></i> CoastTrack</h3>
+        <p class="text-muted mb-1">&copy; {{ date('Y') }} Progetto Universitario di Programmazione Web.</p>
+        <p class="text-muted small">Ispirato al vero Cammino Kalabria Coast to Coast.</p>
+    </div>
+</footer>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

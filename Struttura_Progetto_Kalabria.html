@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Struttura Completa del Progetto - Kalabria Coast to Coast</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px;
+            background-color: #f0f4f8;
+        }
+        .container {
+            background-color: #fff;
+            padding: 40px 50px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        h2 {
+            color: #2980b9;
+            margin-top: 40px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+        }
+        .intro {
+            font-size: 1.1em;
+            color: #555;
+            margin-bottom: 30px;
+            text-align: justify;
+        }
+        
+        /* Legenda */
+        .legend {
+            background: #fdfdfd;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+        }
+        .badge-custom {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            border: 1px solid #c3e6cb;
+        }
+        .badge-framework {
+            background-color: #e2e3e5;
+            color: #383d41;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+            border: 1px solid #d6d8db;
+        }
+
+        /* Albero delle directory */
+        .tree-container {
+            background: #2d3436;
+            color: #dfe6e9;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.95em;
+            line-height: 1.8;
+            overflow-x: auto;
+            margin-bottom: 40px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+        }
+        .tree-custom { color: #55efc4; font-weight: bold; } /* Verde chiaro per codice nostro */
+        .tree-framework { color: #b2bec3; } /* Grigio per framework */
+        
+        /* Sezioni dettagliate */
+        .folder {
+            margin-bottom: 25px;
+            background: #fff;
+            border-left: 5px solid #3498db;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            border-top: 1px solid #f1f1f1;
+            border-right: 1px solid #f1f1f1;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        .folder.is-custom {
+            border-left-color: #27ae60;
+            background-color: #fafffb;
+        }
+        .folder.is-framework {
+            border-left-color: #95a5a6;
+        }
+        
+        .folder-name {
+            font-weight: bold;
+            font-size: 1.3em;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .file-name { font-weight: bold; color: #e67e22; }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 8px; }
+        .highlight {
+            background-color: #f1f8ff;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+            color: #d35400;
+        }
+
+        @media print {
+            body { background-color: #fff; padding: 0; }
+            .container { box-shadow: none; padding: 0; }
+            .folder, .tree-container { break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Struttura del Sottoalbero del Progetto<br><small style="font-size: 0.6em; color: #7f8c8d;">Kalabria Coast to Coast</small></h1>
+        
+        <div class="intro">
+            Questa relazione mappa in modo dettagliato l'intero sottoalbero (struttura delle directory) dell'applicazione web <strong>Kalabria Coast to Coast</strong> sviluppata in Laravel. 
+            Per facilitare la comprensione in sede di esame, è stata fatta una distinzione visiva fondamentale: le directory evidenziate rappresentano il <strong>codice sorgente scritto da noi</strong> (logica di business, interfacce, rotte, database), distinguendole nettamente dalle directory gestite automaticamente dal <strong>framework e dai pacchetti esterni</strong>.
+        </div>
+
+        <div class="legend">
+            <div><span class="badge-custom">Codice del Progetto</span> Sviluppato e manutenuto da noi</div>
+            <div><span class="badge-framework">Codice del Framework</span> Gestito da Laravel / Composer / NPM</div>
+        </div>
+
+        <h2>Mappatura dell'Albero (Directory Tree)</h2>
+        <div class="tree-container">
+kalabria-coast-to-coast/
+├── <span class="tree-custom">app/</span>                  <span style="color:#636e72;">// Logica di business (Nostro Codice)</span>
+│   ├── <span class="tree-custom">Http/</span>
+│   │   ├── <span class="tree-custom">Controllers/</span>    <span style="color:#636e72;">// Controller (es. Admin/OutingController.php)</span>
+│   │   └── <span class="tree-custom">Middleware/</span>     <span style="color:#636e72;">// Filtri di sicurezza e ruoli</span>
+│   ├── <span class="tree-custom">Models/</span>           <span style="color:#636e72;">// Modelli Database (User, Outing, ecc.)</span>
+│   └── <span class="tree-framework">Providers/</span>        <span style="color:#636e72;">// File di bootstrap interni di Laravel</span>
+├── <span class="tree-framework">bootstrap/</span>            <span style="color:#636e72;">// Script di avvio automatico del Framework</span>
+│   └── <span class="tree-framework">cache/</span>            <span style="color:#636e72;">// File temporanei di ottimizzazione NON TOCCARE</span>
+├── <span class="tree-custom">config/</span>               <span style="color:#636e72;">// File di configurazione (Parzialmente nostri)</span>
+├── <span class="tree-custom">database/</span>             <span style="color:#636e72;">// Struttura dei Dati (Nostro Codice)</span>
+│   ├── <span class="tree-framework">factories/</span>        <span style="color:#636e72;">// Generatori automatici (Misti)</span>
+│   ├── <span class="tree-custom">migrations/</span>       <span style="color:#636e72;">// Schemi delle tabelle del DB</span>
+│   └── <span class="tree-custom">seeders/</span>          <span style="color:#636e72;">// Dati iniziali inseriti da noi nel DB</span>
+├── <span class="tree-framework">node_modules/</span>         <span style="color:#636e72;">// Librerie Javascript NPM NON TOCCARE</span>
+├── <span class="tree-custom">public/</span>               <span style="color:#636e72;">// Punto di accesso web</span>
+│   ├── <span class="tree-custom">css/ & js/ & img/</span> <span style="color:#636e72;">// Nostri file statici e immagini</span>
+│   └── <span class="tree-framework">index.php</span>         <span style="color:#636e72;">// Front controller di Laravel</span>
+├── <span class="tree-custom">resources/</span>            <span style="color:#636e72;">// Interfaccia Grafica (Nostro Codice)</span>
+│   ├── <span class="tree-custom">css/ & js/</span>        <span style="color:#636e72;">// Sorgenti non compilati</span>
+│   └── <span class="tree-custom">views/</span>            <span style="color:#636e72;">// I nostri template Blade (HTML)</span>
+│       ├── <span class="tree-custom">admin/</span>        <span style="color:#636e72;">// Viste pannello amministratore</span>
+│       ├── <span class="tree-custom">outings/</span>      <span style="color:#636e72;">// Viste uscite (lista e dettagli)</span>
+│       └── <span class="tree-custom">profile/</span>      <span style="color:#636e72;">// Viste area personale utente</span>
+├── <span class="tree-custom">routes/</span>               <span style="color:#636e72;">// Indirizzamento web (Nostro Codice)</span>
+│   ├── <span class="tree-custom">web.php</span>           <span style="color:#636e72;">// Tutte le URL scritte e gestite da noi</span>
+│   └── <span class="tree-framework">api.php / console.php</span>
+├── <span class="tree-framework">storage/</span>              <span style="color:#636e72;">// Discarica operativa del Framework NON TOCCARE</span>
+│   ├── <span class="tree-framework">app/</span>              <span style="color:#636e72;">// Upload utenti</span>
+│   ├── <span class="tree-framework">framework/</span>        <span style="color:#636e72;">// Sessioni e Viste compilate in PHP</span>
+│   └── <span class="tree-framework">logs/</span>             <span style="color:#636e72;">// Log degli errori</span>
+├── <span class="tree-framework">vendor/</span>               <span style="color:#636e72;">// Sorgenti Laravel e librerie Composer NON TOCCARE</span>
+└── <span class="tree-custom">.env</span>                  <span style="color:#636e72;">// Le nostre credenziali segrete locali (Database ecc.)</span>
+        </div>
+
+        <h2>Dettaglio delle Directory di Progetto <span class="badge-custom" style="font-size: 0.5em; vertical-align: middle;">Codice del Progetto</span></h2>
+        
+        <div class="folder is-custom">
+            <div class="folder-name">📁 app/ <span class="badge-custom">100% Nostro</span></div>
+            <p>È il cervello dell'applicazione. Qui abbiamo scritto tutta la logica che fa funzionare Kalabria Coast to Coast.</p>
+            <ul>
+                <li><span class="file-name">Http/Controllers/</span>: Contiene i "direttori d'orchestra". Abbiamo creato ad esempio <span class="highlight">OutingController</span> per salvare e rifiutare uscite, e <span class="highlight">ParticipationController</span> per gestire le iscrizioni.</li>
+                <li><span class="file-name">Models/</span>: Contiene le classi che dialogano col database usando Eloquent ORM. Abbiamo creato i modelli <span class="highlight">User</span>, <span class="highlight">Outing</span>, <span class="highlight">ParticipationRequest</span> e <span class="highlight">DigitalCredential</span>, definendo le loro relazioni esatte (es. <code>$outing->participationRequests()</code>).</li>
+            </ul>
+        </div>
+
+        <div class="folder is-custom">
+            <div class="folder-name">📁 resources/views/ <span class="badge-custom">100% Nostro</span></div>
+            <p>Qui risiede l'intera interfaccia grafica sviluppata su misura per l'utente, utilizzando HTML, Bootstrap 5 e la sintassi Blade di Laravel.</p>
+            <ul>
+                <li>Sottocartelle principali: <span class="highlight">admin/</span> (gestione uscite e guide), <span class="highlight">outings/</span> (catalogo uscite pubbliche, pulsanti di iscrizione), <span class="highlight">profile/</span> (dashboard utente, storico partecipazioni e gamification dei trofei).</li>
+            </ul>
+        </div>
+
+        <div class="folder is-custom">
+            <div class="folder-name">📁 database/ <span class="badge-custom">100% Nostro</span></div>
+            <p>Non contiene il database fisico, ma le "istruzioni" per costruirlo in modo programmatico.</p>
+            <ul>
+                <li><span class="file-name">migrations/</span>: Contiene i file creati da noi per costruire tabelle e colonne. Grazie a questi file, l'intero database può essere generato da zero su qualsiasi PC con un solo comando.</li>
+                <li><span class="file-name">seeders/</span>: Script scritti da noi per inserire utenti fittizi, le guide ufficiali e i dati di prova (come l'utente mario@example.com) per testare l'app.</li>
+            </ul>
+        </div>
+
+        <div class="folder is-custom">
+            <div class="folder-name">📁 routes/ <span class="badge-custom">100% Nostro</span></div>
+            <p>Il centralino dell'applicazione. Nel file <span class="file-name">web.php</span> abbiamo definito a mano ogni singolo URL visitabile dagli utenti e specificato quali rotte sono protette (visibili solo all'admin o solo agli utenti loggati tramite middleware).</p>
+        </div>
+
+
+        <h2>Dettaglio delle Directory di Supporto <span class="badge-framework" style="font-size: 0.5em; vertical-align: middle;">Codice del Framework</span></h2>
+        
+        <div class="folder is-framework">
+            <div class="folder-name">📁 vendor/ e node_modules/ <span class="badge-framework">Intoccabili</span></div>
+            <p>Contengono rispettivamente tutto il codice PHP di Laravel (gestito tramite Composer) e le librerie Javascript (gestite tramite NPM). Qualsiasi modifica manuale in queste directory andrebbe persa al primo aggiornamento software. Sono il "motore" nascosto che esegue il nostro codice.</p>
+        </div>
+
+        <div class="folder is-framework">
+            <div class="folder-name">📁 storage/ e bootstrap/cache/ <span class="badge-framework">Generati dal server</span></div>
+            <p>Cartelle dinamiche usate dal server per salvare file temporanei, compilare le viste Blade in PHP nativo (per massimizzare la velocità) e conservare i log di sistema in caso di errori (es. <code>storage/logs/laravel.log</code>). Anche queste directory non devono essere manipolate direttamente dallo sviluppatore.</p>
+        </div>
+
+    </div>
+
+    <!-- Script per la stampa automatica -->
+    <script>
+        window.onload = function() {
+            setTimeout(function() {
+                window.print();
+            }, 500);
+        };
+    </script>
+</body>
+</html>

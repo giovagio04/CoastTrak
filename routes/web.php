@@ -34,6 +34,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/user/outings/create', [\App\Http\Controllers\UserOutingController::class, 'create'])->name('user.outings.create');
     Route::post('/user/outings', [\App\Http\Controllers\UserOutingController::class, 'store'])->name('user.outings.store');
     Route::post('/user/outings/{outing}/cancel', [\App\Http\Controllers\UserOutingController::class, 'cancel'])->name('user.outings.cancel');
+
+    // Notifiche
+    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+    Route::post('/notifications/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('notifications.markAllAsRead');
 });
 
 // Rotte Admin

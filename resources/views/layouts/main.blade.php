@@ -137,7 +137,7 @@
                             <a class="nav-link" href="{{ route('dashboard') }}">Gestione Uscite</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-primary" href="{{ route('profile.edit') }}"><i class="fa-solid fa-user"></i> Area Personale</a>
+                            <a class="nav-link text-primary" href="{{ route('profile.show') }}"><i class="fa-solid fa-user"></i> Area Personale</a>
                         </li>
                         <li class="nav-item d-flex align-items-center ms-2">
                             <form method="POST" action="{{ route('logout') }}" class="m-0">

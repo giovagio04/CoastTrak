@@ -12,14 +12,16 @@ use Illuminate\View\View;
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile form.
+     * Display the user's profile dashboard (read-only).
      */
-    public function edit(Request $request): View
+    public function show(Request $request): View
     {
-        return view('profile.edit', [
+        return view('profile.show', [
             'user' => $request->user(),
         ]);
     }
+
+
 
     /**
      * Update the user's profile information.
@@ -46,7 +48,7 @@ class ProfileController extends Controller
 
         $user->save();
 
-        return Redirect::route('profile.edit')->with('status', 'profile-updated');
+        return Redirect::route('profile.show')->with('status', 'profile-updated');
     }
 
     /**

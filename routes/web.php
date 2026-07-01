@@ -26,7 +26,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/outings/{outing}/participate', [\App\Http\Controllers\ParticipationController::class, 'store'])->name('participations.store');
     Route::delete('/participations/{participation}', [\App\Http\Controllers\ParticipationController::class, 'destroy'])->name('participations.destroy');
 
-    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile', [ProfileController::class, 'show'])->name('profile.show');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 

@@ -104,7 +104,7 @@
 <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow">
-            <form method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data">
+            <form id="editProfileForm" method="post" action="{{ route('profile.update') }}" enctype="multipart/form-data">
                 @csrf
                 @method('patch')
                 <input type="hidden" name="email" value="{{ $user->email }}">
@@ -128,9 +128,13 @@
                             <div class="mb-3">
                                 <label for="profile_photo" class="form-label fw-bold">Immagine Profilo</label>
                                 <input class="form-control form-control-sm @error('profile_photo') is-invalid @enderror" id="profile_photo" name="profile_photo" type="file" accept="image/*">
-                                @error('profile_photo')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <div class="invalid-feedback" id="profile_photo-feedback">
+                                    @error('profile_photo')
+                                        {{ $message }}
+                                    @else
+                                        Seleziona un'immagine valida (JPEG, PNG, GIF, WEBP) di dimensione massima 2MB.
+                                    @enderror
+                                </div>
                             </div>
                         </div>
                         
@@ -138,28 +142,40 @@
                         <div class="col-md-8">
                             <div class="mb-3">
                                 <label for="name" class="form-label fw-bold">Nome e Cognome</label>
-                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $user->name) }}" required>
-                                @error('name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', $user->name) }}" required minlength="3" maxlength="255" pattern="^[A-Za-zÀ-ÖØ-öø-ÿ\s'\-]+$" title="Il nome e cognome deve contenere solo lettere, spazi, apostrofi o trattini.">
+                                <div class="invalid-feedback" id="name-feedback">
+                                    @error('name')
+                                        {{ $message }}
+                                    @else
+                                        Il nome e cognome deve essere valido (solo lettere, spazi, apostrofi o trattini, min 3 caratteri).
+                                    @enderror
+                                </div>
                             </div>
                             
                             <div class="mb-3">
                                 <label for="date_of_birth" class="form-label fw-bold">Data di Nascita</label>
-                                <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror" id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth', $user->date_of_birth) }}">
-                                @error('date_of_birth')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror" id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth', $user->date_of_birth) }}" min="1900-01-01" max="{{ date('Y-m-d') }}">
+                                <div class="invalid-feedback" id="date_of_birth-feedback">
+                                    @error('date_of_birth')
+                                        {{ $message }}
+                                    @else
+                                        La data di nascita deve essere compresa tra il 01/01/1900 e oggi.
+                                    @enderror
+                                </div>
                             </div>
                         </div>
                     </div>
                     
                     <div class="mb-3 mt-3">
                         <label for="bio" class="form-label fw-bold">Descrizione (Bio)</label>
-                        <textarea class="form-control @error('bio') is-invalid @enderror" id="bio" name="bio" rows="4" placeholder="Scrivi qualcosa su di te, sulle tue passioni per il trekking, ecc...">{{ old('bio', $user->bio) }}</textarea>
-                        @error('bio')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
+                        <textarea class="form-control @error('bio') is-invalid @enderror" id="bio" name="bio" rows="4" maxlength="1000" placeholder="Scrivi qualcosa su di te, sulle tue passioni per il trekking, ecc...">{{ old('bio', $user->bio) }}</textarea>
+                        <div class="invalid-feedback" id="bio-feedback">
+                            @error('bio')
+                                {{ $message }}
+                            @else
+                                La descrizione non può superare i 1000 caratteri.
+                            @enderror
+                        </div>
                     </div>
                 </div>
                 
@@ -299,48 +315,158 @@
     </div>
 </div>
 
-@if($errors->userDeletion->isNotEmpty())
-    @section('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
+@section('scripts')
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Gestione apertura automatica dei modal in caso di errori Laravel
+        @if($errors->userDeletion->isNotEmpty())
             var myModal = new bootstrap.Modal(document.getElementById('deleteAccountModal'));
             myModal.show();
-        });
-    </script>
-    @endsection
-@elseif($errors->updatePassword->isNotEmpty())
-    @section('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        @elseif($errors->updatePassword->isNotEmpty())
             var myModal = new bootstrap.Modal(document.getElementById('accountSettingsModal'));
             myModal.show();
             var tabEl = document.querySelector('#password-tab');
             var tab = new bootstrap.Tab(tabEl);
             tab.show();
-        });
-    </script>
-    @endsection
-@elseif($errors->has('email'))
-    @section('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        @elseif($errors->has('email'))
             var myModal = new bootstrap.Modal(document.getElementById('accountSettingsModal'));
             myModal.show();
             var tabEl = document.querySelector('#email-tab');
             var tab = new bootstrap.Tab(tabEl);
             tab.show();
-        });
-    </script>
-    @endsection
-@elseif($errors->any())
-    @section('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
+        @elseif($errors->any())
             var myModal = new bootstrap.Modal(document.getElementById('editProfileModal'));
             myModal.show();
-        });
-    </script>
-    @endsection
-@endif
+        @endif
+
+        // Validazione Client-Side del Modulo Modifica Profilo
+        const editProfileForm = document.getElementById('editProfileForm');
+        if (editProfileForm) {
+            const nameInput = document.getElementById('name');
+            const dobInput = document.getElementById('date_of_birth');
+            const bioInput = document.getElementById('bio');
+            const photoInput = document.getElementById('profile_photo');
+
+            // Feedback elements
+            const nameFeedback = document.getElementById('name-feedback');
+            const dobFeedback = document.getElementById('date_of_birth-feedback');
+            const bioFeedback = document.getElementById('bio-feedback');
+            const photoFeedback = document.getElementById('profile_photo-feedback');
+
+            // Funzione helper per impostare errore
+            function setError(input, feedbackElement, message) {
+                input.classList.add('is-invalid');
+                feedbackElement.textContent = message;
+            }
+
+            // Funzione helper per rimuovere errore
+            function clearError(input) {
+                input.classList.remove('is-invalid');
+            }
+
+            // Real-time error clearing when user edits the fields
+            if (nameInput) {
+                nameInput.addEventListener('input', function() {
+                    clearError(nameInput);
+                });
+            }
+            if (dobInput) {
+                dobInput.addEventListener('change', function() {
+                    clearError(dobInput);
+                });
+            }
+            if (bioInput) {
+                bioInput.addEventListener('input', function() {
+                    clearError(bioInput);
+                });
+            }
+
+            // Validazione in tempo reale sull'immagine di profilo
+            if (photoInput) {
+                photoInput.addEventListener('change', function() {
+                    clearError(photoInput);
+                    const file = this.files[0];
+                    if (file) {
+                        // Controllo estensione/tipo mime
+                        if (!file.type.startsWith('image/')) {
+                            setError(photoInput, photoFeedback, 'Il file deve essere un\'immagine (PNG, JPG, GIF, WEBP).');
+                            this.value = ''; // svuota input
+                            return;
+                        }
+                        // Controllo dimensione (2MB = 2 * 1024 * 1024 bytes)
+                        if (file.size > 2 * 1024 * 1024) {
+                            setError(photoInput, photoFeedback, 'L\'immagine non può superare la dimensione di 2 MB.');
+                            this.value = ''; // svuota input
+                            return;
+                        }
+                    }
+                });
+            }
+
+            // Validazione all'invio del form
+            editProfileForm.addEventListener('submit', function (event) {
+                let isValid = true;
+
+                // 1. Validazione Nome e Cognome
+                if (nameInput) {
+                    clearError(nameInput);
+                    const nameVal = nameInput.value.trim();
+                    if (!nameVal) {
+                        setError(nameInput, nameFeedback, 'Il nome e cognome è obbligatorio.');
+                        isValid = false;
+                    } else if (nameVal.length < 3) {
+                        setError(nameInput, nameFeedback, 'Il nome e cognome deve essere di almeno 3 caratteri.');
+                        isValid = false;
+                    } else {
+                        // Regex per verificare caratteri validi (solo lettere, spazi, apostrofi, trattini)
+                        // JS /^[A-Za-zÀ-ÖØ-öø-ÿ\s'\-]+$/ copre la maggior parte delle lettere accentate europee.
+                        const nameRegexJS = /^[A-Za-zÀ-ÖØ-öø-ÿ\s'\-]+$/;
+                        if (!nameRegexJS.test(nameVal)) {
+                            setError(nameInput, nameFeedback, 'Il nome e cognome può contenere solo lettere, spazi, apostrofi o trattini.');
+                            isValid = false;
+                        }
+                    }
+                }
+
+                // 2. Validazione Data di Nascita
+                if (dobInput) {
+                    clearError(dobInput);
+                    const dobVal = dobInput.value;
+                    if (dobVal) {
+                        const dobDate = new Date(dobVal);
+                        const today = new Date();
+                        today.setHours(0,0,0,0);
+                        
+                        const minDate = new Date('1900-01-01');
+                        
+                        if (dobDate > today) {
+                            setError(dobInput, dobFeedback, 'La data di nascita non può essere nel futuro.');
+                            isValid = false;
+                        } else if (dobDate < minDate) {
+                            setError(dobInput, dobFeedback, 'La data di nascita deve essere successiva al 01/01/1900.');
+                            isValid = false;
+                        }
+                    }
+                }
+
+                // 3. Validazione Bio
+                if (bioInput) {
+                    clearError(bioInput);
+                    const bioVal = bioInput.value;
+                    if (bioVal && bioVal.length > 1000) {
+                        setError(bioInput, bioFeedback, 'La descrizione non può superare i 1000 caratteri.');
+                        isValid = false;
+                    }
+                }
+
+                if (!isValid) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+            });
+        }
+    });
+</script>
+@endsection
 
 @endsection

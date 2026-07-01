@@ -53,6 +53,13 @@ class DatabaseSeeder extends Seeder
             'role' => 'user',
         ]);
 
+        $userGiulia = User::create([
+            'name' => 'Giulia Neri',
+            'email' => 'giulia@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'user',
+        ]);
+
         // 3. Tappe del cammino
         $stage1 = Stage::create([
             'number' => 1,

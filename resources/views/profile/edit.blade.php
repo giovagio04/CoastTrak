@@ -34,31 +34,46 @@
                             @endif
                             <div class="mb-3">
                                 <label for="profile_photo" class="form-label fw-bold">Immagine Profilo</label>
-                                <input class="form-control form-control-sm" id="profile_photo" name="profile_photo" type="file" accept="image/*">
+                                <input class="form-control form-control-sm @error('profile_photo') is-invalid @enderror" id="profile_photo" name="profile_photo" type="file" accept="image/*">
+                                @error('profile_photo')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
                         
                         <div class="col-md-8">
                             <div class="mb-3">
                                 <label for="name" class="form-label fw-bold">Nome e Cognome</label>
-                                <input type="text" class="form-control" id="name" name="name" value="{{ old('name', auth()->user()->name) }}" required>
+                                <input type="text" class="form-control @error('name') is-invalid @enderror" id="name" name="name" value="{{ old('name', auth()->user()->name) }}" required>
+                                @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             
                             <div class="mb-3">
                                 <label for="email" class="form-label fw-bold">Email</label>
-                                <input type="email" class="form-control" id="email" name="email" value="{{ old('email', auth()->user()->email) }}" required>
+                                <input type="email" class="form-control @error('email') is-invalid @enderror" id="email" name="email" value="{{ old('email', auth()->user()->email) }}" required>
+                                @error('email')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                             
                             <div class="mb-3">
                                 <label for="date_of_birth" class="form-label fw-bold">Data di Nascita</label>
-                                <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth', auth()->user()->date_of_birth) }}">
+                                <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror" id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth', auth()->user()->date_of_birth) }}">
+                                @error('date_of_birth')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
                             </div>
                         </div>
                     </div>
 
                     <div class="mb-4">
                         <label for="bio" class="form-label fw-bold">Descrizione (Bio)</label>
-                        <textarea class="form-control" id="bio" name="bio" rows="4" placeholder="Scrivi qualcosa su di te, sulle tue passioni per il trekking, ecc...">{{ old('bio', auth()->user()->bio) }}</textarea>
+                        <textarea class="form-control @error('bio') is-invalid @enderror" id="bio" name="bio" rows="4" placeholder="Scrivi qualcosa su di te, sulle tue passioni per il trekking, ecc...">{{ old('bio', auth()->user()->bio) }}</textarea>
+                        @error('bio')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <div class="text-end">

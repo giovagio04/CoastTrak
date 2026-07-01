@@ -70,6 +70,38 @@
     </div>
     
     <div class="col-md-4">
+        <!-- La mia Credenziale Digitale -->
+        <div class="card shadow-sm border-0 bg-light mb-4">
+            <div class="card-body text-center p-4">
+                <div class="display-4 text-warning mb-3">
+                    <i class="fa-solid fa-medal"></i>
+                </div>
+                <h5 class="fw-bold">Credenziale Digitale</h5>
+                <p class="text-muted small mb-4">Statistiche dei tuoi cammini completati</p>
+                
+                <div class="row text-center mb-3">
+                    <div class="col-6 border-end">
+                        <h2 class="fw-bold text-success mb-0">{{ auth()->user()->completedFullTrailsCount() }}</h2>
+                        <small class="text-muted">Cammini<br>Completi</small>
+                    </div>
+                    <div class="col-6">
+                        <h2 class="fw-bold text-primary mb-0">{{ auth()->user()->completedSingleStagesCount() }}</h2>
+                        <small class="text-muted">Tappe<br>Singole</small>
+                    </div>
+                </div>
+
+                @if(auth()->user()->canCreateOuting())
+                    <hr>
+                    <p class="small text-success fw-bold"><i class="fa-solid fa-check-circle"></i> Hai completato il cammino! Puoi proporre uscite tra utenti.</p>
+                    <a href="{{ route('user.outings.create') }}" class="btn btn-success w-100 mt-2">Proponi un'uscita</a>
+                @else
+                    <hr>
+                    <p class="small text-muted"><i class="fa-solid fa-lock"></i> Partecipa a un'uscita "Cammino Completo" per sbloccare la proposta di uscite.</p>
+                @endif
+            </div>
+        </div>
+
+        <!-- Sicurezza -->
         <div class="card shadow-sm border-0 mb-4">
             <div class="card-header bg-white pt-4 pb-0 border-bottom-0">
                 <h5 class="fw-bold"><i class="fa-solid fa-key text-warning"></i> Sicurezza</h5>

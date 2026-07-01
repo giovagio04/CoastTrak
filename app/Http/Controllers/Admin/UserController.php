@@ -36,4 +36,23 @@ class UserController extends Controller
         
         return view('admin.users.index', compact('users'));
     }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(User $user)
+    {
+        $user->load([
+            'digitalCredentials.stage',
+            'digitalCredentials.outing',
+            'outings' => function ($q) {
+                $q->orderBy('date', 'desc');
+            },
+            'participationRequests.outing' => function ($q) {
+                $q->orderBy('date', 'desc');
+            }
+        ]);
+
+        return view('admin.users.show', compact('user'));
+    }
 }

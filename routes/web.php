@@ -43,6 +43,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('outings', AdminOutingController::class);
     Route::resource('guides', AdminGuideController::class);
     Route::get('users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
+    Route::get('users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'show'])->name('users.show');
 });
 
 require __DIR__.'/auth.php';

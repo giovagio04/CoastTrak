@@ -62,6 +62,12 @@
                             <span class="badge bg-success">Utente</span>
                         @endif
                     </li>
+                    @if($outing->type == 'user' && $outing->organizer)
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span class="text-muted">Organizzatore</span>
+                        <a href="{{ route('admin.users.show', $outing->organizer->id) }}" class="fw-bold text-decoration-none">{{ $outing->organizer->name }}</a>
+                    </li>
+                    @endif
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span class="text-muted">Tappa</span>
                         <span class="fw-bold">{{ $outing->stage_name }}</span>
@@ -109,7 +115,9 @@
                                     <i class="fa-solid fa-user text-secondary"></i>
                                 </div>
                                 <div>
-                                    <div class="fw-bold">{{ $req->user->name }}</div>
+                                    <div class="fw-bold">
+                                        <a href="{{ route('admin.users.show', $req->user->id) }}" class="text-decoration-none">{{ $req->user->name }}</a>
+                                    </div>
                                     <div class="text-muted small">{{ $req->user->email }}</div>
                                 </div>
                             </li>

@@ -61,7 +61,7 @@
                 <tbody>
                     @forelse($users as $user)
                         <tr>
-                            <td class="fw-bold">{{ $user->name }}</td>
+                            <td class="fw-bold"><a href="{{ route('admin.users.show', $user->id) }}" class="text-decoration-none">{{ $user->name }}</a></td>
                             <td><a href="mailto:{{ $user->email }}" class="text-decoration-none">{{ $user->email }}</a></td>
                             <td>{{ $user->created_at->format('d/m/Y') }}</td>
                             <td>

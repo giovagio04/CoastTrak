@@ -18,6 +18,19 @@ class OutingController extends Controller
 
         $outing->update(['status' => 'published']);
 
+        // Iscrivi automaticamente l'organizzatore all'uscita appena approvata
+        if ($outing->organizer_id) {
+            \App\Models\ParticipationRequest::updateOrCreate(
+                [
+                    'user_id' => $outing->organizer_id,
+                    'outing_id' => $outing->id,
+                ],
+                [
+                    'status' => 'accepted',
+                ]
+            );
+        }
+
         return back()->with('success', 'Uscita tra utenti approvata con successo e resa visibile al pubblico!');
     }
     public function reject(Request $request, Outing $outing)

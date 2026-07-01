@@ -90,7 +90,20 @@
                         $isFull = $acceptedCount >= $outing->max_participants;
                     @endphp
 
-                    @if($userRequest)
+                    @if($outing->organizer_id === auth()->id())
+                        <div class="alert alert-success">
+                            <i class="fa-solid fa-user-tie"></i> Sei l'organizzatore di questa uscita!
+                        </div>
+                        @if($outing->status === 'published')
+                            <button type="button" class="btn btn-danger w-100 rounded-pill mt-2" data-bs-toggle="modal" data-bs-target="#cancelOutingModal">
+                                <i class="fa-solid fa-ban"></i> Annulla Uscita
+                            </button>
+                        @elseif($outing->status === 'cancelled')
+                            <div class="alert alert-warning py-2 small mt-2">
+                                <i class="fa-solid fa-circle-info"></i> Questa uscita è stata annullata.
+                            </div>
+                        @endif
+                    @elseif($userRequest)
                         @if($userRequest->status == 'pending')
                             <div class="alert alert-info">Richiesta inviata. In attesa di approvazione.</div>
                         @elseif($userRequest->status == 'accepted')
@@ -110,8 +123,35 @@
                     <a href="{{ route('login') }}" class="btn btn-outline-primary w-100 mb-2">Accedi</a>
                     <a href="{{ route('register') }}" class="btn btn-outline-secondary w-100">Registrati</a>
                 @endif
-            </div>
         </div>
     </div>
 </div>
+
+<!-- Modale Annullamento Organizzatore -->
+@if(auth()->check() && $outing->organizer_id === auth()->id() && $outing->status === 'published')
+<div class="modal fade" id="cancelOutingModal" tabindex="-1" aria-labelledby="cancelOutingModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content text-start">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold text-danger" id="cancelOutingModalLabel"><i class="fa-solid fa-ban"></i> Annulla Uscita</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{{ route('user.outings.cancel', $outing->id) }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <p class="mb-3">Sei sicuro di voler annullare questa uscita? Questa operazione è definitiva e notificherà i partecipanti.</p>
+                    <div class="mb-3">
+                        <label for="reason" class="form-label fw-bold">Motivazione dell'Annullamento (Sarà mostrata nei dettagli del cammino):</label>
+                        <textarea class="form-control" id="reason" name="reason" rows="3" placeholder="Scrivi il motivo (es. condizioni meteo sfavorevoli, imprevisto personale)..." required></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
+                    <button type="submit" class="btn btn-danger">Conferma ed Annulla Uscita</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@endif
 @endsection

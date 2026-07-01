@@ -53,6 +53,13 @@ class DatabaseSeeder extends Seeder
             'role' => 'user',
         ]);
 
+        $user5 = User::create([
+            'name' => 'Awais',
+            'email' => 'awais@example.com',
+            'password' => Hash::make('password'),
+            'role' => 'user',
+        ]);
+
         $userGiulia = User::create([
             'name' => 'Giulia Neri',
             'email' => 'giulia@example.com',
@@ -181,6 +188,12 @@ class DatabaseSeeder extends Seeder
             'difficulty' => 'difficile',
             'status' => 'published', // simuliamo che sia già approvata
             'notes' => 'Portare acqua in abbondanza!'
+        ]);
+
+        ParticipationRequest::create([
+            'outing_id' => $outingUser->id,
+            'user_id' => $user1->id,
+            'status' => 'accepted'
         ]);
 
         ParticipationRequest::create([

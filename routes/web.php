@@ -33,6 +33,7 @@ Route::middleware('auth')->group(function () {
     // Uscite create dagli utenti
     Route::get('/user/outings/create', [\App\Http\Controllers\UserOutingController::class, 'create'])->name('user.outings.create');
     Route::post('/user/outings', [\App\Http\Controllers\UserOutingController::class, 'store'])->name('user.outings.store');
+    Route::post('/user/outings/{outing}/cancel', [\App\Http\Controllers\UserOutingController::class, 'cancel'])->name('user.outings.cancel');
 });
 
 // Rotte Admin

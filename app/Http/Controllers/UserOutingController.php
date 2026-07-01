@@ -55,4 +55,31 @@ class UserOutingController extends Controller
 
         return redirect()->route('dashboard')->with('success', 'La tua uscita è stata proposta! L\'amministratore la valuterà entro 24 ore.');
     }
+
+    /**
+     * Cancel the specified outing by the organizer.
+     */
+    public function cancel(Request $request, Outing $outing)
+    {
+        if ($outing->organizer_id !== auth()->id()) {
+            abort(403, 'Non hai i permessi per annullare questo cammino.');
+        }
+
+        if ($outing->status === 'cancelled') {
+            return back()->with('error', 'Questa uscita è già stata annullata.');
+        }
+
+        $reason = $request->input('reason');
+        $notes = $outing->notes;
+        if ($reason) {
+            $notes = $notes ? $notes . "\n\n[Motivazione Annullamento]: " . $reason : "[Motivazione Annullamento]: " . $reason;
+        }
+
+        $outing->update([
+            'status' => 'cancelled',
+            'notes' => $notes
+        ]);
+
+        return back()->with('success', 'Il cammino è stato annullato con successo.');
+    }
 }

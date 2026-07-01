@@ -33,7 +33,12 @@
                                 @foreach($participations as $req)
                                     <tr>
                                         <td>{{ $req->outing->date->format('d/m/Y') }}</td>
-                                        <td><a href="{{ route('outings.show', $req->outing->id) }}">{{ $req->outing->stage_name }}</a></td>
+                                        <td>
+                                            <a href="{{ route('outings.show', $req->outing->id) }}">{{ $req->outing->stage_name }}</a>
+                                            @if($req->outing->organizer_id === auth()->id())
+                                                <span class="badge bg-info text-dark ms-1 small"><i class="fa-solid fa-user-tie"></i> Organizzatore</span>
+                                            @endif
+                                        </td>
                                         <td><span class="badge bg-secondary">{{ strtoupper($req->outing->status) }}</span></td>
                                         <td>
                                             @if($req->status == 'accepted')
@@ -46,11 +51,20 @@
                                         </td>
                                         <td>
                                             @if($req->outing->date >= now() && in_array($req->outing->status, ['published', 'open']))
-                                                <form action="{{ route('participations.destroy', $req->id) }}" method="POST" onsubmit="return confirm('Sicuro di voler annullare la tua partecipazione?');">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-xmark"></i> Annulla</button>
-                                                </form>
+                                                @if($req->outing->organizer_id !== auth()->id())
+                                                    <form action="{{ route('participations.destroy', $req->id) }}" method="POST" onsubmit="return confirm('Sicuro di voler annullare la tua partecipazione?');">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-xmark"></i> Annulla</button>
+                                                    </form>
+                                                @else
+                                                    <div class="d-flex flex-column align-items-center">
+                                                        <span class="text-muted small mb-1"><i class="fa-solid fa-user-tie"></i> Organizzatore</span>
+                                                        @if($req->outing->status === 'published')
+                                                            <a href="{{ route('outings.show', $req->outing->id) }}" class="btn btn-xs btn-outline-danger py-0 px-2" style="font-size: 0.75rem;"><i class="fa-solid fa-ban"></i> Annulla</a>
+                                                        @endif
+                                                    </div>
+                                                @endif
                                             @endif
                                         </td>
                                     </tr>

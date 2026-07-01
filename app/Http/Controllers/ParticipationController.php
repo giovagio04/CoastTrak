@@ -10,6 +10,11 @@ class ParticipationController extends Controller
 {
     public function store(Request $request, Outing $outing)
     {
+        // 0. L'organizzatore non può iscriversi alla sua stessa uscita
+        if ($outing->organizer_id === auth()->id()) {
+            return back()->with('error', 'Non puoi richiedere di partecipare al tuo stesso cammino.');
+        }
+
         // 1. Verifica se l'utente ha già una richiesta per questa uscita
         if ($outing->participationRequests()->where('user_id', auth()->id())->exists()) {
             return back()->with('error', 'Hai già inviato una richiesta per questa uscita.');
@@ -40,6 +45,11 @@ class ParticipationController extends Controller
         // Solo l'utente stesso può annullare la propria partecipazione
         if ($participation->user_id !== auth()->id()) {
             abort(403, 'Non puoi annullare la partecipazione di un altro utente.');
+        }
+
+        // L'organizzatore non può annullare la propria partecipazione
+        if ($participation->outing->organizer_id === auth()->id()) {
+            return back()->with('error', 'L\'organizzatore non può annullare la propria partecipazione al cammino.');
         }
 
         $participation->delete();

@@ -189,6 +189,26 @@
                     </button>
                 </li>
                 @auth
+                    <li class="nav-item dropdown me-2 position-relative d-flex align-items-center">
+                        <a class="nav-link position-relative text-secondary px-2" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 1.1rem; transition: color 0.2s;">
+                            <i class="fa-solid fa-bell"></i>
+                            <span id="notificationBadge" class="position-absolute top-1 start-100 translate-middle badge rounded-pill bg-danger d-none" style="font-size: 0.65rem; padding: 0.25em 0.5em;">
+                                0
+                            </span>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0 mt-2" aria-labelledby="notificationDropdown" style="width: 320px; border-radius: 12px; overflow: hidden; right: 0; left: auto;">
+                            <div class="p-3 bg-body-secondary border-bottom d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-bell text-primary me-2"></i>Notifiche</h6>
+                                <button id="markAllReadBtn" class="btn btn-link btn-sm text-decoration-none p-0 text-primary fw-semibold" style="font-size: 0.8rem;">Segna come lette</button>
+                            </div>
+                            <div id="notificationList" class="overflow-auto" style="max-height: 300px;">
+                                <div class="p-4 text-center text-muted">
+                                    <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
+                                    <p class="mb-0 small">Caricamento...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
                     @if(auth()->user()->role === 'admin')
                         <li class="nav-item">
                             <a class="nav-link text-danger" href="{{ route('admin.outings.index') }}">
@@ -209,26 +229,6 @@
                             </form>
                         </li>
                     @else
-                        <li class="nav-item dropdown me-2 position-relative d-flex align-items-center">
-                            <a class="nav-link position-relative text-secondary px-2" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 1.1rem; transition: color 0.2s;">
-                                <i class="fa-solid fa-bell"></i>
-                                <span id="notificationBadge" class="position-absolute top-1 start-100 translate-middle badge rounded-pill bg-danger d-none" style="font-size: 0.65rem; padding: 0.25em 0.5em;">
-                                    0
-                                </span>
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0 mt-2" aria-labelledby="notificationDropdown" style="width: 320px; border-radius: 12px; overflow: hidden; right: 0; left: auto;">
-                                <div class="p-3 bg-body-secondary border-bottom d-flex justify-content-between align-items-center">
-                                    <h6 class="mb-0 fw-bold"><i class="fa-solid fa-bell text-primary me-2"></i>Notifiche</h6>
-                                    <button id="markAllReadBtn" class="btn btn-link btn-sm text-decoration-none p-0 text-primary fw-semibold" style="font-size: 0.8rem;">Segna come lette</button>
-                                </div>
-                                <div id="notificationList" class="overflow-auto" style="max-height: 300px;">
-                                    <div class="p-4 text-center text-muted">
-                                        <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
-                                        <p class="mb-0 small">Caricamento...</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </li>
                         <li class="nav-item">
                             <a class="nav-link" href="{{ route('dashboard') }}">Gestione Uscite</a>
                         </li>
@@ -273,80 +273,143 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 @auth
-    @if(auth()->user()->role !== 'admin')
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const badge = document.getElementById('notificationBadge');
-                const list = document.getElementById('notificationList');
-                const markAllBtn = document.getElementById('markAllReadBtn');
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const badge = document.getElementById('notificationBadge');
+            const list = document.getElementById('notificationList');
+            const markAllBtn = document.getElementById('markAllReadBtn');
 
-                // Funzione per caricare le notifiche
-                function loadNotifications() {
-                    fetch('{{ route("notifications.index") }}', {
-                        headers: {
-                            'X-Requested-With': 'XMLHttpRequest',
-                            'Accept': 'application/json'
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        // Aggiorna Badge
-                        if (data.unread_count > 0) {
-                            badge.textContent = data.unread_count;
-                            badge.classList.remove('d-none');
-                        } else {
-                            badge.classList.add('d-none');
-                        }
+            // Funzione per caricare le notifiche
+            function loadNotifications() {
+                fetch('{{ route("notifications.index") }}', {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Aggiorna Badge
+                    if (data.unread_count > 0) {
+                        badge.textContent = data.unread_count;
+                        badge.classList.remove('d-none');
+                    } else {
+                        badge.classList.add('d-none');
+                    }
 
-                        // Svuota lista
-                        list.innerHTML = '';
+                    // Svuota lista
+                    list.innerHTML = '';
 
-                        if (data.notifications.length === 0) {
-                            list.innerHTML = `
-                                <div class="p-4 text-center text-muted">
-                                    <i class="fa-solid fa-bell-slash fa-2x mb-2 text-secondary-emphasis" style="opacity: 0.5;"></i>
-                                    <p class="mb-0 small">Non ci sono notifiche</p>
-                                </div>
-                            `;
-                            return;
-                        }
-
-                        data.notifications.forEach(n => {
-                            const isUnread = !n.read_at;
-                            const item = document.createElement('div');
-                            item.className = `p-3 border-bottom notification-item ${isUnread ? 'bg-light-blue' : ''}`;
-                            item.style.transition = 'background-color 0.2s';
-                            
-                            if (isUnread) {
-                                item.style.backgroundColor = 'rgba(13, 110, 253, 0.05)';
-                            }
-
-                            item.innerHTML = `
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <h6 class="mb-1 fw-bold text-dark" style="font-size: 0.9rem;">${n.title}</h6>
-                                    ${isUnread ? '<span class="badge bg-primary p-1 rounded-circle" style="width: 8px; height: 8px; display: inline-block;"></span>' : ''}
-                                </div>
-                                <p class="mb-1 text-muted small text-justify" style="font-size: 0.8rem; line-height: 1.3;">${n.message}</p>
-                                <small class="text-muted" style="font-size: 0.7rem;">${n.created_at}</small>
-                            `;
-
-                            list.appendChild(item);
-                        });
-                    })
-                    .catch(err => {
-                        console.error('Errore nel recupero delle notifiche:', err);
+                    if (data.notifications.length === 0) {
                         list.innerHTML = `
-                            <div class="p-4 text-center text-danger">
-                                <i class="fa-solid fa-triangle-exclamation fa-2x mb-2"></i>
-                                <p class="mb-0 small">Errore nel caricamento delle notifiche</p>
+                            <div class="p-4 text-center text-muted">
+                                <i class="fa-solid fa-bell-slash fa-2x mb-2 text-secondary-emphasis" style="opacity: 0.5;"></i>
+                                <p class="mb-0 small">Non ci sono notifiche</p>
                             </div>
                         `;
-                    });
-                }
+                        return;
+                    }
 
-                // Segna come letta
-                function markAsRead(id) {
-                    fetch(`/notifications/${id}/read`, {
+                    data.notifications.forEach(n => {
+                        const isUnread = !n.read_at;
+                        const item = document.createElement('div');
+                        item.className = `p-3 border-bottom notification-item ${isUnread ? 'bg-light-blue' : ''}`;
+                        item.style.transition = 'background-color 0.2s';
+                        
+                        if (isUnread) {
+                            item.style.backgroundColor = 'rgba(13, 110, 253, 0.05)';
+                        }
+
+                        item.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-start">
+                                <h6 class="mb-1 fw-bold text-dark" style="font-size: 0.9rem;">${n.title}</h6>
+                                ${isUnread ? '<span class="badge bg-primary p-1 rounded-circle" style="width: 8px; height: 8px; display: inline-block;"></span>' : ''}
+                            </div>
+                            <p class="mb-1 text-muted small text-justify" style="font-size: 0.8rem; line-height: 1.3;">${n.message}</p>
+                            <small class="text-muted" style="font-size: 0.7rem;">${n.created_at}</small>
+                        `;
+
+                        // Effetti hover e interazioni click
+                        const hasAction = !!n.action_url;
+                        const isClickable = hasAction;
+
+                        if (isClickable) {
+                            item.style.cursor = 'pointer';
+                            item.addEventListener('mouseenter', () => {
+                                item.style.backgroundColor = isUnread ? 'rgba(13, 110, 253, 0.08)' : 'rgba(0, 0, 0, 0.03)';
+                            });
+                            item.addEventListener('mouseleave', () => {
+                                item.style.backgroundColor = isUnread ? 'rgba(13, 110, 253, 0.05)' : 'transparent';
+                            });
+
+                            item.addEventListener('click', function () {
+                                if (isUnread) {
+                                    fetch(`/notifications/${n.id}/read`, {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                            'X-Requested-With': 'XMLHttpRequest',
+                                            'Accept': 'application/json'
+                                        }
+                                    }).then(() => {
+                                        if (hasAction) {
+                                            window.location.href = n.action_url;
+                                        } else {
+                                            loadNotifications();
+                                        }
+                                    }).catch(() => {
+                                        if (hasAction) {
+                                            window.location.href = n.action_url;
+                                        } else {
+                                            loadNotifications();
+                                        }
+                                    });
+                                } else if (hasAction) {
+                                    window.location.href = n.action_url;
+                                }
+                            });
+                        } else {
+                            item.style.cursor = 'default';
+                        }
+
+                        list.appendChild(item);
+                    });
+                })
+                .catch(err => {
+                    console.error('Errore nel recupero delle notifiche:', err);
+                    list.innerHTML = `
+                        <div class="p-4 text-center text-danger">
+                            <i class="fa-solid fa-triangle-exclamation fa-2x mb-2"></i>
+                            <p class="mb-0 small">Errore nel caricamento delle notifiche</p>
+                        </div>
+                    `;
+                });
+            }
+
+            // Segna come letta
+            function markAsRead(id) {
+                fetch(`/notifications/${id}/read`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        loadNotifications();
+                    }
+                });
+            }
+
+            // Segna tutte come lette
+            if (markAllBtn) {
+                markAllBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    fetch('{{ route("notifications.markAllAsRead") }}', {
                         method: 'POST',
                         headers: {
                             'X-CSRF-TOKEN': '{{ csrf_token() }}',
@@ -360,38 +423,16 @@
                             loadNotifications();
                         }
                     });
-                }
+                });
+            }
 
-                // Segna tutte come lette
-                if (markAllBtn) {
-                    markAllBtn.addEventListener('click', function (e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        fetch('{{ route("notifications.markAllAsRead") }}', {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'X-Requested-With': 'XMLHttpRequest',
-                                'Accept': 'application/json'
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                loadNotifications();
-                            }
-                        });
-                    });
-                }
+            // Esegui
+            loadNotifications();
 
-                // Esegui
-                loadNotifications();
-
-                // Aggiorna ogni 60 secondi
-                setInterval(loadNotifications, 60000);
-            });
-        </script>
-    @endif
+            // Aggiorna ogni 60 secondi
+            setInterval(loadNotifications, 60000);
+        });
+    </script>
 @endauth
 
 <script>

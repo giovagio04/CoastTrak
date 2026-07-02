@@ -37,6 +37,16 @@ class ParticipationController extends Controller
             'status' => $status
         ]);
 
+        // Notifica per utente organizzatore di iscrizione a un cammino tra utenti da lui organizzato.
+        // Cliccandola l’utente organizzatore viene portato alla pagina di gestione del cammino.
+        if ($outing->type === 'user' && $outing->organizer) {
+            $outing->organizer->notify(new \App\Notifications\SimpleNotification(
+                'Nuova richiesta di iscrizione',
+                "L'utente '" . auth()->user()->name . "' ha richiesto di iscriversi al tuo cammino '" . $outing->stage_name . "' del " . $outing->date->format('d/m/Y') . ".",
+                route('outings.show', $outing->id) // Cliccabile
+            ));
+        }
+
         return back()->with('success', 'Richiesta di partecipazione elaborata con successo!');
     }
 
@@ -50,6 +60,30 @@ class ParticipationController extends Controller
         // L'organizzatore non può annullare la propria partecipazione
         if ($participation->outing->organizer_id === auth()->id()) {
             return back()->with('error', 'L\'organizzatore non può annullare la propria partecipazione al cammino.');
+        }
+
+        $outing = $participation->outing;
+        $user = auth()->user();
+
+        if ($outing->type === 'official') {
+            // Annullamento iscrizione a un cammino ufficiale da parte di un utente, l’admin riceve la notifica
+            $admins = \App\Models\User::where('role', 'admin')->get();
+            foreach ($admins as $admin) {
+                $admin->notify(new \App\Notifications\SimpleNotification(
+                    'Annullamento iscrizione cammino ufficiale',
+                    "L'utente '{$user->name}' ha annullato la sua iscrizione al cammino ufficiale '{$outing->stage_name}' del {$outing->date->format('d/m/Y')}.",
+                    null // Non cliccabile
+                ));
+            }
+        } else {
+            // Annullamento iscrizione ad un cammino tra utenti da parte di un utente, l’utente organizzatore riceve la notifica
+            if ($outing->organizer) {
+                $outing->organizer->notify(new \App\Notifications\SimpleNotification(
+                    'Annullamento iscrizione cammino',
+                    "L'utente '{$user->name}' ha annullato la sua iscrizione al tuo cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')}.",
+                    null // Non cliccabile
+                ));
+            }
         }
 
         $participation->delete();
@@ -84,7 +118,7 @@ class ParticipationController extends Controller
             $participation->user->notify(new \App\Notifications\SimpleNotification(
                 'Richiesta di partecipazione accettata',
                 "La tua richiesta di partecipazione al cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} è stata accettata dall'organizzatore.",
-                route('outings.show', $outing->id)
+                null // Non cliccabile
             ));
         }
 
@@ -112,7 +146,7 @@ class ParticipationController extends Controller
             $participation->user->notify(new \App\Notifications\SimpleNotification(
                 'Richiesta di partecipazione rifiutata',
                 "La tua richiesta di partecipazione al cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} è stata rifiutata dall'organizzatore.",
-                route('outings.show', $outing->id)
+                null // Non cliccabile
             ));
         }
 

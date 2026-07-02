@@ -34,7 +34,7 @@ class OutingController extends Controller
             $outing->organizer->notify(new \App\Notifications\SimpleNotification(
                 'Proposta di cammino approvata',
                 "La tua proposta per il cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} è stata approvata dall'amministratore.",
-                route('outings.show', $outing->id)
+                null // Non cliccabile
             ));
         }
 
@@ -61,7 +61,7 @@ class OutingController extends Controller
             $outing->organizer->notify(new \App\Notifications\SimpleNotification(
                 'Proposta di cammino rifiutata',
                 "La tua proposta per il cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} è stata rifiutata dall'amministratore." . ($reason ? " Motivazione: {$reason}" : ""),
-                route('outings.show', $outing->id)
+                null // Non cliccabile
             ));
         }
 
@@ -92,7 +92,7 @@ class OutingController extends Controller
                 $participant->user->notify(new \App\Notifications\SimpleNotification(
                     'Cammino annullato dall\'amministratore',
                     "Il cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} a cui eri iscritto è stato annullato dall'amministratore." . ($reason ? " Motivazione: {$reason}" : ""),
-                    route('outings.show', $outing->id)
+                    null // Non cliccabile
                 ));
             }
         }

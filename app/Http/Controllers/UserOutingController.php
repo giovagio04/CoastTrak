@@ -51,7 +51,17 @@ class UserOutingController extends Controller
         // L'amministratore ha 24 ore di tempo per approvare l'uscita
         $validated['approval_deadline'] = Carbon::now()->addHours(24);
 
-        Outing::create($validated);
+        $outing = Outing::create($validated);
+
+        // Notifica all'admin della nuova proposta di cammino
+        $admins = \App\Models\User::where('role', 'admin')->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new \App\Notifications\SimpleNotification(
+                'Nuova proposta di cammino',
+                "L'utente '" . auth()->user()->name . "' ha proposto il cammino '" . $outing->stage_name . "' per la data " . $outing->date->format('d/m/Y') . ".",
+                route('admin.outings.show', $outing->id) // Cliccabile
+            ));
+        }
 
         return redirect()->route('dashboard')->with('success', 'La tua uscita è stata proposta! L\'amministratore la valuterà entro 24 ore.');
     }
@@ -92,9 +102,19 @@ class UserOutingController extends Controller
                 $participant->user->notify(new \App\Notifications\SimpleNotification(
                     'Cammino annullato dall\'organizzatore',
                     "L'organizzatore ha annullato il cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} a cui eri iscritto." . ($reason ? " Motivazione: {$reason}" : ""),
-                    route('outings.show', $outing->id)
+                    null // Non cliccabile
                 ));
             }
+        }
+
+        // Notifica all'admin che l'organizzatore ha annullato l'uscita
+        $admins = \App\Models\User::where('role', 'admin')->get();
+        foreach ($admins as $admin) {
+            $admin->notify(new \App\Notifications\SimpleNotification(
+                'Cammino tra utenti annullato dall\'organizzatore',
+                "L'organizzatore '" . auth()->user()->name . "' ha annullato il cammino '" . $outing->stage_name . "' del " . $outing->date->format('d/m/Y') . "." . ($reason ? " Motivazione: {$reason}" : ""),
+                null // Non cliccabile
+            ));
         }
 
         return back()->with('success', 'Il cammino è stato annullato con successo.');

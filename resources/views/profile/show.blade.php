@@ -40,7 +40,7 @@
                         @if($user->profile_photo_path)
                             <img src="{{ asset('storage/' . $user->profile_photo_path) }}" alt="Profile Photo" class="rounded-circle img-thumbnail mb-3" style="width: 150px; height: 150px; object-fit: cover;">
                         @else
-                            <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px;">
+                            <div class="rounded-circle bg-body-secondary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 150px; height: 150px;">
                                 <i class="fa-solid fa-user text-secondary fa-4x"></i>
                             </div>
                         @endif
@@ -73,7 +73,7 @@
 
     <!-- Riquadro Destro: Credenziale Digitale (col-md-4) -->
     <div class="col-md-4">
-        <div class="card shadow-sm border-0 bg-light h-100">
+        <div class="card shadow-sm border-0 bg-body-tertiary h-100">
             <div class="card-body text-center p-4">
                 <div class="display-4 text-warning mb-3">
                     <i class="fa-solid fa-medal"></i>
@@ -118,7 +118,7 @@
                             @if($user->profile_photo_path)
                                 <img src="{{ asset('storage/' . $user->profile_photo_path) }}" alt="Profile Photo" class="rounded-circle img-thumbnail mb-3" style="width: 130px; height: 130px; object-fit: cover;">
                             @else
-                                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 130px; height: 130px;">
+                                <div class="rounded-circle bg-body-secondary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 130px; height: 130px;">
                                     <i class="fa-solid fa-user text-secondary fa-3x"></i>
                                 </div>
                             @endif

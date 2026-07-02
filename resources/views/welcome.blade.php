@@ -10,29 +10,51 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script>
+        (function () {
+            const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-bs-theme', theme);
+        })();
+    </script>
     <style>
         body {
             font-family: 'Outfit', sans-serif;
+            background-color: var(--bs-body-bg);
+        }
+        html[data-bs-theme="light"] body {
             background-color: #f8f9fa;
         }
         
         /* Navbar styling */
         .navbar {
-            background-color: rgba(255, 255, 255, 0.95) !important;
+            background-color: var(--bs-body-bg) !important;
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
             padding: 15px 0;
+            border-bottom: 1px solid var(--bs-border-color-translucent);
+        }
+        html[data-bs-theme="light"] .navbar {
+            background-color: rgba(255, 255, 255, 0.95) !important;
+        }
+        html[data-bs-theme="dark"] .navbar {
+            background-color: rgba(33, 37, 41, 0.95) !important;
         }
         .navbar-brand { 
             font-weight: 800; 
-            color: #1a1a1a !important; 
+            color: var(--bs-body-color) !important; 
             font-size: 1.5rem;
+        }
+        html[data-bs-theme="light"] .navbar-brand {
+            color: #1a1a1a !important;
         }
         .nav-link {
             font-weight: 600;
-            color: #333 !important;
+            color: var(--bs-secondary-color) !important;
             transition: color 0.3s;
             margin-left: 15px;
+        }
+        html[data-bs-theme="light"] .nav-link {
+            color: #333 !important;
         }
         .nav-link:hover {
             color: #ff6b35 !important;
@@ -138,10 +160,13 @@
             border: none;
             border-radius: 20px;
             overflow: hidden;
-            background: white;
+            background: var(--bs-card-bg);
             box-shadow: 0 15px 35px rgba(0,0,0,0.05);
             transition: all 0.4s ease;
             height: 100%;
+        }
+        html[data-bs-theme="light"] .feature-card {
+            background: white;
         }
         .feature-card:hover {
             transform: translateY(-10px);
@@ -220,7 +245,12 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
             </ul>
-            <ul class="navbar-nav">
+            <ul class="navbar-nav align-items-center">
+                <li class="nav-item me-3">
+                    <button id="themeToggle" class="btn btn-link text-secondary p-1" title="Cambia tema" style="font-size: 1.25rem; text-decoration: none; border: none; background: transparent;">
+                        <i id="themeToggleIcon" class="fa-solid fa-moon"></i>
+                    </button>
+                </li>
                 @auth
                     @if(auth()->user()->role === 'admin')
                         <li class="nav-item">
@@ -341,5 +371,38 @@
 
 <!-- Bootstrap 5 JS Bundle -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const toggleBtn = document.getElementById('themeToggle');
+        const toggleIcon = document.getElementById('themeToggleIcon');
+
+        if (!toggleBtn || !toggleIcon) return;
+
+        const updateIcon = (theme) => {
+            if (theme === 'dark') {
+                toggleIcon.classList.remove('fa-moon');
+                toggleIcon.classList.add('fa-sun');
+                toggleBtn.classList.remove('text-secondary');
+                toggleBtn.classList.add('text-warning');
+            } else {
+                toggleIcon.classList.remove('fa-sun');
+                toggleIcon.classList.add('fa-moon');
+                toggleBtn.classList.remove('text-warning');
+                toggleBtn.classList.add('text-secondary');
+            }
+        };
+
+        const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+        updateIcon(currentTheme);
+
+        toggleBtn.addEventListener('click', () => {
+            const theme = document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            localStorage.setItem('theme', theme);
+            updateIcon(theme);
+        });
+    });
+</script>
 </body>
 </html>

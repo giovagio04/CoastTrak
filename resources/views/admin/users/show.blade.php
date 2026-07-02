@@ -33,7 +33,7 @@
                 @if($user->profile_photo_path)
                     <img src="{{ asset('storage/' . $user->profile_photo_path) }}" alt="Foto Profilo" class="rounded-circle img-thumbnail mb-3 mx-auto d-block" style="width: 130px; height: 130px; object-fit: cover;">
                 @else
-                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 130px; height: 130px;">
+                    <div class="rounded-circle bg-body-secondary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 130px; height: 130px;">
                         <i class="fa-solid fa-user text-secondary fa-4x"></i>
                     </div>
                 @endif
@@ -86,9 +86,9 @@
                 <hr class="my-3">
 
                 <!-- Statistiche Credenziali integrate -->
-                <div class="bg-light rounded p-3 text-center mb-2">
+                <div class="bg-body-secondary rounded p-3 text-center mb-2">
                     <div class="text-warning mb-2">
-                        <i class="fa-solid fa-medal fa-lg"></i> <strong class="text-dark small">Credenziali Conseguite</strong>
+                        <i class="fa-solid fa-medal fa-lg"></i> <strong class="text-body small">Credenziali Conseguite</strong>
                     </div>
                     <div class="row text-center g-0">
                         <div class="col-6 border-end">

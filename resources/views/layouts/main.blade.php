@@ -10,33 +10,62 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script>
+        (function () {
+            const theme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-bs-theme', theme);
+        })();
+    </script>
     <style>
         body {
             font-family: 'Outfit', sans-serif;
-            background-color: #f8f9fa;
+            background-color: var(--bs-body-bg);
             /* Aggiungiamo un padding-top per evitare che la navbar fissa copra il contenuto nelle pagine interne */
             padding-top: 90px; 
         }
         
+        html[data-bs-theme="light"] body {
+            background-color: #f8f9fa;
+        }
+        
         /* Navbar styling coerente con la Home */
         .navbar {
-            background-color: rgba(255, 255, 255, 0.98) !important;
+            background-color: var(--bs-body-bg) !important;
             backdrop-filter: blur(10px);
             transition: all 0.3s ease;
             padding: 15px 0;
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            border-bottom: 1px solid var(--bs-border-color-translucent);
         }
+        
+        html[data-bs-theme="light"] .navbar {
+            background-color: rgba(255, 255, 255, 0.98) !important;
+        }
+        
+        html[data-bs-theme="dark"] .navbar {
+            background-color: rgba(33, 37, 41, 0.98) !important;
+        }
+
         .navbar-brand { 
             font-weight: 800; 
-            color: #1a1a1a !important; 
+            color: var(--bs-body-color) !important; 
             font-size: 1.5rem;
         }
+        
+        html[data-bs-theme="light"] .navbar-brand {
+            color: #1a1a1a !important;
+        }
+
         .nav-link {
             font-weight: 600;
-            color: #333 !important;
+            color: var(--bs-secondary-color) !important;
             transition: color 0.3s;
             margin-left: 15px;
         }
+        
+        html[data-bs-theme="light"] .nav-link {
+            color: #333 !important;
+        }
+
         .nav-link:hover {
             color: #ff6b35 !important;
         }
@@ -83,6 +112,46 @@
             border-radius: 15px 15px 0 0 !important;
         }
 
+        /* Dark mode overrides for cards and sections */
+        html[data-bs-theme="dark"] {
+            --bs-body-bg: #121416;
+            --bs-body-color: #e9ecef;
+            --bs-secondary-bg: #1f2327;
+            --bs-tertiary-bg: #2b3035;
+            --bs-card-bg: #1a1d20;
+            --bs-border-color: rgba(255, 255, 255, 0.15);
+            --bs-border-color-translucent: rgba(255, 255, 255, 0.08);
+        }
+
+        html[data-bs-theme="dark"] .card {
+            background-color: var(--bs-card-bg);
+            border: 1px solid rgba(255, 255, 255, 0.08) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        html[data-bs-theme="dark"] .modal-content {
+            background-color: #1a1d20;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        html[data-bs-theme="dark"] .list-group-item {
+            background-color: transparent;
+            color: var(--bs-body-color);
+            border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        html[data-bs-theme="dark"] .table {
+            --bs-table-color: #e9ecef;
+            --bs-table-bg: transparent;
+            --bs-table-border-color: rgba(255, 255, 255, 0.08);
+        }
+
+        html[data-bs-theme="dark"] .table-light {
+            --bs-table-color: #f8f9fa;
+            --bs-table-bg: #212529;
+            --bs-table-border-color: rgba(255, 255, 255, 0.1);
+        }
+
         /* Footer coerente con la Home */
         .footer {
             background-color: #1a1a1a;
@@ -113,7 +182,12 @@
                     </li>
                 @endif
             </ul>
-            <ul class="navbar-nav">
+            <ul class="navbar-nav align-items-center">
+                <li class="nav-item me-3">
+                    <button id="themeToggle" class="btn btn-link text-secondary p-1" title="Cambia tema" style="font-size: 1.25rem; text-decoration: none; border: none; background: transparent;">
+                        <i id="themeToggleIcon" class="fa-solid fa-moon"></i>
+                    </button>
+                </li>
                 @auth
                     @if(auth()->user()->role === 'admin')
                         <li class="nav-item">
@@ -143,7 +217,7 @@
                                 </span>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0 mt-2" aria-labelledby="notificationDropdown" style="width: 320px; border-radius: 12px; overflow: hidden; right: 0; left: auto;">
-                                <div class="p-3 bg-light border-bottom d-flex justify-content-between align-items-center">
+                                <div class="p-3 bg-body-secondary border-bottom d-flex justify-content-between align-items-center">
                                     <h6 class="mb-0 fw-bold"><i class="fa-solid fa-bell text-primary me-2"></i>Notifiche</h6>
                                     <button id="markAllReadBtn" class="btn btn-link btn-sm text-decoration-none p-0 text-primary fw-semibold" style="font-size: 0.8rem;">Segna come lette</button>
                                 </div>
@@ -319,6 +393,39 @@
         </script>
     @endif
 @endauth
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const toggleBtn = document.getElementById('themeToggle');
+        const toggleIcon = document.getElementById('themeToggleIcon');
+
+        if (!toggleBtn || !toggleIcon) return;
+
+        const updateIcon = (theme) => {
+            if (theme === 'dark') {
+                toggleIcon.classList.remove('fa-moon');
+                toggleIcon.classList.add('fa-sun');
+                toggleBtn.classList.remove('text-secondary');
+                toggleBtn.classList.add('text-warning');
+            } else {
+                toggleIcon.classList.remove('fa-sun');
+                toggleIcon.classList.add('fa-moon');
+                toggleBtn.classList.remove('text-warning');
+                toggleBtn.classList.add('text-secondary');
+            }
+        };
+
+        const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'light';
+        updateIcon(currentTheme);
+
+        toggleBtn.addEventListener('click', () => {
+            const theme = document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-bs-theme', theme);
+            localStorage.setItem('theme', theme);
+            updateIcon(theme);
+        });
+    });
+</script>
 
 @yield('scripts')
 </body>

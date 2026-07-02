@@ -12,7 +12,7 @@
     @forelse($outings as $outing)
         <div class="col">
             <div class="card h-100 shadow-sm border-0">
-                <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                <div class="card-header bg-transparent border-bottom-0 pt-4 pb-0">
                     @if($outing->type == 'official')
                         <span class="badge bg-primary mb-2">Ufficiale</span>
                     @else
@@ -51,7 +51,7 @@
                         </p>
                     @endif
                 </div>
-                <div class="card-footer bg-white border-top-0 pb-4">
+                <div class="card-footer bg-transparent border-top-0 pb-4">
                     <a href="{{ route('outings.show', $outing->id) }}" class="btn btn-custom btn-outline-custom w-100">Dettagli e Partecipa</a>
                 </div>
             </div>

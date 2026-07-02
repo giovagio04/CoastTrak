@@ -45,7 +45,7 @@
 <div class="row">
     <div class="col-md-6 mb-4">
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white fw-bold">
+            <div class="card-header bg-transparent fw-bold">
                 <i class="fa-solid fa-circle-info text-primary"></i> Informazioni Cammino
             </div>
             <div class="card-body">
@@ -107,7 +107,7 @@
     
     <div class="col-md-6 mb-4">
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white fw-bold">
+            <div class="card-header bg-transparent fw-bold">
                 <i class="fa-solid fa-users text-success"></i> Utenti Iscritti
             </div>
             <div class="card-body p-0">
@@ -123,7 +123,7 @@
                     <ul class="list-group list-group-flush">
                         @foreach($partecipanti as $req)
                             <li class="list-group-item d-flex align-items-center p-3">
-                                <div class="bg-light rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
+                                <div class="bg-body-secondary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 40px; height: 40px;">
                                     <i class="fa-solid fa-user text-secondary"></i>
                                 </div>
                                 <div>
@@ -143,7 +143,7 @@
 
 @if($outing->notes)
 <div class="card shadow-sm border-0 mb-4">
-    <div class="card-header bg-white fw-bold">
+    <div class="card-header bg-transparent fw-bold">
         <i class="fa-solid fa-note-sticky text-warning"></i> Note aggiuntive
     </div>
     <div class="card-body">

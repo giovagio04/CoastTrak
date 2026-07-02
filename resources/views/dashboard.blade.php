@@ -13,7 +13,7 @@
     <!-- Le Mie Partecipazioni -->
     <div class="col-lg-8 col-md-7">
         <div class="card shadow-sm border-0 h-100">
-            <div class="card-header bg-white pt-4 pb-0 border-bottom-0">
+            <div class="card-header bg-transparent pt-4 pb-0 border-bottom-0">
                 <h5 class="fw-bold"><i class="fa-solid fa-list-check text-primary"></i> Le mie uscite</h5>
             </div>
             <div class="card-body">

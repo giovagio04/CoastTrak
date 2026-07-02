@@ -1,9 +1,32 @@
 @extends('layouts.main')
 
 @section('content')
+@php
+    $referer = request()->headers->get('referer');
+    $backUrl = route('outings.index');
+    $backLabel = 'Uscite';
+
+    if ($referer) {
+        $refererPath = parse_url($referer, PHP_URL_PATH);
+        if ($refererPath === '/dashboard') {
+            $backUrl = route('dashboard');
+            $backLabel = 'Gestione Uscite';
+        } elseif ($refererPath === '/profile') {
+            $backUrl = route('profile.show');
+            $backLabel = 'Area Personale';
+        } elseif (str_starts_with($refererPath, '/profiles/')) {
+            $backUrl = $referer;
+            $backLabel = 'Profilo Utente';
+        } elseif ($refererPath === '/notifications') {
+            $backUrl = route('notifications.index');
+            $backLabel = 'Notifiche';
+        }
+    }
+@endphp
+
 <nav aria-label="breadcrumb" class="mb-4">
   <ol class="breadcrumb">
-    <li class="breadcrumb-item"><a href="{{ route('outings.index') }}">Uscite</a></li>
+    <li class="breadcrumb-item"><a href="{{ $backUrl }}">{{ $backLabel }}</a></li>
     <li class="breadcrumb-item active" aria-current="page">Dettaglio Uscita</li>
   </ol>
 </nav>
@@ -75,7 +98,7 @@
                 </div>
 
                 @if($outing->notes)
-                    <div class="alert alert-warning mt-4 border-warning border-start border-4 border-top-0 border-end-0 border-bottom-0 rounded-0 bg-light">
+                    <div class="alert alert-warning mt-4 border-warning border-start border-4 border-top-0 border-end-0 border-bottom-0 rounded-0">
                         <h6 class="fw-bold"><i class="fa-solid fa-circle-info"></i> Note dell'Organizzatore</h6>
                         <p class="mb-0">{{ $outing->notes }}</p>
                     </div>

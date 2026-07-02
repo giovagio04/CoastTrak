@@ -9,7 +9,7 @@
 </nav>
 
 <div class="card shadow-sm border-0">
-    <div class="card-header bg-white border-bottom-0 pt-4">
+    <div class="card-header bg-transparent border-bottom-0 pt-4">
         <h4 class="fw-bold mb-0">Crea Uscita Ufficiale</h4>
     </div>
     <div class="card-body">

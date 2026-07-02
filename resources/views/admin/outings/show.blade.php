@@ -52,7 +52,19 @@
                 <ul class="list-group list-group-flush">
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span class="text-muted">Stato</span>
-                        <span class="badge bg-secondary">{{ strtoupper($outing->status) }}</span>
+                        @if($outing->status === 'pending')
+                            <span class="badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i> PENDING</span>
+                        @elseif($outing->status === 'published')
+                            <span class="badge bg-success"><i class="fa-solid fa-circle-check me-1"></i> PUBLISHED</span>
+                        @elseif($outing->status === 'concluded')
+                            <span class="badge bg-secondary"><i class="fa-solid fa-circle-info me-1"></i> CONCLUDED</span>
+                        @elseif($outing->status === 'cancelled')
+                            <span class="badge bg-danger"><i class="fa-solid fa-ban me-1"></i> CANCELLED</span>
+                        @elseif($outing->status === 'rejected')
+                            <span class="badge bg-danger"><i class="fa-solid fa-xmark me-1"></i> REJECTED</span>
+                        @else
+                            <span class="badge bg-secondary">{{ strtoupper($outing->status) }}</span>
+                        @endif
                     </li>
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span class="text-muted">Tipo</span>

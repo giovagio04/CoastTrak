@@ -117,7 +117,7 @@ class DatabaseSeeder extends Seeder
             'meeting_point' => 'Piazza di Soverato, ore 8:00',
             'max_participants' => 20,
             'difficulty' => 'facile',
-            'status' => 'open'
+            'status' => 'published'
         ]);
 
         // Uscita passata (conclusa)

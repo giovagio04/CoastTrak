@@ -39,7 +39,21 @@
                                                 <span class="badge bg-info text-dark ms-1 small"><i class="fa-solid fa-user-tie"></i> Organizzatore</span>
                                             @endif
                                         </td>
-                                        <td><span class="badge bg-secondary">{{ strtoupper($req->outing->status) }}</span></td>
+                                        <td>
+                                            @if($req->outing->status === 'pending')
+                                                <span class="badge bg-warning text-dark"><i class="fa-solid fa-clock me-1"></i> PENDING</span>
+                                            @elseif($req->outing->status === 'published')
+                                                <span class="badge bg-success"><i class="fa-solid fa-circle-check me-1"></i> PUBLISHED</span>
+                                            @elseif($req->outing->status === 'concluded')
+                                                <span class="badge bg-secondary"><i class="fa-solid fa-circle-info me-1"></i> CONCLUDED</span>
+                                            @elseif($req->outing->status === 'cancelled')
+                                                <span class="badge bg-danger"><i class="fa-solid fa-ban me-1"></i> CANCELLED</span>
+                                            @elseif($req->outing->status === 'rejected')
+                                                <span class="badge bg-danger"><i class="fa-solid fa-xmark me-1"></i> REJECTED</span>
+                                            @else
+                                                <span class="badge bg-secondary">{{ strtoupper($req->outing->status) }}</span>
+                                            @endif
+                                        </td>
                                         <td>
                                             @if($req->status == 'accepted')
                                                 <span class="badge bg-success">Accettata</span>
@@ -50,7 +64,7 @@
                                             @endif
                                         </td>
                                         <td>
-                                            @if($req->outing->date >= now() && in_array($req->outing->status, ['published', 'open']))
+                                            @if($req->outing->date >= now() && in_array($req->outing->status, ['published']))
                                                 @if($req->outing->organizer_id !== auth()->id())
                                                     <form action="{{ route('participations.destroy', $req->id) }}" method="POST" onsubmit="return confirm('Sicuro di voler annullare la tua partecipazione?');">
                                                         @csrf

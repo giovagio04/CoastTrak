@@ -23,8 +23,6 @@
                     <select name="status" class="form-select border-primary" required>
                         <option value="pending" {{ $outing->status == 'pending' ? 'selected' : '' }}>In attesa di approvazione</option>
                         <option value="published" {{ $outing->status == 'published' ? 'selected' : '' }}>Pubblicata (Visibile)</option>
-                        <option value="open" {{ $outing->status == 'open' ? 'selected' : '' }}>Aperta (Prenotabile)</option>
-                        <option value="closed" {{ $outing->status == 'closed' ? 'selected' : '' }}>Chiusa (Iscrizioni terminate)</option>
                         <option value="concluded" {{ $outing->status == 'concluded' ? 'selected' : '' }}>Conclusa</option>
                         <option value="cancelled" {{ $outing->status == 'cancelled' ? 'selected' : '' }}>Annullata</option>
                     </select>

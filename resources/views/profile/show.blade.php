@@ -91,15 +91,6 @@
                         <small class="text-muted fs-6">Tappe<br>Singole</small>
                     </div>
                 </div>
-
-                @if($user->id === auth()->id() && $user->canCreateOuting())
-                    <hr>
-                    <p class="small text-success fw-bold"><i class="fa-solid fa-check-circle"></i> Hai completato il cammino! Puoi proporre uscite tra utenti.</p>
-                    <a href="{{ route('user.outings.create') }}" class="btn btn-success w-100 mt-2">Proponi un'uscita</a>
-                @elseif($user->canCreateOuting())
-                    <hr>
-                    <p class="small text-success fw-bold"><i class="fa-solid fa-check-circle"></i> Questo utente ha completato il cammino e può proporre uscite.</p>
-                @endif
             </div>
         </div>
     </div>

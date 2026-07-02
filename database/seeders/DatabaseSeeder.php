@@ -202,6 +202,26 @@ class DatabaseSeeder extends Seeder
             'status' => 'pending'
         ]);
 
+        // Uscita completa creata da Maria Bianchi (user3) per il test
+        $outingMaria = Outing::create([
+            'type' => 'user',
+            'is_full_trail' => true,
+            'organizer_id' => $user3->id,
+            'date' => Carbon::create(2026, 7, 5),
+            'meeting_point' => 'Piazza di Soverato',
+            'max_participants' => 5,
+            'difficulty' => 'medio',
+            'status' => 'published',
+            'notes' => 'TEST ANTIGRAVITY'
+        ]);
+
+        ParticipationRequest::create([
+            'outing_id' => $outingMaria->id,
+            'user_id' => $user3->id,
+            'status' => 'accepted'
+        ]);
+
+
         // 8. Notifiche di test per gli utenti
         $user1->notify(new \App\Notifications\SimpleNotification(
             'Benvenuto su CoastTrak!',

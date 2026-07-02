@@ -29,6 +29,13 @@ class OutingController extends Controller
                     'status' => 'accepted',
                 ]
             );
+
+            // Invia notifica all'organizzatore
+            $outing->organizer->notify(new \App\Notifications\SimpleNotification(
+                'Proposta di cammino approvata',
+                "La tua proposta per il cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} è stata approvata dall'amministratore.",
+                route('outings.show', $outing->id)
+            ));
         }
 
         return back()->with('success', 'Uscita tra utenti approvata con successo e resa visibile al pubblico!');
@@ -50,6 +57,14 @@ class OutingController extends Controller
             'notes' => $notes
         ]);
 
+        if ($outing->organizer_id) {
+            $outing->organizer->notify(new \App\Notifications\SimpleNotification(
+                'Proposta di cammino rifiutata',
+                "La tua proposta per il cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} è stata rifiutata dall'amministratore." . ($reason ? " Motivazione: {$reason}" : ""),
+                route('outings.show', $outing->id)
+            ));
+        }
+
         return back()->with('success', 'Uscita rifiutata.');
     }
 
@@ -69,6 +84,18 @@ class OutingController extends Controller
             'status' => 'cancelled',
             'notes' => $notes
         ]);
+
+        // Notifica tutti gli iscritti accettati
+        $participants = $outing->participationRequests()->where('status', 'accepted')->with('user')->get();
+        foreach ($participants as $participant) {
+            if ($participant->user) {
+                $participant->user->notify(new \App\Notifications\SimpleNotification(
+                    'Cammino annullato dall\'amministratore',
+                    "Il cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} a cui eri iscritto è stato annullato dall'amministratore." . ($reason ? " Motivazione: {$reason}" : ""),
+                    route('outings.show', $outing->id)
+                ));
+            }
+        }
 
         return back()->with('success', 'Uscita annullata con successo.');
     }

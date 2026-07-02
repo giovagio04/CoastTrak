@@ -220,58 +220,5 @@ class DatabaseSeeder extends Seeder
             'user_id' => $user3->id,
             'status' => 'accepted'
         ]);
-
-
-        // 8. Notifiche di test per gli utenti
-        $user1->notify(new \App\Notifications\SimpleNotification(
-            'Benvenuto su CoastTrak!',
-            'Grazie per esserti iscritto alla piattaforma. Esplora i cammini e partecipa alle uscite.'
-        ));
-
-        $user1->notify(new \App\Notifications\SimpleNotification(
-            'Nuova uscita approvata',
-            'La tua uscita da Petrizzi a Monterosso Calabro è stata approvata dall\'amministratore.',
-            route('outings.show', $outingUser->id)
-        ));
-
-        $user1->notify(new \App\Notifications\SimpleNotification(
-            'Richiesta di partecipazione',
-            'Luigi Verdi ha chiesto di unirsi alla tua uscita da Petrizzi a Monterosso.'
-        ));
-
-        $user1->notify(new \App\Notifications\SimpleNotification(
-            'Previsioni Meteo',
-            'Meteo favorevole previsto per il weekend! Ricorda di idratarti adeguatamente.'
-        ));
-
-        $user1->notify(new \App\Notifications\SimpleNotification(
-            'Suggerimento Equipaggiamento',
-            'Consigliamo scarpe da trekking impermeabili per affrontare il fango presente sul sentiero della Tappa 1.'
-        ));
-
-        $user1->notify(new \App\Notifications\SimpleNotification(
-            'Tappa Completata!',
-            'Ottimo lavoro! Hai completato con successo la tappa Soverato -> Petrizzi.'
-        ));
-
-        $user1->notify(new \App\Notifications\SimpleNotification(
-            'Timbro Credenziale',
-            'La tua credenziale digitale è stata timbrata con successo per la Tappa 1.'
-        ));
-
-        $user1->notify(new \App\Notifications\SimpleNotification(
-            'Messaggio dalla Guida',
-            'Giuseppe Trek ha risposto alla tua domanda sulla difficoltà del percorso.'
-        ));
-
-        $user1->notify(new \App\Notifications\SimpleNotification(
-            'Avviso Maltempo',
-            'Uscita programmata per domani posticipata a causa di allerta meteo arancione.'
-        ));
-
-        $user1->notify(new \App\Notifications\SimpleNotification(
-            'Stato del Sentiero',
-            'Attenzione: segnalata una leggera deviazione sulla Tappa 2 vicino a Monterosso Calabro.'
-        ));
     }
 }

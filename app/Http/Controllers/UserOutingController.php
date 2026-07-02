@@ -80,6 +80,23 @@ class UserOutingController extends Controller
             'notes' => $notes
         ]);
 
+        // Notifica tutti gli iscritti accettati (tranne l'organizzatore)
+        $participants = $outing->participationRequests()
+            ->where('status', 'accepted')
+            ->where('user_id', '!=', $outing->organizer_id)
+            ->with('user')
+            ->get();
+
+        foreach ($participants as $participant) {
+            if ($participant->user) {
+                $participant->user->notify(new \App\Notifications\SimpleNotification(
+                    'Cammino annullato dall\'organizzatore',
+                    "L'organizzatore ha annullato il cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} a cui eri iscritto." . ($reason ? " Motivazione: {$reason}" : ""),
+                    route('outings.show', $outing->id)
+                ));
+            }
+        }
+
         return back()->with('success', 'Il cammino è stato annullato con successo.');
     }
 }

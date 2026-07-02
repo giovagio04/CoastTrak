@@ -79,6 +79,15 @@ class ParticipationController extends Controller
 
         $participation->update(['status' => 'accepted']);
 
+        // Invia notifica al richiedente
+        if ($participation->user) {
+            $participation->user->notify(new \App\Notifications\SimpleNotification(
+                'Richiesta di partecipazione accettata',
+                "La tua richiesta di partecipazione al cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} è stata accettata dall'organizzatore.",
+                route('outings.show', $outing->id)
+            ));
+        }
+
         return back()->with('success', 'Richiesta di partecipazione approvata con successo!');
     }
 
@@ -97,6 +106,15 @@ class ParticipationController extends Controller
         }
 
         $participation->update(['status' => 'rejected']);
+
+        // Invia notifica al richiedente
+        if ($participation->user) {
+            $participation->user->notify(new \App\Notifications\SimpleNotification(
+                'Richiesta di partecipazione rifiutata',
+                "La tua richiesta di partecipazione al cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} è stata rifiutata dall'organizzatore.",
+                route('outings.show', $outing->id)
+            ));
+        }
 
         return back()->with('success', 'Richiesta di partecipazione rifiutata.');
     }

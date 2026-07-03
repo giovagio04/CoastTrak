@@ -11,23 +11,27 @@ class OutingController extends Controller
     {
         // Validazione dei dati di input della ricerca
         $request->validate([
-            'start_location' => 'nullable|string|max:100',
-            'end_location' => 'nullable|string|max:100|different:start_location',
-            'type' => 'nullable|in:all,official,user',
-            'difficulty' => 'nullable|in:all,facile,medio,difficile',
-            'date_from' => 'nullable|date|after_or_equal:today',
-            'date_to' => 'nullable|date|after_or_equal:date_from',
+            'start_location'  => 'nullable|string|max:100',
+            'end_location'    => 'nullable|string|max:100|different:start_location',
+            'type'            => 'nullable|in:all,official,user',
+            'difficulty'      => 'nullable|in:all,facile,medio,difficile',
+            'date_from'       => 'nullable|date|after_or_equal:today',
+            'date_to'         => 'nullable|date|after_or_equal:date_from',
+            'available_only'  => 'nullable|boolean',
         ], [
-            'end_location.different' => 'La località di arrivo deve essere diversa da quella di partenza.',
-            'date_from.date' => 'La data di inizio inserita non è valida.',
-            'date_from.after_or_equal' => 'La data di inizio non può essere precedente a quella odierna.',
-            'date_to.date' => 'La data di fine inserita non è valida.',
-            'date_to.after_or_equal' => 'La data di fine deve essere successiva o uguale alla data di inizio.',
+            'end_location.different'      => 'La località di arrivo deve essere diversa da quella di partenza.',
+            'date_from.date'              => 'La data di inizio inserita non è valida.',
+            'date_from.after_or_equal'    => 'La data di inizio non può essere precedente a quella odierna.',
+            'date_to.date'                => 'La data di fine inserita non è valida.',
+            'date_to.after_or_equal'      => 'La data di fine deve essere successiva o uguale alla data di inizio.',
         ]);
 
         // Recupero solo le uscite visibili al pubblico
         $query = Outing::whereIn('status', ['published'])
-            ->with(['organizer', 'guide']);
+            ->with(['organizer', 'guide'])
+            ->withCount(['participationRequests as accepted_count' => function ($q) {
+                $q->where('status', 'accepted');
+            }]);
 
         // Filtro per Tipo (Ufficiale / Tra Utenti)
         if ($request->filled('type') && $request->type !== 'all') {
@@ -73,6 +77,15 @@ class OutingController extends Controller
                       }
                   });
             });
+        }
+
+        // Filtro "Solo posti disponibili"
+        if ($request->boolean('available_only')) {
+            $query->whereRaw('(
+                SELECT COUNT(*) FROM participation_requests
+                WHERE participation_requests.outing_id = outings.id
+                AND participation_requests.status = ?
+            ) < outings.max_participants', ['accepted']);
         }
 
         $outings = $query->orderBy('date', 'asc')->get();

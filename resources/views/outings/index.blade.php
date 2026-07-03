@@ -35,6 +35,7 @@
             (request('type') && request('type') !== 'all') ? request('type') : null,
             (request('difficulty') && request('difficulty') !== 'all') ? request('difficulty') : null,
             request('date_from'), request('date_to'),
+            request('available_only') ? '1' : null,
         ]);
     @endphp
 
@@ -55,6 +56,7 @@
         <input type="hidden" name="difficulty"      id="hDiff"  value="{{ request('difficulty', 'all') }}">
         <input type="hidden" name="date_from"       id="hDateFrom" value="{{ request('date_from') }}">
         <input type="hidden" name="date_to"         id="hDateTo"   value="{{ request('date_to') }}">
+        <input type="hidden" name="available_only"  id="hAvailableOnly" value="{{ request('available_only') ? '1' : '' }}">
     </form>
 
     @if(count($activeFilters) > 0)
@@ -169,6 +171,21 @@
                             <input type="date" id="mDateTo" class="form-control" value="{{ request('date_to') }}">
                         </div>
                     </div>
+                </div>
+
+                <hr class="my-2">
+
+                <!-- Solo posti disponibili -->
+                <div class="mb-2">
+                    <div class="form-check form-switch d-flex align-items-center gap-2 py-2">
+                        <input class="form-check-input" type="checkbox" role="switch"
+                               id="mAvailableOnly" style="width:2.5em; height:1.25em; cursor:pointer;"
+                               {{ request('available_only') ? 'checked' : '' }}>
+                        <label class="form-check-label fw-bold d-flex align-items-center gap-2 mb-0" for="mAvailableOnly">
+                            <i class="fa-solid fa-user-check text-success"></i> Solo posti disponibili
+                        </label>
+                    </div>
+                    <p class="text-muted small mb-0 ms-1">Mostra solo le uscite che non hanno ancora raggiunto il numero massimo di partecipanti.</p>
                 </div>
 
             </div><!-- /modal-body -->
@@ -289,6 +306,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const mDiff     = document.getElementById('mDiff');
     const mDateFrom = document.getElementById('mDateFrom');
     const mDateTo   = document.getElementById('mDateTo');
+    const mAvailableOnly = document.getElementById('mAvailableOnly');
 
     // Campi hidden del form
     const hStart    = document.getElementById('hStart');
@@ -297,6 +315,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const hDiff     = document.getElementById('hDiff');
     const hDateFrom = document.getElementById('hDateFrom');
     const hDateTo   = document.getElementById('hDateTo');
+    const hAvailableOnly = document.getElementById('hAvailableOnly');
 
     // Banner errori nel modal
     const errorBanner = document.getElementById('modalErrorBanner');
@@ -318,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // Nasconde il banner ogni volta che l'utente modifica un campo
-    [mStart, mEnd, mType, mDiff, mDateFrom, mDateTo].forEach(el => {
+    [mStart, mEnd, mType, mDiff, mDateFrom, mDateTo, mAvailableOnly].forEach(el => {
         el.addEventListener('input', hideModalErrors);
         el.addEventListener('change', hideModalErrors);
     });
@@ -343,16 +362,16 @@ document.addEventListener('DOMContentLoaded', function () {
             today.setHours(0, 0, 0, 0);
             if (dateFromObj < today) {
                 errors.push("La data di inizio non può essere precedente a quella odierna.");
-            } else if (dateFromObj.getFullYear() > 2100) {
-                errors.push("La data di inizio inserita non è valida.");
             }
         }
 
-        // Controllo 3: data fine valida
+        // Controllo 3: data fine non precedente ad oggi
         if (dateToStr) {
-            const year = new Date(dateToStr).getFullYear();
-            if (year < 2000 || year > 2100) {
-                errors.push("La data di fine inserita non è valida.");
+            const dateToObj = new Date(dateToStr);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            if (dateToObj < today) {
+                errors.push("La data di fine non può essere precedente a quella odierna.");
             }
         }
 
@@ -378,6 +397,7 @@ document.addEventListener('DOMContentLoaded', function () {
         hDiff.value     = mDiff.value;
         hDateFrom.value = mDateFrom.value;
         hDateTo.value   = mDateTo.value;
+        hAvailableOnly.value = mAvailableOnly.checked ? '1' : '';
         document.getElementById('filterForm').submit();
     });
 
@@ -389,6 +409,7 @@ document.addEventListener('DOMContentLoaded', function () {
         mDiff.value     = 'all';
         mDateFrom.value = '';
         mDateTo.value   = '';
+        mAvailableOnly.checked = false;
         hideModalErrors();
     });
 

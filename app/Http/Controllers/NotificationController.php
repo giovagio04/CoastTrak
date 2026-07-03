@@ -18,11 +18,27 @@ class NotificationController extends Controller
             ->take(15)
             ->get()
             ->map(function ($notification) {
+                $title = $notification->data['title'] ?? 'Notifica';
+                $actionUrl = $notification->data['action_url'] ?? null;
+
+                // Forziamo a null l'action_url per specifiche notifiche che non devono essere cliccabili
+                $titleLower = strtolower($title);
+                if (
+                    str_contains($titleLower, 'proposta di cammino approvata') ||
+                    str_contains($titleLower, 'proposta di cammina approvata') ||
+                    str_contains($titleLower, 'proposta di cammino rifiutata') ||
+                    str_contains($titleLower, 'proposta di cammina rifiutata') ||
+                    str_contains($titleLower, 'cammino annullato dall\'amministratore') ||
+                    str_contains($titleLower, 'cammino annullato da amministratore')
+                ) {
+                    $actionUrl = null;
+                }
+
                 return [
                     'id' => $notification->id,
-                    'title' => $notification->data['title'] ?? 'Notifica',
+                    'title' => $title,
                     'message' => $notification->data['message'] ?? '',
-                    'action_url' => $notification->data['action_url'] ?? null,
+                    'action_url' => $actionUrl,
                     'read_at' => $notification->read_at,
                     'created_at' => $notification->created_at ? $notification->created_at->diffForHumans() : '',
                 ];
@@ -54,4 +70,26 @@ class NotificationController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    /**
+     * Delete a single notification.
+     */
+    public function destroy(Request $request, string $id): JsonResponse
+    {
+        $notification = $request->user()->notifications()->findOrFail($id);
+        $notification->delete();
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Delete all notifications.
+     */
+    public function destroyAll(Request $request): JsonResponse
+    {
+        $request->user()->notifications()->delete();
+
+        return response()->json(['success' => true]);
+    }
 }
+

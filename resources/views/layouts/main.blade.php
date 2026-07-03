@@ -159,6 +159,109 @@
             padding: 50px 0 20px;
             margin-top: 60px;
         }
+
+        /* Stili per il dropdown delle notifiche */
+        .notification-dropdown {
+            width: 340px;
+            border-radius: 16px !important;
+            border: 1px solid var(--bs-border-color-translucent) !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+            overflow: hidden;
+        }
+        
+        .notification-dropdown .animate-bell {
+            display: inline-block;
+        }
+        
+        @keyframes bellRing {
+            0%, 100% { transform: rotate(0); }
+            20%, 60% { transform: rotate(15deg); }
+            40%, 80% { transform: rotate(-15deg); }
+        }
+        
+        .notification-dropdown:hover .animate-bell,
+        #notificationDropdown:hover .fa-bell {
+            animation: bellRing 0.6s ease-in-out;
+        }
+
+        .btn-action-header {
+            width: 32px;
+            height: 32px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            border: none;
+            background: transparent;
+            border-radius: 50%;
+            color: var(--bs-secondary-color) !important;
+        }
+        .btn-action-header:hover {
+            background-color: var(--bs-tertiary-bg);
+            color: var(--bs-primary) !important;
+        }
+        .btn-action-header.text-danger-hover:hover {
+            color: #dc3545 !important;
+            background-color: rgba(220, 53, 69, 0.1);
+        }
+
+        .notification-item {
+            position: relative;
+            border-left: 3px solid transparent;
+            transition: all 0.2s ease;
+            background-color: transparent;
+        }
+        
+        .notification-item.unread {
+            border-left-color: #ff6b35;
+            background-color: rgba(255, 107, 53, 0.04) !important;
+        }
+        
+        .notification-item.unread.clickable:hover {
+            background-color: rgba(255, 107, 53, 0.08) !important;
+        }
+        
+        .notification-item.clickable:hover {
+            background-color: rgba(0, 0, 0, 0.03) !important;
+        }
+        
+        html[data-bs-theme="dark"] .notification-item.clickable:hover {
+            background-color: rgba(255, 255, 255, 0.04) !important;
+        }
+        
+        .notification-item.clickable {
+            cursor: pointer;
+        }
+
+        .delete-notification-btn {
+            opacity: 0;
+            transition: all 0.2s ease;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--bs-secondary-color);
+            background: transparent;
+            border: none;
+        }
+        
+        .notification-item:hover .delete-notification-btn {
+            opacity: 0.7;
+        }
+        
+        .notification-item:hover .delete-notification-btn:hover {
+            opacity: 1;
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545 !important;
+        }
+
+        @media (hover: none) {
+            .delete-notification-btn {
+                opacity: 0.7;
+            }
+        }
     </style>
 </head>
 <body>
@@ -196,12 +299,23 @@
                                 0
                             </span>
                         </a>
-                        <div class="dropdown-menu dropdown-menu-end shadow border-0 p-0 mt-2" aria-labelledby="notificationDropdown" style="width: 320px; border-radius: 12px; overflow: hidden; right: 0; left: auto;">
-                            <div class="p-3 bg-body-secondary border-bottom d-flex justify-content-between align-items-center">
-                                <h6 class="mb-0 fw-bold"><i class="fa-solid fa-bell text-primary me-2"></i>Notifiche</h6>
-                                <button id="markAllReadBtn" class="btn btn-link btn-sm text-decoration-none p-0 text-primary fw-semibold" style="font-size: 0.8rem;">Segna come lette</button>
+                        <div class="dropdown-menu dropdown-menu-end p-0 mt-2 notification-dropdown" aria-labelledby="notificationDropdown">
+                            <div class="px-3 py-2 bg-body-secondary border-bottom d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0 fw-bold d-flex align-items-center text-body-emphasis">
+                                    <i class="fa-solid fa-bell me-2 animate-bell" style="color: #ff6b35;"></i>
+                                    Notifiche
+                                    <span id="notificationBadgeHeader" class="badge rounded-pill bg-danger ms-2 d-none" style="font-size: 0.65rem;">0</span>
+                                </h6>
+                                <div class="d-flex align-items-center">
+                                    <button id="markAllReadBtn" class="btn-action-header me-1" title="Segna tutte come lette">
+                                        <i class="fa-solid fa-check-double"></i>
+                                    </button>
+                                    <button id="deleteAllNotificationsBtn" class="btn-action-header text-danger-hover" title="Cancella tutte">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
                             </div>
-                            <div id="notificationList" class="overflow-auto" style="max-height: 300px;">
+                            <div id="notificationList" class="overflow-auto" style="max-height: 320px;">
                                 <div class="p-4 text-center text-muted">
                                     <div class="spinner-border spinner-border-sm text-primary mb-2" role="status"></div>
                                     <p class="mb-0 small">Caricamento...</p>
@@ -290,11 +404,19 @@
                 .then(response => response.json())
                 .then(data => {
                     // Aggiorna Badge
+                    const badgeHeader = document.getElementById('notificationBadgeHeader');
                     if (data.unread_count > 0) {
                         badge.textContent = data.unread_count;
                         badge.classList.remove('d-none');
+                        if (badgeHeader) {
+                            badgeHeader.textContent = data.unread_count;
+                            badgeHeader.classList.remove('d-none');
+                        }
                     } else {
                         badge.classList.add('d-none');
+                        if (badgeHeader) {
+                            badgeHeader.classList.add('d-none');
+                        }
                     }
 
                     // Svuota lista
@@ -302,9 +424,12 @@
 
                     if (data.notifications.length === 0) {
                         list.innerHTML = `
-                            <div class="p-4 text-center text-muted">
-                                <i class="fa-solid fa-bell-slash fa-2x mb-2 text-secondary-emphasis" style="opacity: 0.5;"></i>
-                                <p class="mb-0 small">Non ci sono notifiche</p>
+                            <div class="py-5 text-center text-muted">
+                                <div class="mb-3 d-inline-block p-3 rounded-circle bg-body-tertiary">
+                                    <i class="fa-solid fa-bell-slash fa-2x text-secondary" style="opacity: 0.6;"></i>
+                                </div>
+                                <p class="mb-0 fw-semibold text-secondary" style="font-size: 0.9rem;">Non ci sono notifiche</p>
+                                <span class="text-muted small" style="font-size: 0.75rem;">Ti avviseremo quando ci saranno novità</span>
                             </div>
                         `;
                         return;
@@ -313,35 +438,39 @@
                     data.notifications.forEach(n => {
                         const isUnread = !n.read_at;
                         const item = document.createElement('div');
-                        item.className = `p-3 border-bottom notification-item ${isUnread ? 'bg-light-blue' : ''}`;
-                        item.style.transition = 'background-color 0.2s';
-                        
-                        if (isUnread) {
-                            item.style.backgroundColor = 'rgba(13, 110, 253, 0.05)';
-                        }
+                        item.className = `p-3 border-bottom notification-item ${isUnread ? 'unread' : ''}`;
 
                         item.innerHTML = `
                             <div class="d-flex justify-content-between align-items-start">
-                                <h6 class="mb-1 fw-bold text-dark" style="font-size: 0.9rem;">${n.title}</h6>
-                                ${isUnread ? '<span class="badge bg-primary p-1 rounded-circle" style="width: 8px; height: 8px; display: inline-block;"></span>' : ''}
+                                <h6 class="mb-1 fw-bold text-body-emphasis notification-title" style="font-size: 0.9rem; padding-right: 15px;">${n.title}</h6>
+                                <div class="d-flex align-items-center">
+                                    ${isUnread ? '<span class="badge bg-primary p-1 rounded-circle me-2" style="width: 8px; height: 8px; display: inline-block;"></span>' : ''}
+                                    <button class="btn btn-link btn-sm p-0 text-secondary delete-notification-btn" data-id="${n.id}" title="Cancella notifica">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </div>
                             </div>
                             <p class="mb-1 text-muted small text-justify" style="font-size: 0.8rem; line-height: 1.3;">${n.message}</p>
                             <small class="text-muted" style="font-size: 0.7rem;">${n.created_at}</small>
                         `;
 
-                        // Effetti hover e interazioni click
+                        // Gestione eliminazione singola
+                        const deleteBtn = item.querySelector('.delete-notification-btn');
+                        if (deleteBtn) {
+                            deleteBtn.addEventListener('click', function (e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const id = this.getAttribute('data-id');
+                                deleteNotification(id);
+                            });
+                        }
+
+                        // Interazioni click
                         const hasAction = !!n.action_url;
                         const isClickable = hasAction;
 
                         if (isClickable) {
-                            item.style.cursor = 'pointer';
-                            item.addEventListener('mouseenter', () => {
-                                item.style.backgroundColor = isUnread ? 'rgba(13, 110, 253, 0.08)' : 'rgba(0, 0, 0, 0.03)';
-                            });
-                            item.addEventListener('mouseleave', () => {
-                                item.style.backgroundColor = isUnread ? 'rgba(13, 110, 253, 0.05)' : 'transparent';
-                            });
-
+                            item.classList.add('clickable');
                             item.addEventListener('click', function () {
                                 if (isUnread) {
                                     fetch(`/notifications/${n.id}/read`, {
@@ -368,8 +497,6 @@
                                     window.location.href = n.action_url;
                                 }
                             });
-                        } else {
-                            item.style.cursor = 'default';
                         }
 
                         list.appendChild(item);
@@ -404,6 +531,24 @@
                 });
             }
 
+            // Cancella singola notifica
+            function deleteNotification(id) {
+                fetch(`/notifications/${id}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        loadNotifications();
+                    }
+                });
+            }
+
             // Segna tutte come lette
             if (markAllBtn) {
                 markAllBtn.addEventListener('click', function (e) {
@@ -423,6 +568,31 @@
                             loadNotifications();
                         }
                     });
+                });
+            }
+
+            // Cancella tutte le notifiche
+            const deleteAllBtn = document.getElementById('deleteAllNotificationsBtn');
+            if (deleteAllBtn) {
+                deleteAllBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (confirm('Sei sicuro di voler cancellare tutte le notifiche?')) {
+                        fetch('/notifications', {
+                            method: 'DELETE',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'X-Requested-With': 'XMLHttpRequest',
+                                'Accept': 'application/json'
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                loadNotifications();
+                            }
+                        });
+                    }
                 });
             }
 

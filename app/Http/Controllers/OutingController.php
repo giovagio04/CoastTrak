@@ -7,13 +7,75 @@ use Illuminate\Http\Request;
 
 class OutingController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        // Validazione dei dati di input della ricerca
+        $request->validate([
+            'start_location' => 'nullable|string|max:100',
+            'end_location' => 'nullable|string|max:100|different:start_location',
+            'type' => 'nullable|in:all,official,user',
+            'difficulty' => 'nullable|in:all,facile,medio,difficile',
+            'date_from' => 'nullable|date|after_or_equal:today',
+            'date_to' => 'nullable|date|after_or_equal:date_from',
+        ], [
+            'end_location.different' => 'La località di arrivo deve essere diversa da quella di partenza.',
+            'date_from.date' => 'La data di inizio inserita non è valida.',
+            'date_from.after_or_equal' => 'La data di inizio non può essere precedente a quella odierna.',
+            'date_to.date' => 'La data di fine inserita non è valida.',
+            'date_to.after_or_equal' => 'La data di fine deve essere successiva o uguale alla data di inizio.',
+        ]);
+
         // Recupero solo le uscite visibili al pubblico
-        $outings = Outing::whereIn('status', ['published'])
-            ->with(['organizer', 'guide'])
-            ->orderBy('date', 'asc')
-            ->get();
+        $query = Outing::whereIn('status', ['published'])
+            ->with(['organizer', 'guide']);
+
+        // Filtro per Tipo (Ufficiale / Tra Utenti)
+        if ($request->filled('type') && $request->type !== 'all') {
+            $query->where('type', $request->type);
+        }
+
+        // Filtro per Difficoltà
+        if ($request->filled('difficulty') && $request->difficulty !== 'all') {
+            $query->where('difficulty', $request->difficulty);
+        }
+
+        // Filtro per Data Da
+        if ($request->filled('date_from')) {
+            $query->whereDate('date', '>=', $request->date_from);
+        }
+
+        // Filtro per Data A
+        if ($request->filled('date_to')) {
+            $query->whereDate('date', '<=', $request->date_to);
+        }
+
+        // Filtro per Località di Partenza
+        if ($request->filled('start_location')) {
+            $start = $request->start_location;
+            $query->where(function ($q) use ($start) {
+                $q->where('start_location', 'LIKE', '%' . $start . '%')
+                  ->orWhere(function ($sq) use ($start) {
+                      if (stripos('Soverato', $start) !== false || stripos('Cammino Completo', $start) !== false) {
+                          $sq->where('is_full_trail', true);
+                      }
+                  });
+            });
+        }
+
+        // Filtro per Località di Arrivo
+        if ($request->filled('end_location')) {
+            $end = $request->end_location;
+            $query->where(function ($q) use ($end) {
+                $q->where('end_location', 'LIKE', '%' . $end . '%')
+                  ->orWhere(function ($sq) use ($end) {
+                      if (stripos('Pizzo', $end) !== false || stripos('Cammino Completo', $end) !== false) {
+                          $sq->where('is_full_trail', true);
+                      }
+                  });
+            });
+        }
+
+        $outings = $query->orderBy('date', 'asc')->get();
 
         return view('outings.index', compact('outings'));
     }

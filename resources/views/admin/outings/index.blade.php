@@ -49,7 +49,7 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <a href="{{ route('admin.outings.index') }}" class="btn btn-light me-auto">Azzera Filtri</a>
+                    <button type="button" class="btn btn-light me-auto" id="btnResetAdminFilters">Azzera Filtri</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Chiudi</button>
                     <button type="submit" class="btn btn-primary">Applica Filtri</button>
                 </div>
@@ -120,4 +120,17 @@
         @endif
     </div>
 </div>
+@endsection
+
+@section('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.getElementById('btnResetAdminFilters').addEventListener('click', function () {
+        // Svuota i select del modal senza navigare via
+        var modalEl = document.getElementById('filterModal');
+        modalEl.querySelector('[name="type"]').value   = '';
+        modalEl.querySelector('[name="status"]').value = '';
+    });
+});
+</script>
 @endsection

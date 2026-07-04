@@ -23,10 +23,9 @@ class ParticipationController extends Controller
             return back()->with('error', "Questa uscita non è disponibile per le iscrizioni.");
         }
 
-        // 1. Verifica se l'utente ha già una richiesta per questa uscita
-        if ($outing->participationRequests()->where('user_id', auth()->id())->exists()) {
-            return back()->with('error', 'Hai già inviato una richiesta per questa uscita.');
-        }
+        // BUG-02 FIX: il controllo duplicati è stato spostato DENTRO la transazione
+        // con lockForUpdate (vedi sotto), rendendolo atomico. Un check qui fuori
+        // non è affidabile in presenza di richieste concorrenti.
 
         // VULN-02 FIX: Operazione atomica con lock pessimistico per prevenire race condition.
         // Senza questo lock, due richieste simultanee possono entrambe superare il controllo
@@ -38,6 +37,14 @@ class ParticipationController extends Controller
             // Ri-carica l'uscita con un lock esclusivo per questa transazione
             $lockedOuting = Outing::lockForUpdate()->find($outing->id);
 
+            // BUG-02 FIX: controllo duplicati spostato qui dentro, atomico grazie al lock.
+            // Questo previene la race condition in cui due richieste simultanee superano
+            // entrambe il check pre-transazione prima che una delle due inserisca il record.
+            if ($lockedOuting->participationRequests()->where('user_id', auth()->id())->exists()) {
+                $errorMessage = 'Hai già inviato una richiesta per questa uscita.';
+                return;
+            }
+
             // Controllo posti disponibili (atomico)
             $acceptedCount = $lockedOuting->participationRequests()->where('status', 'accepted')->count();
             if ($acceptedCount >= $lockedOuting->max_participants) {
@@ -48,11 +55,23 @@ class ParticipationController extends Controller
             // Determina lo stato della richiesta
             $status = ($lockedOuting->type === 'official') ? 'accepted' : 'pending';
 
-            ParticipationRequest::create([
-                'outing_id' => $lockedOuting->id,
-                'user_id'   => auth()->id(),
-                'status'    => $status,
-            ]);
+            try {
+                ParticipationRequest::create([
+                    'outing_id' => $lockedOuting->id,
+                    'user_id'   => auth()->id(),
+                    'status'    => $status,
+                ]);
+            } catch (\Illuminate\Database\QueryException $e) {
+                // Ultimo livello di difesa: il vincolo UNIQUE a DB intercetta
+                // eventuali duplicati che abbiano comunque superato il lock
+                // (es. su SQLite in modalità WAL o in test paralleli).
+                if (str_contains($e->getMessage(), 'UNIQUE constraint failed') ||
+                    str_contains($e->getMessage(), 'Duplicate entry')) {
+                    $errorMessage = 'Hai già inviato una richiesta per questa uscita.';
+                    return;
+                }
+                throw $e;
+            }
 
             if ($lockedOuting->type === 'user' && $lockedOuting->organizer) {
                 $notifyOrganizer = true;

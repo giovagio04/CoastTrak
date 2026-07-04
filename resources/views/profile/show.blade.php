@@ -77,7 +77,7 @@
 
     <!-- Riquadro Destro: Credenziale Digitale (col-md-4) -->
     <div class="col-md-4">
-        <div class="card shadow-sm border-0 bg-body-tertiary h-100">
+        <div class="card shadow-sm border-0 h-100">
             <div class="card-body text-center p-4">
                 <div class="display-4 text-warning mb-3">
                     <i class="fa-solid fa-medal"></i>

@@ -40,13 +40,18 @@
         </div>
 
         <div class="flex items-center justify-end mt-4">
-            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
-                {{ __('Already registered?') }}
-            </a>
-
             <x-primary-button class="ms-4">
-                {{ __('Register') }}
+                {{ __('Registrati') }}
             </x-primary-button>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-gray-200 text-center">
+            <p class="text-sm text-gray-600">
+                {{ __('Hai già un account?') }}
+                <a class="underline font-semibold text-indigo-600 hover:text-indigo-500 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ms-1" href="{{ route('login') }}">
+                    {{ __('Accedi') }}
+                </a>
+            </p>
         </div>
     </form>
 </x-guest-layout>

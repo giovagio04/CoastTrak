@@ -108,7 +108,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-image: url('{{ asset('img/hero.png') }}');
+            background-image: url('{{ asset('img/hero_real.jpg') }}');
             background-size: cover;
             background-position: center;
             z-index: 1;
@@ -226,7 +226,7 @@
             transition: background 0.3s ease;
         }
         .split-image {
-            background-image: url('{{ asset('img/hikers.png') }}');
+            background-image: url('{{ asset('img/hikers_real.jpg') }}');
             background-size: cover;
             background-position: center;
             min-height: 600px;

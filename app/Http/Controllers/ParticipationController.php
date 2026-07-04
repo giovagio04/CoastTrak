@@ -16,6 +16,13 @@ class ParticipationController extends Controller
             return back()->with('error', 'Non puoi richiedere di partecipare al tuo stesso cammino.');
         }
 
+        // BUG-01 FIX: L'uscita deve essere in stato 'published' per accettare iscrizioni.
+        // Senza questo controllo, gli utenti potevano iscriversi a uscite
+        // concluded, cancelled o rejected tramite POST diretto.
+        if ($outing->status !== 'published') {
+            return back()->with('error', "Questa uscita non è disponibile per le iscrizioni.");
+        }
+
         // 1. Verifica se l'utente ha già una richiesta per questa uscita
         if ($outing->participationRequests()->where('user_id', auth()->id())->exists()) {
             return back()->with('error', 'Hai già inviato una richiesta per questa uscita.');

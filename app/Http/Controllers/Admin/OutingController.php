@@ -191,7 +191,7 @@ class OutingController extends Controller
             'start_location'  => 'required_if:route_type,custom|nullable|string|max:255',
             'end_location'    => 'required_if:route_type,custom|nullable|string|max:255|different:start_location',
             'guide_id'        => 'nullable|exists:guides,id',
-            'date'            => 'required|date|before_or_equal:+3 years',
+            'date'            => 'required|date|after_or_equal:today|before_or_equal:+3 years',
             'meeting_point'   => 'required|string|max:255',
             'max_participants' => 'required|integer|min:1|max:50',
             'difficulty'      => 'required|in:facile,medio,difficile',

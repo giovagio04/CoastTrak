@@ -56,7 +56,11 @@
                         <div class="mb-3">
                             <span class="text-muted small fw-bold text-uppercase">Data di Nascita</span>
                             <p class="text-body mt-1 mb-0">
-                                {{ $user->date_of_birth ? \Carbon\Carbon::parse($user->date_of_birth)->format('d/m/Y') : 'Non specificata' }}
+                                @if(auth()->id() === $user->id || auth()->user()->role === 'admin')
+                                    {{ $user->date_of_birth ? \Carbon\Carbon::parse($user->date_of_birth)->format('d/m/Y') : 'Non specificata' }}
+                                @else
+                                    <span class="text-muted fst-italic"><i class="fa-solid fa-lock fa-sm"></i> Privata</span>
+                                @endif
                             </p>
                         </div>
                     </div>

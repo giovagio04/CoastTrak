@@ -46,6 +46,9 @@ class OutingController extends Controller
             return back()->with('error', 'Questa uscita non può essere rifiutata.');
         }
 
+        // VULN-06 FIX: Validazione lunghezza motivazione
+        $request->validate(['reason' => 'nullable|string|max:2000']);
+
         $reason = $request->input('reason');
         $notes = $outing->notes;
         if ($reason) {
@@ -73,6 +76,9 @@ class OutingController extends Controller
         if ($outing->status === 'cancelled') {
             return back()->with('error', 'Questa uscita è già annullata.');
         }
+
+        // VULN-06 FIX: Validazione lunghezza motivazione
+        $request->validate(['reason' => 'nullable|string|max:2000']);
 
         $reason = $request->input('reason');
         $notes = $outing->notes;
@@ -103,6 +109,12 @@ class OutingController extends Controller
 
     public function index(Request $request)
     {
+        // VULN-04 FIX: Validazione dei filtri con valori ammessi
+        $request->validate([
+            'type'   => 'nullable|in:official,user',
+            'status' => 'nullable|in:pending,published,concluded,cancelled,rejected',
+        ]);
+
         $query = Outing::with(['guide', 'participationRequests']);
 
         // Filtro per Tipo
@@ -137,15 +149,15 @@ class OutingController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'route_type' => 'required|in:standard,custom',
-            'start_location' => 'required_if:route_type,custom|nullable|string',
-            'end_location' => 'required_if:route_type,custom|nullable|string|different:start_location',
-            'guide_id' => 'nullable|exists:guides,id',
-            'date' => 'required|date|after_or_equal:today|before_or_equal:+3 years',
-            'meeting_point' => 'required|string|max:255',
+            'route_type'      => 'required|in:standard,custom',
+            'start_location'  => 'required_if:route_type,custom|nullable|string|max:255',
+            'end_location'    => 'required_if:route_type,custom|nullable|string|max:255|different:start_location',
+            'guide_id'        => 'nullable|exists:guides,id',
+            'date'            => 'required|date|after_or_equal:today|before_or_equal:+3 years',
+            'meeting_point'   => 'required|string|max:255',
             'max_participants' => 'required|integer|min:1|max:50',
-            'difficulty' => 'required|in:facile,medio,difficile',
-            'notes' => 'nullable|string'
+            'difficulty'      => 'required|in:facile,medio,difficile',
+            'notes'           => 'nullable|string|max:5000', // VULN-06 FIX
         ]);
 
         if ($validated['route_type'] === 'standard') {
@@ -175,16 +187,16 @@ class OutingController extends Controller
     public function update(Request $request, Outing $outing)
     {
         $validated = $request->validate([
-            'route_type' => 'required|in:standard,custom',
-            'start_location' => 'required_if:route_type,custom|nullable|string',
-            'end_location' => 'required_if:route_type,custom|nullable|string|different:start_location',
-            'guide_id' => 'nullable|exists:guides,id',
-            'date' => 'required|date|before_or_equal:+3 years',
-            'meeting_point' => 'required|string|max:255',
+            'route_type'      => 'required|in:standard,custom',
+            'start_location'  => 'required_if:route_type,custom|nullable|string|max:255',
+            'end_location'    => 'required_if:route_type,custom|nullable|string|max:255|different:start_location',
+            'guide_id'        => 'nullable|exists:guides,id',
+            'date'            => 'required|date|before_or_equal:+3 years',
+            'meeting_point'   => 'required|string|max:255',
             'max_participants' => 'required|integer|min:1|max:50',
-            'difficulty' => 'required|in:facile,medio,difficile',
-            'notes' => 'nullable|string',
-            'status' => 'required|in:pending,published,concluded,cancelled,rejected'
+            'difficulty'      => 'required|in:facile,medio,difficile',
+            'notes'           => 'nullable|string|max:5000', // VULN-06 FIX
+            'status'          => 'required|in:pending,published,concluded,cancelled,rejected',
         ]);
 
         if ($validated['route_type'] === 'standard') {

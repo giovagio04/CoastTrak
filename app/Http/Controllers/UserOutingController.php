@@ -26,14 +26,14 @@ class UserOutingController extends Controller
         }
 
         $validated = $request->validate([
-            'route_type' => 'required|in:standard,custom',
-            'start_location' => 'required_if:route_type,custom|nullable|string',
-            'end_location' => 'required_if:route_type,custom|nullable|string|different:start_location',
-            'date' => 'required|date|after:today|before_or_equal:+3 years',
-            'meeting_point' => 'required|string|max:255',
+            'route_type'      => 'required|in:standard,custom',
+            'start_location'  => 'required_if:route_type,custom|nullable|string|max:255',
+            'end_location'    => 'required_if:route_type,custom|nullable|string|max:255|different:start_location',
+            'date'            => 'required|date|after:today|before_or_equal:+3 years',
+            'meeting_point'   => 'required|string|max:255',
             'max_participants' => 'required|integer|min:2|max:15',
-            'difficulty' => 'required|in:facile,medio,difficile',
-            'notes' => 'nullable|string'
+            'difficulty'      => 'required|in:facile,medio,difficile',
+            'notes'           => 'nullable|string|max:5000', // VULN-06 FIX
         ]);
 
         if ($validated['route_type'] === 'standard') {
@@ -78,6 +78,9 @@ class UserOutingController extends Controller
         if ($outing->status === 'cancelled') {
             return back()->with('error', 'Questa uscita è già stata annullata.');
         }
+
+        // VULN-06 FIX: Validazione lunghezza motivazione annullamento
+        $request->validate(['reason' => 'nullable|string|max:2000']);
 
         $reason = $request->input('reason');
         $notes = $outing->notes;

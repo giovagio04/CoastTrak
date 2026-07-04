@@ -72,6 +72,19 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
+        // VULN-09 FIX: Blocca l'eliminazione se l'utente è organizzatore di uscite attive.
+        // Senza questo controllo, la cascade delete eliminerebbe silenziosamente tutte le
+        // partecipazioni e le credenziali digitali degli altri utenti iscritti a queste uscite.
+        $activeOutingsCount = $user->outings()
+            ->whereIn('status', ['published', 'pending'])
+            ->count();
+
+        if ($activeOutingsCount > 0) {
+            return Redirect::route('profile.show')->withErrors([
+                'account_deletion' => "Non puoi eliminare l'account mentre sei organizzatore di {$activeOutingsCount} uscita/e attiva/e. Annulla prima le tue uscite pubblicati o in attesa di approvazione.",
+            ], 'userDeletion');
+        }
+
         Auth::logout();
 
         $user->delete();

@@ -17,54 +17,51 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Creazione Admin
+        // NOTA: 'role' è escluso da $fillable per sicurezza.
+        // Nel seeder si usa update() direttamente sull'istanza Eloquent per bypassare
+        // la whitelist di $fillable in modo controllato.
         $admin = User::create([
-            'name' => 'Amministratore',
-            'email' => 'admin@coasttrack.it',
+            'name'     => 'Amministratore',
+            'email'    => 'admin@coasttrack.it',
             'password' => Hash::make('password'),
-            'role' => 'admin',
         ]);
+        $admin->updateQuietly(['role' => 'admin']);
 
         // 2. Creazione Utenti normali
         $user1 = User::create([
-            'name' => 'Mario Rossi',
-            'email' => 'mario@example.com',
+            'name'     => 'Mario Rossi',
+            'email'    => 'mario@example.com',
             'password' => Hash::make('password'),
-            'role' => 'user',
         ]);
 
         $user2 = User::create([
-            'name' => 'Luigi Verdi',
-            'email' => 'luigi@example.com',
+            'name'     => 'Luigi Verdi',
+            'email'    => 'luigi@example.com',
             'password' => Hash::make('password'),
-            'role' => 'user',
         ]);
 
         $user3 = User::create([
-            'name' => 'Maria Bianchi',
-            'email' => 'maria@example.com',
+            'name'     => 'Maria Bianchi',
+            'email'    => 'maria@example.com',
             'password' => Hash::make('password'),
-            'role' => 'user',
         ]);
 
         $user4 = User::create([
-            'name' => 'Stefano Neri',
-            'email' => 'stefano@example.com',
+            'name'     => 'Stefano Neri',
+            'email'    => 'stefano@example.com',
             'password' => Hash::make('password'),
-            'role' => 'user',
         ]);
 
         $user5 = User::create([
-            'name' => 'Awais',
-            'email' => 'awais@example.com',
+            'name'     => 'Awais',
+            'email'    => 'awais@example.com',
             'password' => Hash::make('password'),
-            'role' => 'user',
         ]);
 
         $userGiulia = User::create([
-            'name' => 'Giulia Neri',
-            'email' => 'giulia@example.com',
+            'name'     => 'Giulia Neri',
+            'email'    => 'giulia@example.com',
             'password' => Hash::make('password'),
-            'role' => 'user',
         ]);
 
         // 3. Tappe del cammino

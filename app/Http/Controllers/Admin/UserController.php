@@ -23,6 +23,12 @@ class UserController extends Controller
             });
         }
 
+        // VULN-10 FIX: Validazione dei filtri della lista utenti
+        $request->validate([
+            'search'     => 'nullable|string|max:255',
+            'min_trails' => 'nullable|integer|min:0|max:100',
+        ]);
+
         if ($request->filled('min_trails')) {
             $minTrails = $request->min_trails;
             $query->whereHas('digitalCredentials', function ($q) {

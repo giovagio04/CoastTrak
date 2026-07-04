@@ -28,7 +28,7 @@ class ProfileUpdateRequest extends FormRequest
             ],
             'date_of_birth' => ['nullable', 'date', 'before_or_equal:today', 'after:1900-01-01'],
             'bio' => ['nullable', 'string', 'max:1000'],
-            'profile_photo' => ['nullable', 'image', 'max:2048'],
+            'profile_photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp', 'max:2048'], // VULN-07 FIX
         ];
     }
 

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Outing;
 use App\Models\ParticipationRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class ParticipationController extends Controller
 {
@@ -20,30 +21,47 @@ class ParticipationController extends Controller
             return back()->with('error', 'Hai già inviato una richiesta per questa uscita.');
         }
 
-        // 2. Controllo posti disponibili (contiamo solo gli accettati)
-        $acceptedCount = $outing->participationRequests()->where('status', 'accepted')->count();
-        if ($acceptedCount >= $outing->max_participants) {
-            return back()->with('error', 'L\'uscita ha raggiunto il numero massimo di partecipanti.');
+        // VULN-02 FIX: Operazione atomica con lock pessimistico per prevenire race condition.
+        // Senza questo lock, due richieste simultanee possono entrambe superare il controllo
+        // dei posti e iscriversi, anche se rimane un solo posto disponibile.
+        $errorMessage = null;
+        $notifyOrganizer = false;
+
+        DB::transaction(function () use ($outing, &$errorMessage, &$notifyOrganizer) {
+            // Ri-carica l'uscita con un lock esclusivo per questa transazione
+            $lockedOuting = Outing::lockForUpdate()->find($outing->id);
+
+            // Controllo posti disponibili (atomico)
+            $acceptedCount = $lockedOuting->participationRequests()->where('status', 'accepted')->count();
+            if ($acceptedCount >= $lockedOuting->max_participants) {
+                $errorMessage = 'L\'uscita ha raggiunto il numero massimo di partecipanti.';
+                return;
+            }
+
+            // Determina lo stato della richiesta
+            $status = ($lockedOuting->type === 'official') ? 'accepted' : 'pending';
+
+            ParticipationRequest::create([
+                'outing_id' => $lockedOuting->id,
+                'user_id'   => auth()->id(),
+                'status'    => $status,
+            ]);
+
+            if ($lockedOuting->type === 'user' && $lockedOuting->organizer) {
+                $notifyOrganizer = true;
+            }
+        });
+
+        if ($errorMessage) {
+            return back()->with('error', $errorMessage);
         }
 
-        // 3. Determina lo stato della richiesta
-        // Le uscite ufficiali accettano in automatico se c'è posto.
-        // Le uscite tra utenti (Sprint 4) richiedono l'approvazione dell'organizzatore.
-        $status = ($outing->type === 'official') ? 'accepted' : 'pending';
-
-        ParticipationRequest::create([
-            'outing_id' => $outing->id,
-            'user_id' => auth()->id(),
-            'status' => $status
-        ]);
-
-        // Notifica per utente organizzatore di iscrizione a un cammino tra utenti da lui organizzato.
-        // Cliccandola l’utente organizzatore viene portato alla pagina di gestione del cammino.
-        if ($outing->type === 'user' && $outing->organizer) {
+        // Notifica eseguita fuori dalla transazione per evitare lock prolungati
+        if ($notifyOrganizer && $outing->organizer) {
             $outing->organizer->notify(new \App\Notifications\SimpleNotification(
                 'Nuova richiesta di iscrizione',
                 "L'utente '" . auth()->user()->name . "' ha richiesto di iscriversi al tuo cammino '" . $outing->stage_name . "' del " . $outing->date->format('d/m/Y') . ".",
-                route('outings.show', $outing->id) // Cliccabile
+                route('outings.show', $outing->id)
             ));
         }
 
@@ -100,25 +118,47 @@ class ParticipationController extends Controller
             abort(403, 'Azione non autorizzata. Solo l\'organizzatore può approvare le richieste.');
         }
 
-        // Verifica lo stato della richiesta
+        // Verifica lo stato della richiesta (controllo rapido pre-transazione)
         if ($participation->status !== 'pending') {
             return back()->with('error', 'Questa richiesta è già stata elaborata.');
         }
 
-        // Controllo posti disponibili (contiamo solo gli accettati)
-        $acceptedCount = $outing->participationRequests()->where('status', 'accepted')->count();
-        if ($acceptedCount >= $outing->max_participants) {
-            return back()->with('error', 'Impossibile approvare: l\'uscita ha raggiunto il numero massimo di partecipanti.');
+        // VULN-03 FIX: Stessa race condition di VULN-02. Due approvazioni simultanee
+        // potevano portare oltre il limite di max_participants.
+        $errorMessage = null;
+
+        DB::transaction(function () use ($participation, $outing, &$errorMessage) {
+            // Ri-legge la partecipazione con lock per evitare doppia approvazione
+            $lockedParticipation = ParticipationRequest::lockForUpdate()->find($participation->id);
+
+            if ($lockedParticipation->status !== 'pending') {
+                $errorMessage = 'Questa richiesta è già stata elaborata.';
+                return;
+            }
+
+            // Ri-conta i posti con lock sull'uscita
+            $lockedOuting = Outing::lockForUpdate()->find($outing->id);
+            $acceptedCount = $lockedOuting->participationRequests()->where('status', 'accepted')->count();
+
+            if ($acceptedCount >= $lockedOuting->max_participants) {
+                $errorMessage = 'Impossibile approvare: l\'uscita ha raggiunto il numero massimo di partecipanti.';
+                return;
+            }
+
+            $lockedParticipation->update(['status' => 'accepted']);
+        });
+
+        if ($errorMessage) {
+            return back()->with('error', $errorMessage);
         }
 
-        $participation->update(['status' => 'accepted']);
-
-        // Invia notifica al richiedente
+        // Notifica eseguita fuori dalla transazione
+        $participation->refresh();
         if ($participation->user) {
             $participation->user->notify(new \App\Notifications\SimpleNotification(
                 'Richiesta di partecipazione accettata',
                 "La tua richiesta di partecipazione al cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} è stata accettata dall'organizzatore.",
-                null // Non cliccabile
+                null
             ));
         }
 

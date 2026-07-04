@@ -4,29 +4,28 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
-use Illuminate\Database\Eloquent\Attributes\Fillable;
-use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
-#[Fillable(['name', 'email', 'password', 'role', 'date_of_birth', 'bio', 'profile_photo_path', 'is_banned', 'ban_reason'])]
-#[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
+    /**
+     * Campi assegnabili in massa.
+     * NOTA DI SICUREZZA: 'role', 'is_banned' e 'ban_reason' sono intenzionalmente
+     * esclusi per prevenire privilege escalation via mass assignment.
+     * Questi campi vengono impostati solo da codice controllato (controller admin).
+     */
     protected $fillable = [
         'name',
         'email',
         'password',
-        'role',
         'date_of_birth',
         'bio',
         'profile_photo_path',
-        'is_banned',
-        'ban_reason',
     ];
 
     /**

@@ -17,47 +17,79 @@
         })();
     </script>
     <style>
+        :root {
+            --primary-color: #004c8c;
+            --primary-hover: #003366;
+            --accent-color: #ff6b35;
+            --accent-hover: #e55a2b;
+            --success-color: #2e8b57;
+            
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-heading: #004c8c;
+            --text-muted: #6c757d;
+            --navbar-bg: rgba(255, 255, 255, 0.95);
+            --navbar-border: rgba(0, 0, 0, 0.08);
+            --shadow-color: rgba(0, 0, 0, 0.05);
+            
+            --split-bg: linear-gradient(135deg, #004c8c 0%, #2e8b57 100%);
+            --icon-1: #2e8b57;
+            --icon-2: #ff6b35;
+            --icon-3: #004c8c;
+        }
+
+        html[data-bs-theme="dark"] {
+            --primary-color: #3b82f6;
+            --primary-hover: #60a5fa;
+            --accent-color: #ff8552;
+            --accent-hover: #ff9e75;
+            --success-color: #4ade80;
+            
+            --bg-color: #121416;
+            --card-bg: #1a1d20;
+            --text-heading: #60a5fa;
+            --text-muted: #adb5bd;
+            --navbar-bg: rgba(33, 37, 41, 0.95);
+            --navbar-border: rgba(255, 255, 255, 0.08);
+            --shadow-color: rgba(0, 0, 0, 0.3);
+            
+            --split-bg: linear-gradient(135deg, #1a1d20 0%, #121416 100%);
+            --icon-1: #4ade80;
+            --icon-2: #ff8552;
+            --icon-3: #60a5fa;
+        }
+
         body {
             font-family: 'Outfit', sans-serif;
-            background-color: var(--bs-body-bg);
-        }
-        html[data-bs-theme="light"] body {
-            background-color: #f8f9fa;
+            background-color: var(--bg-color);
+            color: var(--bs-body-color);
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         
         /* Navbar styling */
         .navbar {
-            background-color: var(--bs-body-bg) !important;
+            background-color: var(--navbar-bg) !important;
             backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
+            transition: all 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
             padding: 15px 0;
-            border-bottom: 1px solid var(--bs-border-color-translucent);
-        }
-        html[data-bs-theme="light"] .navbar {
-            background-color: rgba(255, 255, 255, 0.95) !important;
-        }
-        html[data-bs-theme="dark"] .navbar {
-            background-color: rgba(33, 37, 41, 0.95) !important;
+            border-bottom: 1px solid var(--navbar-border);
         }
         .navbar-brand { 
             font-weight: 800; 
             color: var(--bs-body-color) !important; 
             font-size: 1.5rem;
-        }
-        html[data-bs-theme="light"] .navbar-brand {
-            color: #1a1a1a !important;
+            transition: color 0.3s ease;
         }
         .nav-link {
             font-weight: 600;
-            color: var(--bs-secondary-color) !important;
-            transition: color 0.3s;
+            color: var(--bs-body-color) !important;
+            transition: color 0.3s ease, opacity 0.3s ease;
             margin-left: 15px;
-        }
-        html[data-bs-theme="light"] .nav-link {
-            color: #333 !important;
+            opacity: 0.85;
         }
         .nav-link:hover {
-            color: #ff6b35 !important;
+            color: var(--accent-color) !important;
+            opacity: 1;
         }
 
         /* Hero Section */
@@ -128,16 +160,16 @@
             letter-spacing: 1px;
         }
         .btn-primary-custom {
-            background-color: #ff6b35;
+            background-color: var(--accent-color);
             color: white;
             border: none;
-            box-shadow: 0 10px 20px rgba(255, 107, 53, 0.3);
+            box-shadow: 0 10px 20px rgba(255, 107, 53, 0.2);
         }
         .btn-primary-custom:hover {
-            background-color: #e55a2b;
+            background-color: var(--accent-hover);
             color: white;
             transform: translateY(-3px);
-            box-shadow: 0 15px 25px rgba(255, 107, 53, 0.4);
+            box-shadow: 0 15px 25px rgba(255, 107, 53, 0.3);
         }
         .btn-outline-custom {
             background-color: rgba(255,255,255,0.1);
@@ -147,45 +179,51 @@
         }
         .btn-outline-custom:hover {
             background-color: white;
-            color: #004c8c;
+            color: var(--primary-color);
             transform: translateY(-3px);
         }
 
         /* Feature Section */
         .feature-section {
             padding: 120px 0;
-            background-color: #f8f9fa;
+            background-color: var(--bg-color);
+            transition: background-color 0.3s ease;
+        }
+        .feature-section .text-muted {
+            color: var(--text-muted) !important;
+            transition: color 0.3s ease;
         }
         .feature-card {
             border: none;
             border-radius: 20px;
             overflow: hidden;
-            background: var(--bs-card-bg);
-            box-shadow: 0 15px 35px rgba(0,0,0,0.05);
-            transition: all 0.4s ease;
+            background: var(--card-bg);
+            box-shadow: 0 15px 35px var(--shadow-color);
+            transition: all 0.4s ease, background-color 0.3s ease, box-shadow 0.3s ease;
             height: 100%;
-        }
-        html[data-bs-theme="light"] .feature-card {
-            background: white;
         }
         .feature-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 25px 45px rgba(0,0,0,0.1);
+            box-shadow: 0 25px 45px var(--shadow-color);
         }
         .feature-icon {
             font-size: 3.5rem;
-            color: #2e8b57;
             margin-bottom: 20px;
+            transition: color 0.3s ease;
         }
+        .feature-icon.icon-1 { color: var(--icon-1); }
+        .feature-icon.icon-2 { color: var(--icon-2); }
+        .feature-icon.icon-3 { color: var(--icon-3); }
         
         /* Split Section */
         .split-section {
             display: flex;
             align-items: stretch;
-            background-color: #004c8c;
+            background: var(--split-bg);
             color: white;
             padding: 0;
             overflow: hidden;
+            transition: background 0.3s ease;
         }
         .split-image {
             background-image: url('{{ asset('img/hikers.png') }}');
@@ -201,9 +239,15 @@
         }
         
         .footer {
-            background-color: #1a1a1a;
-            color: #f8f9fa;
+            background-color: var(--navbar-bg);
+            color: var(--bs-body-color);
             padding: 60px 0 30px;
+            border-top: 1px solid var(--navbar-border);
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        .footer .text-muted {
+            color: var(--text-muted) !important;
+            transition: color 0.3s ease;
         }
         
         /* Animations */
@@ -236,7 +280,7 @@
 <nav class="navbar navbar-expand-lg fixed-top shadow-sm">
     <div class="container">
         <a class="navbar-brand" href="{{ url('/') }}">
-            <i class="fa-solid fa-person-hiking" style="color: #2e8b57;"></i> CoastTrack
+            <i class="fa-solid fa-person-hiking" style="color: var(--success-color);"></i> CoastTrack
         </a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
             <span class="navbar-toggler-icon"></span>
@@ -307,7 +351,7 @@
 <section class="feature-section">
     <div class="container">
         <div class="text-center mb-5 fade-up">
-            <h2 class="display-5 fw-bold" style="color: #004c8c;">Vivi la Calabria a passo lento</h2>
+            <h2 class="display-5 fw-bold" style="color: var(--text-heading);">Vivi la Calabria a passo lento</h2>
             <p class="lead text-muted mt-3">Un'app pensata per connettere amanti della natura e del trekking sul cammino più bello del sud Italia.</p>
         </div>
         
@@ -315,7 +359,7 @@
             <div class="col-md-4 fade-up delay-1">
                 <div class="card feature-card p-4 text-center">
                     <div class="card-body">
-                        <i class="fa-solid fa-route feature-icon"></i>
+                        <i class="fa-solid fa-route feature-icon icon-1"></i>
                         <h4 class="fw-bold mt-3">3 Tappe Mozzafiato</h4>
                         <p class="text-muted mt-3">Da Soverato a Pizzo Calabro, 55 km di pura bellezza attraversando le montagne rigogliose delle Serre calabre.</p>
                     </div>
@@ -324,7 +368,7 @@
             <div class="col-md-4 fade-up delay-2">
                 <div class="card feature-card p-4 text-center">
                     <div class="card-body">
-                        <i class="fa-solid fa-compass feature-icon" style="color: #ff6b35;"></i>
+                        <i class="fa-solid fa-compass feature-icon icon-2"></i>
                         <h4 class="fw-bold mt-3">Uscite Ufficiali</h4>
                         <p class="text-muted mt-3">Partecipa a escursioni sicure organizzate dall'amministrazione e guidate da esperti qualificati del territorio.</p>
                     </div>
@@ -333,7 +377,7 @@
             <div class="col-md-4 fade-up delay-3">
                 <div class="card feature-card p-4 text-center">
                     <div class="card-body">
-                        <i class="fa-solid fa-users-viewfinder feature-icon" style="color: #004c8c;"></i>
+                        <i class="fa-solid fa-users-viewfinder feature-icon icon-3"></i>
                         <h4 class="fw-bold mt-3">Community Attiva</h4>
                         <p class="text-muted mt-3">Completa le tappe, ottieni la Credenziale Digitale e proponi le tue uscite auto-organizzate agli altri esploratori.</p>
                     </div>
@@ -363,7 +407,7 @@
 
 <footer class="footer">
     <div class="container text-center">
-        <h3 class="fw-bold mb-3"><i class="fa-solid fa-person-hiking" style="color: #2e8b57;"></i> CoastTrack</h3>
+        <h3 class="fw-bold mb-3"><i class="fa-solid fa-person-hiking" style="color: var(--success-color);"></i> CoastTrack</h3>
         <p class="text-muted mb-1">&copy; {{ date('Y') }} Progetto Universitario di Programmazione Web.</p>
         <p class="text-muted small">Ispirato al vero Cammino Kalabria Coast to Coast.</p>
     </div>

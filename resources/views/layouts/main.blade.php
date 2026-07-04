@@ -123,6 +123,10 @@
             --bs-border-color-translucent: rgba(255, 255, 255, 0.08);
         }
 
+        html[data-bs-theme="dark"] .text-dark {
+            color: var(--bs-body-color) !important;
+        }
+
         html[data-bs-theme="dark"] .card {
             background-color: var(--bs-card-bg);
             border: 1px solid rgba(255, 255, 255, 0.08) !important;
@@ -154,10 +158,17 @@
 
         /* Footer coerente con la Home */
         .footer {
-            background-color: #1a1a1a;
-            color: #f8f9fa;
+            background-color: var(--bs-secondary-bg);
+            color: var(--bs-body-color);
             padding: 50px 0 20px;
             margin-top: 60px;
+            border-top: 1px solid var(--bs-border-color-translucent);
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        
+        .footer .text-muted {
+            color: var(--bs-secondary-color) !important;
+            transition: color 0.3s ease;
         }
 
         /* Stili per il dropdown delle notifiche */

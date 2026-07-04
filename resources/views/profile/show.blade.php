@@ -50,12 +50,12 @@
                     <div class="col-md-8 ps-md-4">
                         <div class="mb-3">
                             <span class="text-muted small fw-bold text-uppercase">Nome e Cognome</span>
-                            <h4 class="fw-bold text-dark mt-1">{{ $user->name }}</h4>
+                            <h4 class="fw-bold text-body mt-1">{{ $user->name }}</h4>
                         </div>
                         
                         <div class="mb-3">
                             <span class="text-muted small fw-bold text-uppercase">Data di Nascita</span>
-                            <p class="text-dark mt-1 mb-0">
+                            <p class="text-body mt-1 mb-0">
                                 {{ $user->date_of_birth ? \Carbon\Carbon::parse($user->date_of_birth)->format('d/m/Y') : 'Non specificata' }}
                             </p>
                         </div>
@@ -65,7 +65,7 @@
                 <!-- Descrizione (Bio) -->
                 <div class="mb-2 border-top pt-3">
                     <span class="text-muted small fw-bold text-uppercase">Descrizione (Bio)</span>
-                    <p class="text-dark mt-2 text-justify" style="white-space: pre-wrap;">{{ $user->bio ?: 'Nessuna descrizione inserita.' }}</p>
+                    <p class="text-body mt-2 text-justify" style="white-space: pre-wrap;">{{ $user->bio ?: 'Nessuna descrizione inserita.' }}</p>
                 </div>
             </div>
         </div>

@@ -26,6 +26,11 @@ class ProfileController extends Controller
      */
     public function showUser(\App\Models\User $user): View
     {
+        // FAIL-08 FIX: Prevenire la visualizzazione dei profili admin (IDOR)
+        if ($user->role === 'admin') {
+            abort(403, 'Profilo non disponibile.');
+        }
+
         return view('profile.show', [
             'user' => $user,
         ]);

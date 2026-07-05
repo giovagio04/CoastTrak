@@ -129,6 +129,11 @@ class ParticipationController extends Controller
             return back()->with('error', 'La tua partecipazione è già stata revocata e non può essere ulteriormente modificata.');
         }
 
+        // FAIL-03 FIX: Non permettere l'annullamento della partecipazione a un'uscita conclusa
+        if ($participation->outing->status === 'concluded') {
+            return back()->with('error', 'Non puoi annullare la partecipazione a un\'uscita già conclusa.');
+        }
+
         $outing = $participation->outing;
         $user = auth()->user();
 

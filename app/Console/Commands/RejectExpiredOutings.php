@@ -26,10 +26,29 @@ class RejectExpiredOutings extends Command
      */
     public function handle()
     {
-        $expiredOutingsCount = Outing::where('status', 'pending')
-            ->where('created_at', '<=', now()->subHours(24))
-            ->update(['status' => 'rejected']);
+        // FAIL-09 FIX: Usa approval_deadline e non created_at, e notifica l'organizzatore
+        $expiredOutings = Outing::where('status', 'pending')
+            ->where('approval_deadline', '<=', now())
+            ->get();
 
-        $this->info("Rejected {$expiredOutingsCount} expired pending outings.");
+        foreach ($expiredOutings as $outing) {
+            $notes = $outing->notes;
+            $reason = "Tempo per l'approvazione scaduto.";
+            
+            $outing->update([
+                'status' => 'rejected',
+                'notes' => $notes ? $notes . "\n\n[Motivazione Rifiuto]: " . $reason : "[Motivazione Rifiuto]: " . $reason
+            ]);
+
+            if ($outing->organizer) {
+                $outing->organizer->notify(new \App\Notifications\SimpleNotification(
+                    'Proposta di cammino rifiutata',
+                    "La tua proposta per il cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} è stata rifiutata automaticamente perché è scaduto il tempo (24 ore) per l'approvazione.",
+                    null // Non cliccabile
+                ));
+            }
+        }
+
+        $this->info("Rejected {$expiredOutings->count()} expired pending outings.");
     }
 }

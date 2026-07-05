@@ -199,6 +199,11 @@ class OutingController extends Controller
             'status'          => 'required|in:pending,published,concluded,cancelled,rejected',
         ]);
 
+        // FAIL-05 FIX: Impedisce all'admin di cambiare lo stato di un'uscita conclusa (state machine)
+        if ($outing->status === 'concluded' && $validated['status'] !== 'concluded') {
+            return back()->withErrors(['status' => 'Non puoi modificare lo stato di un\'uscita già conclusa.']);
+        }
+
         if ($validated['route_type'] === 'standard') {
             $validated['is_full_trail'] = true;
             $validated['start_location'] = null;
@@ -215,7 +220,19 @@ class OutingController extends Controller
 
     public function destroy(Outing $outing)
     {
+        // FAIL-07 FIX: Notifica tutti i partecipanti iscritti prima dell'eliminazione
+        $participants = $outing->participationRequests()->where('status', 'accepted')->with('user')->get();
+        foreach ($participants as $participant) {
+            if ($participant->user) {
+                $participant->user->notify(new \App\Notifications\SimpleNotification(
+                    'Cammino eliminato dall\'amministratore',
+                    "Il cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} a cui eri iscritto è stato rimosso definitivamente dal sistema.",
+                    null // Non cliccabile
+                ));
+            }
+        }
+
         $outing->delete();
-        return redirect()->route('admin.outings.index')->with('success', 'Uscita eliminata!');
+        return redirect()->route('admin.outings.index')->with('success', 'Uscita eliminata con successo!');
     }
 }

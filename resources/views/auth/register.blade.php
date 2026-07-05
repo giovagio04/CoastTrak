@@ -1,57 +1,105 @@
 <x-guest-layout>
+
+    {{-- Titolo --}}
+    <h2 class="auth-title">Crea un account</h2>
+    <p class="auth-subtitle">Unisciti alla comunità CoastTrack e inizia a camminare.</p>
+
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
-        <!-- Name -->
-        <div>
-            <x-input-label for="name" :value="__('Name')" />
-            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
-            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+        {{-- Nome --}}
+        <div class="mb-3">
+            <label for="name" class="form-label auth-label">Nome</label>
+            <input
+                id="name"
+                type="text"
+                name="name"
+                value="{{ old('name') }}"
+                class="form-control auth-input @error('name') is-invalid @enderror"
+                placeholder="Mario Rossi"
+                required
+                autofocus
+                autocomplete="name"
+            >
+            @error('name')
+                <div class="invalid-feedback">
+                    <i class="fa-solid fa-circle-exclamation me-1"></i>{{ $message }}
+                </div>
+            @enderror
         </div>
 
-        <!-- Email Address -->
-        <div class="mt-4">
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        {{-- Email --}}
+        <div class="mb-3">
+            <label for="email" class="form-label auth-label">Email</label>
+            <input
+                id="email"
+                type="email"
+                name="email"
+                value="{{ old('email') }}"
+                class="form-control auth-input @error('email') is-invalid @enderror"
+                placeholder="tuaemail@esempio.it"
+                required
+                autocomplete="username"
+            >
+            @error('email')
+                <div class="invalid-feedback">
+                    <i class="fa-solid fa-circle-exclamation me-1"></i>{{ $message }}
+                </div>
+            @enderror
         </div>
 
-        <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-
-            <x-text-input id="password" class="block mt-1 w-full"
-                            type="password"
-                            name="password"
-                            required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        {{-- Password --}}
+        <div class="mb-3">
+            <label for="password" class="form-label auth-label">Password</label>
+            <input
+                id="password"
+                type="password"
+                name="password"
+                class="form-control auth-input @error('password') is-invalid @enderror"
+                placeholder="Minimo 8 caratteri"
+                required
+                autocomplete="new-password"
+            >
+            @error('password')
+                <div class="invalid-feedback">
+                    <i class="fa-solid fa-circle-exclamation me-1"></i>{{ $message }}
+                </div>
+            @enderror
         </div>
 
-        <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input id="password_confirmation" class="block mt-1 w-full"
-                            type="password"
-                            name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+        {{-- Conferma Password --}}
+        <div class="mb-4">
+            <label for="password_confirmation" class="form-label auth-label">Conferma Password</label>
+            <input
+                id="password_confirmation"
+                type="password"
+                name="password_confirmation"
+                class="form-control auth-input @error('password_confirmation') is-invalid @enderror"
+                placeholder="Ripeti la password"
+                required
+                autocomplete="new-password"
+            >
+            @error('password_confirmation')
+                <div class="invalid-feedback">
+                    <i class="fa-solid fa-circle-exclamation me-1"></i>{{ $message }}
+                </div>
+            @enderror
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button class="ms-4">
-                {{ __('Registrati') }}
-            </x-primary-button>
+        {{-- Bottone Submit --}}
+        <div class="d-grid">
+            <button type="submit" class="btn btn-auth-primary">
+                <i class="fa-solid fa-user-plus me-2"></i>Crea Account
+            </button>
         </div>
 
-        <div class="mt-6 pt-4 border-t border-gray-200 text-center">
-            <p class="text-sm text-gray-600">
-                {{ __('Hai già un account?') }}
-                <a class="underline font-semibold text-indigo-600 hover:text-indigo-500 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ms-1" href="{{ route('login') }}">
-                    {{ __('Accedi') }}
-                </a>
-            </p>
-        </div>
+        {{-- Login --}}
+        <hr class="auth-divider">
+        <p class="text-center mb-0" style="font-size: 0.875rem; color: var(--bs-secondary-color);">
+            Hai già un account?
+            <a href="{{ route('login') }}" class="auth-link ms-1">Accedi</a>
+        </p>
+
     </form>
+
 </x-guest-layout>

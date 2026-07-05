@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Models\Outing;
+use App\Models\ParticipationRequest;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -75,12 +77,30 @@ class UserController extends Controller
             'reason' => 'nullable|string|max:1000',
         ]);
 
-        $user->update([
-            'is_banned' => true,
-            'ban_reason' => $request->reason,
-        ]);
+        // Usare assegnazione diretta invece di update() perché is_banned e ban_reason
+        // sono esclusi da $fillable per sicurezza (anti mass-assignment).
+        // Con update() verrebbero ignorati silenziosamente — questo era il bug.
+        $user->is_banned  = true;
+        $user->ban_reason = $request->reason;
+        $user->save();
 
-        return back()->with('success', 'Utente bannato con successo.');
+        // Rimuoviamo l'utente da tutte le uscite future non ancora concluse
+        ParticipationRequest::where('user_id', $user->id)
+            ->whereIn('status', ['accepted', 'pending'])
+            ->whereHas('outing', function ($q) {
+                $q->whereNotIn('status', ['concluded', 'cancelled', 'rejected'])
+                  ->where('date', '>=', now()->toDateString());
+            })
+            ->update(['status' => 'rejected']);
+
+        // Annulliamo definitivamente le uscite che l'utente ha organizzato e che non si sono ancora tenute.
+        // Se l'organizzatore è bannato, il cammino non può più aver luogo.
+        Outing::where('organizer_id', $user->id)
+            ->whereIn('status', ['pending', 'published'])
+            ->where('date', '>=', now()->toDateString())
+            ->update(['status' => 'cancelled']);
+
+        return back()->with('success', 'Utente bannato con successo e rimosso dalle uscite future.');
     }
 
     /**
@@ -88,10 +108,10 @@ class UserController extends Controller
      */
     public function unban(User $user)
     {
-        $user->update([
-            'is_banned' => false,
-            'ban_reason' => null,
-        ]);
+        // Stessa cosa dell'unban: assegnazione diretta per bypassare $fillable
+        $user->is_banned  = false;
+        $user->ban_reason = null;
+        $user->save();
 
         return back()->with('success', 'Utente riabilitato con successo.');
     }

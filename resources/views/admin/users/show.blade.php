@@ -131,7 +131,7 @@
     <!-- Colonna Destra: Liste Dettagliate -->
     <div class="col-lg-8">
         <!-- Tabs Navigazione -->
-        <ul class="nav nav-pills mb-3 bg-white p-2 rounded shadow-sm gap-2" id="userTab" role="tablist">
+        <ul class="nav nav-pills mb-3 p-2 rounded shadow-sm gap-2" id="userTab" role="tablist" style="background-color: var(--bs-card-bg, #fff);">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active border-0" id="credentials-tab" data-bs-toggle="tab" data-bs-target="#credentials" type="button" role="tab">
                     <i class="fa-solid fa-award me-1"></i> Credenziali Digitali

@@ -15,7 +15,7 @@
                 <h4 class="fw-bold mb-0"><i class="fa-solid fa-person-hiking me-2"></i> Proponi un'Uscita tra Utenti</h4>
             </div>
             <div class="card-body p-4">
-                <div class="alert alert-info border-info border-start border-4 border-top-0 border-end-0 border-bottom-0 bg-light mb-4">
+                <div class="alert alert-info border-info border-start border-4 border-top-0 border-end-0 border-bottom-0 mb-4">
                     <strong>Nota:</strong> Questa è un'uscita auto-organizzata. L'amministratore dovrà revisionarla e approvarla (ha un tempo massimo di 24 ore). Scegli responsabilmente tappa e livello di difficoltà.
                 </div>
 

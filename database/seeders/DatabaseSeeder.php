@@ -16,10 +16,9 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Creazione Admin
+        // 1. Creo l'Admin
         // NOTA: 'role' è escluso da $fillable per sicurezza.
-        // Nel seeder si usa update() direttamente sull'istanza Eloquent per bypassare
-        // la whitelist di $fillable in modo controllato.
+        // Uso updateQuietly per forzare il ruolo admin senza passare da mass-assignment.
         $admin = User::create([
             'name'     => 'Amministratore',
             'email'    => 'admin@coasttrack.it',
@@ -27,7 +26,7 @@ class DatabaseSeeder extends Seeder
         ]);
         $admin->updateQuietly(['role' => 'admin']);
 
-        // 2. Creazione Utenti normali
+        // 2. Creo gli utenti normali
         $user1 = User::create([
             'name'     => 'Mario Rossi',
             'email'    => 'mario@example.com',
@@ -64,7 +63,7 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
         ]);
 
-        // 3. Tappe del cammino
+        // 3. Creo le tre tappe del cammino
         $stage1 = Stage::create([
             'number' => 1,
             'name' => 'Tappa 1 – Soverato → Petrizzi',
@@ -95,7 +94,7 @@ class DatabaseSeeder extends Seeder
             'difficulty' => 'medio'
         ]);
 
-        // 4. Guide
+        // 4. Creo le guide ambientali
         $guide1 = Guide::create([
             'name' => 'Giuseppe Trek',
             'description' => 'Esperto del territorio calabrese.',
@@ -103,7 +102,7 @@ class DatabaseSeeder extends Seeder
             'specializations' => 'Flora e fauna locale'
         ]);
 
-        // 5. Uscite Ufficiali
+        // 5. Creo le uscite ufficiali
         $outing1 = Outing::create([
             'type' => 'official',
             'is_full_trail' => false,
@@ -117,7 +116,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'published'
         ]);
 
-        // Uscita passata (conclusa)
+        // Un'uscita del passato già conclusa
         $outingPast = Outing::create([
             'type' => 'official',
             'is_full_trail' => false,
@@ -131,7 +130,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'concluded'
         ]);
 
-        // 6. Partecipazioni all'uscita conclusa (Genera la Credenziale)
+        // 6. Registro le partecipazioni all'uscita conclusa (così si creano le credenziali digitali)
         ParticipationRequest::create([
             'outing_id' => $outingPast->id,
             'user_id' => $user1->id,
@@ -145,7 +144,7 @@ class DatabaseSeeder extends Seeder
             'completed_at' => Carbon::now()->subDays(4)
         ]);
 
-        // Uscita completa passata (conclusa) per permettere a Maria di aver completato l'intero cammino
+        // Uscita completa del passato per far sì che Maria abbia completato tutto il cammino
         $outingFullPast = Outing::create([
             'type' => 'official',
             'is_full_trail' => true,
@@ -167,12 +166,12 @@ class DatabaseSeeder extends Seeder
 
         DigitalCredential::create([
             'user_id' => $user3->id,
-            'stage_id' => null, // null indica il cammino completo
+            'stage_id' => null, // Metto null così indica il cammino intero
             'outing_id' => $outingFullPast->id,
             'completed_at' => Carbon::now()->subDays(9)
         ]);
 
-        // 7. Uscite tra utenti (create da user1 perché ha completato una tappa)
+        // 7. Uscite tra utenti (mario può crearne una perché ha completato la prima tappa)
         $outingUser = Outing::create([
             'type' => 'user',
             'is_full_trail' => false,
@@ -183,7 +182,7 @@ class DatabaseSeeder extends Seeder
             'meeting_point' => 'Piazza di Petrizzi',
             'max_participants' => 5,
             'difficulty' => 'difficile',
-            'status' => 'published', // simuliamo che sia già approvata
+            'status' => 'published', // Facciamo finta che sia già approvata dall'admin
             'notes' => 'Portare acqua in abbondanza!'
         ]);
 
@@ -199,7 +198,7 @@ class DatabaseSeeder extends Seeder
             'status' => 'pending'
         ]);
 
-        // Uscita completa creata da Maria Bianchi (user3) per il test
+        // Uscita completa organizzata da Maria Bianchi per i test
         $outingMaria = Outing::create([
             'type' => 'user',
             'is_full_trail' => true,

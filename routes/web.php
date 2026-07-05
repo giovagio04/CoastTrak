@@ -11,18 +11,18 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-// Rotte Pubbliche
+// Rotte aperte a tutti
 Route::get('/outings', [OutingController::class, 'index'])->name('outings.index');
 Route::get('/outings/{outing}', [OutingController::class, 'show'])->name('outings.show');
 
-// INFO-01 FIX: Logica del dashboard spostata in DashboardController
+// Fix INFO-01: Ho spostato tutta la logica della dashboard dentro DashboardController
 Route::get('/dashboard', DashboardController::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    // INFO-02 FIX: Rate limiting su azioni di partecipazione (max 20 req/min)
-    // per prevenire spam e carico eccessivo sul database.
+    // Fix INFO-02: Metto un rate limit per l'iscrizione (max 20 richieste al minuto)
+    // per evitare spam ed evitare di sovraccaricare il database.
     Route::middleware('throttle:20,1')->group(function () {
         Route::post('/outings/{outing}/participate', [\App\Http\Controllers\ParticipationController::class, 'store'])->name('participations.store');
         Route::delete('/participations/{participation}', [\App\Http\Controllers\ParticipationController::class, 'destroy'])->name('participations.destroy');
@@ -35,12 +35,12 @@ Route::middleware('auth')->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Uscite create dagli utenti
+    // Gestione delle uscite proposte dagli utenti
     Route::get('/user/outings/create', [\App\Http\Controllers\UserOutingController::class, 'create'])->name('user.outings.create');
     Route::post('/user/outings', [\App\Http\Controllers\UserOutingController::class, 'store'])->name('user.outings.store');
     Route::post('/user/outings/{outing}/cancel', [\App\Http\Controllers\UserOutingController::class, 'cancel'])->name('user.outings.cancel');
 
-    // Notifiche (rate limited: max 30 req/min)
+    // Gestione notifiche con rate limit a max 30 richieste/min
     Route::middleware('throttle:30,1')->group(function () {
         Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
         Route::post('/notifications/{id}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
@@ -50,7 +50,7 @@ Route::middleware('auth')->group(function () {
     });
 });
 
-// Rotte Admin
+// Qui ci sono le rotte riservate agli amministratori
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::post('outings/{outing}/approve', [\App\Http\Controllers\Admin\OutingController::class, 'approve'])->name('outings.approve');
     Route::post('outings/{outing}/reject', [\App\Http\Controllers\Admin\OutingController::class, 'reject'])->name('outings.reject');

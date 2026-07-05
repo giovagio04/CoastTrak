@@ -33,7 +33,7 @@ class UserOutingController extends Controller
             'meeting_point'   => 'required|string|max:255',
             'max_participants' => 'required|integer|min:2|max:15',
             'difficulty'      => 'required|in:facile,medio,difficile',
-            'notes'           => 'nullable|string|max:5000', // VULN-06 FIX
+            'notes'           => 'nullable|string|max:5000', // Fix VULN-06: Valido la lunghezza delle note per evitare testi giganti
         ]);
 
         if ($validated['route_type'] === 'standard') {
@@ -48,18 +48,18 @@ class UserOutingController extends Controller
         $validated['type'] = 'user';
         $validated['organizer_id'] = auth()->id();
         $validated['status'] = 'pending';
-        // L'amministratore ha 24 ore di tempo per approvare l'uscita
+        // Diamo all'admin 24 ore per approvare questa proposta
         $validated['approval_deadline'] = Carbon::now()->addHours(24);
 
         $outing = Outing::create($validated);
 
-        // Notifica all'admin della nuova proposta di cammino
+        // Mando la notifica a tutti gli admin per avvisarli della proposta
         $admins = \App\Models\User::where('role', 'admin')->get();
         foreach ($admins as $admin) {
             $admin->notify(new \App\Notifications\SimpleNotification(
                 'Nuova proposta di cammino',
                 "L'utente '" . auth()->user()->name . "' ha proposto il cammino '" . $outing->stage_name . "' per la data " . $outing->date->format('d/m/Y') . ".",
-                route('admin.outings.show', $outing->id) // Cliccabile
+                route('admin.outings.show', $outing->id) // Link cliccabile per andare alla pagina
             ));
         }
 
@@ -79,7 +79,7 @@ class UserOutingController extends Controller
             return back()->with('error', 'Questa uscita è già stata annullata.');
         }
 
-        // VULN-06 FIX: Validazione lunghezza motivazione annullamento
+        // Fix VULN-06: Controllo che la motivazione dell'annullamento non superi i 2000 caratteri
         $request->validate(['reason' => 'nullable|string|max:2000']);
 
         $reason = $request->input('reason');
@@ -93,7 +93,7 @@ class UserOutingController extends Controller
             'notes' => $notes
         ]);
 
-        // Notifica tutti gli iscritti accettati (tranne l'organizzatore)
+        // Avviso tutti gli iscritti confermati che l'uscita è saltata
         $participants = $outing->participationRequests()
             ->where('status', 'accepted')
             ->where('user_id', '!=', $outing->organizer_id)
@@ -105,18 +105,18 @@ class UserOutingController extends Controller
                 $participant->user->notify(new \App\Notifications\SimpleNotification(
                     'Cammino annullato dall\'organizzatore',
                     "L'organizzatore ha annullato il cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} a cui eri iscritto." . ($reason ? " Motivazione: {$reason}" : ""),
-                    null // Non cliccabile
+                    null // Qui non serve il link
                 ));
             }
         }
 
-        // Notifica all'admin che l'organizzatore ha annullato l'uscita
+        // Avviso anche gli admin che l'organizzatore ha annullato l'uscita
         $admins = \App\Models\User::where('role', 'admin')->get();
         foreach ($admins as $admin) {
             $admin->notify(new \App\Notifications\SimpleNotification(
                 'Cammino tra utenti annullato dall\'organizzatore',
                 "L'organizzatore '" . auth()->user()->name . "' ha annullato il cammino '" . $outing->stage_name . "' del " . $outing->date->format('d/m/Y') . "." . ($reason ? " Motivazione: {$reason}" : ""),
-                null // Non cliccabile
+                null // Qui non serve il link
             ));
         }
 

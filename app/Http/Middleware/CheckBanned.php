@@ -24,9 +24,9 @@ class CheckBanned
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            // BUG-01 FIX: le chiamate AJAX/JSON (es. notifiche, partecipazioni via fetch)
-            // non producono un redirect HTML utilizzabile, quindi vengono bloccate
-            // con un 403 JSON immediato prima ancora di eseguire la logica del controller.
+            // Fix BUG-01: Se la richiesta è AJAX o JSON (tipo per le notifiche o per iscriversi via fetch),
+            // non possiamo fare un redirect HTML normale. Quindi rimando subito un 403 in JSON
+            // senza far andare avanti la richiesta al controller.
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'error' => 'Account sospeso.',

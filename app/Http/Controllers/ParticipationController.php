@@ -11,48 +11,67 @@ class ParticipationController extends Controller
 {
     public function store(Request $request, Outing $outing)
     {
-        // 0. L'organizzatore non può iscriversi alla sua stessa uscita
+        // 0. Chi organizza non può iscriversi alla propria uscita
         if ($outing->organizer_id === auth()->id()) {
             return back()->with('error', 'Non puoi richiedere di partecipare al tuo stesso cammino.');
         }
 
-        // BUG-01 FIX: L'uscita deve essere in stato 'published' per accettare iscrizioni.
-        // Senza questo controllo, gli utenti potevano iscriversi a uscite
-        // concluded, cancelled o rejected tramite POST diretto.
+        // Fix BUG-01: L'uscita deve essere pubblicata per accettare iscrizioni.
+        // Altrimenti la gente potrebbe iscriversi a uscite già finite, annullate o rifiutate tramite POST diretto.
         if ($outing->status !== 'published') {
             return back()->with('error', "Questa uscita non è disponibile per le iscrizioni.");
         }
 
-        // BUG-02 FIX: il controllo duplicati è stato spostato DENTRO la transazione
-        // con lockForUpdate (vedi sotto), rendendolo atomico. Un check qui fuori
-        // non è affidabile in presenza di richieste concorrenti.
+        // Fix BUG-02: Controllo i duplicati dentro la transazione col lockForUpdate.
+        // Farlo fuori non è sicuro se arrivano richieste in contemporanea.
 
-        // VULN-02 FIX: Operazione atomica con lock pessimistico per prevenire race condition.
-        // Senza questo lock, due richieste simultanee possono entrambe superare il controllo
-        // dei posti e iscriversi, anche se rimane un solo posto disponibile.
+        // Fix VULN-02: Uso un lock pessimistico per evitare race condition sui posti rimasti.
+        // Se non blocco la riga, due utenti che cliccano insieme potrebbero registrarsi superando il limite.
         $errorMessage = null;
         $notifyOrganizer = false;
 
         DB::transaction(function () use ($outing, &$errorMessage, &$notifyOrganizer) {
-            // Ri-carica l'uscita con un lock esclusivo per questa transazione
+            // Ricarico l'uscita bloccando la riga nel DB per questa transazione
             $lockedOuting = Outing::lockForUpdate()->find($outing->id);
 
-            // BUG-02 FIX: controllo duplicati spostato qui dentro, atomico grazie al lock.
-            // Questo previene la race condition in cui due richieste simultanee superano
-            // entrambe il check pre-transazione prima che una delle due inserisca il record.
-            if ($lockedOuting->participationRequests()->where('user_id', auth()->id())->exists()) {
+            // Controllo se esiste già una richiesta per questo utente
+            $existing = $lockedOuting->participationRequests()
+                ->where('user_id', auth()->id())
+                ->lockForUpdate()
+                ->first();
+
+            if ($existing) {
+                // Se la richiesta era rejected (es. per ban), permetto la re-iscrizione aggiornandola
+                if ($existing->status === 'rejected') {
+                    // Controllo posti prima di riattivare
+                    $acceptedCount = $lockedOuting->participationRequests()->where('status', 'accepted')->count();
+                    if ($acceptedCount >= $lockedOuting->max_participants) {
+                        $errorMessage = 'L\'uscita ha raggiunto il numero massimo di partecipanti.';
+                        return;
+                    }
+
+                    $newStatus = ($lockedOuting->type === 'official') ? 'accepted' : 'pending';
+                    $existing->update(['status' => $newStatus]);
+
+                    if ($lockedOuting->type === 'user' && $lockedOuting->organizer) {
+                        $notifyOrganizer = true;
+                    }
+                    return;
+                }
+
+                // Qualsiasi altro stato (pending, accepted) = richiesta già attiva, blocco
                 $errorMessage = 'Hai già inviato una richiesta per questa uscita.';
                 return;
             }
 
-            // Controllo posti disponibili (atomico)
+            // Controllo se ci sono ancora posti liberi
             $acceptedCount = $lockedOuting->participationRequests()->where('status', 'accepted')->count();
             if ($acceptedCount >= $lockedOuting->max_participants) {
                 $errorMessage = 'L\'uscita ha raggiunto il numero massimo di partecipanti.';
                 return;
             }
 
-            // Determina lo stato della richiesta
+            // Decido lo stato iniziale della richiesta
             $status = ($lockedOuting->type === 'official') ? 'accepted' : 'pending';
 
             try {
@@ -62,9 +81,8 @@ class ParticipationController extends Controller
                     'status'    => $status,
                 ]);
             } catch (\Illuminate\Database\QueryException $e) {
-                // Ultimo livello di difesa: il vincolo UNIQUE a DB intercetta
-                // eventuali duplicati che abbiano comunque superato il lock
-                // (es. su SQLite in modalità WAL o in test paralleli).
+                // Ultimo check: il vincolo UNIQUE sul database blocca 
+                // eventuali richieste doppie sfuggite al lock.
                 if (str_contains($e->getMessage(), 'UNIQUE constraint failed') ||
                     str_contains($e->getMessage(), 'Duplicate entry')) {
                     $errorMessage = 'Hai già inviato una richiesta per questa uscita.';
@@ -82,7 +100,7 @@ class ParticipationController extends Controller
             return back()->with('error', $errorMessage);
         }
 
-        // Notifica eseguita fuori dalla transazione per evitare lock prolungati
+        // Mando la notifica fuori dalla transazione per non tenere il DB bloccato troppo tempo
         if ($notifyOrganizer && $outing->organizer) {
             $outing->organizer->notify(new \App\Notifications\SimpleNotification(
                 'Nuova richiesta di iscrizione',
@@ -96,36 +114,41 @@ class ParticipationController extends Controller
 
     public function destroy(ParticipationRequest $participation)
     {
-        // Solo l'utente stesso può annullare la propria partecipazione
+        // Solo tu puoi cancellare la tua partecipazione
         if ($participation->user_id !== auth()->id()) {
             abort(403, 'Non puoi annullare la partecipazione di un altro utente.');
         }
 
-        // L'organizzatore non può annullare la propria partecipazione
+        // Chi organizza non può ritirarsi dall'uscita
         if ($participation->outing->organizer_id === auth()->id()) {
             return back()->with('error', 'L\'organizzatore non può annullare la propria partecipazione al cammino.');
+        }
+
+        // Se la partecipazione è già stata revocata (es. per ban), l'utente non può "annullarla" nuovamente
+        if ($participation->status === 'rejected') {
+            return back()->with('error', 'La tua partecipazione è già stata revocata e non può essere ulteriormente modificata.');
         }
 
         $outing = $participation->outing;
         $user = auth()->user();
 
         if ($outing->type === 'official') {
-            // Annullamento iscrizione a un cammino ufficiale da parte di un utente, l’admin riceve la notifica
+            // Se un utente si cancella da un cammino ufficiale, avviso l'admin
             $admins = \App\Models\User::where('role', 'admin')->get();
             foreach ($admins as $admin) {
                 $admin->notify(new \App\Notifications\SimpleNotification(
                     'Annullamento iscrizione cammino ufficiale',
                     "L'utente '{$user->name}' ha annullato la sua iscrizione al cammino ufficiale '{$outing->stage_name}' del {$outing->date->format('d/m/Y')}.",
-                    null // Non cliccabile
+                    null // Niente link cliccabile
                 ));
             }
         } else {
-            // Annullamento iscrizione ad un cammino tra utenti da parte di un utente, l’utente organizzatore riceve la notifica
+            // Se un utente si cancella da un cammino privato, avviso l'organizzatore
             if ($outing->organizer) {
                 $outing->organizer->notify(new \App\Notifications\SimpleNotification(
                     'Annullamento iscrizione cammino',
                     "L'utente '{$user->name}' ha annullato la sua iscrizione al tuo cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')}.",
-                    null // Non cliccabile
+                    null // Niente link
                 ));
             }
         }
@@ -139,22 +162,21 @@ class ParticipationController extends Controller
     {
         $outing = $participation->outing;
 
-        // Verifica che l'utente corrente sia l'organizzatore dell'uscita
+        // Controllo che l'utente loggato sia proprio l'organizzatore
         if ($outing->organizer_id !== auth()->id()) {
             abort(403, 'Azione non autorizzata. Solo l\'organizzatore può approvare le richieste.');
         }
 
-        // Verifica lo stato della richiesta (controllo rapido pre-transazione)
+        // Controllo veloce prima della transazione se la richiesta è ancora in attesa
         if ($participation->status !== 'pending') {
             return back()->with('error', 'Questa richiesta è già stata elaborata.');
         }
 
-        // VULN-03 FIX: Stessa race condition di VULN-02. Due approvazioni simultanee
-        // potevano portare oltre il limite di max_participants.
+        // Fix VULN-03: Stessa race condition di prima. Evito che due approvazioni contemporanee superino max_participants.
         $errorMessage = null;
 
         DB::transaction(function () use ($participation, $outing, &$errorMessage) {
-            // Ri-legge la partecipazione con lock per evitare doppia approvazione
+            // Rileggo la partecipazione col lock per non rischiare approvazioni doppie
             $lockedParticipation = ParticipationRequest::lockForUpdate()->find($participation->id);
 
             if ($lockedParticipation->status !== 'pending') {
@@ -162,7 +184,7 @@ class ParticipationController extends Controller
                 return;
             }
 
-            // Ri-conta i posti con lock sull'uscita
+            // Riconto i posti bloccando l'uscita
             $lockedOuting = Outing::lockForUpdate()->find($outing->id);
             $acceptedCount = $lockedOuting->participationRequests()->where('status', 'accepted')->count();
 
@@ -178,7 +200,7 @@ class ParticipationController extends Controller
             return back()->with('error', $errorMessage);
         }
 
-        // Notifica eseguita fuori dalla transazione
+        // Mando la notifica fuori dalla transazione
         $participation->refresh();
         if ($participation->user) {
             $participation->user->notify(new \App\Notifications\SimpleNotification(
@@ -195,24 +217,24 @@ class ParticipationController extends Controller
     {
         $outing = $participation->outing;
 
-        // Verifica che l'utente corrente sia l'organizzatore dell'uscita
+        // Controllo che sia l'organizzatore
         if ($outing->organizer_id !== auth()->id()) {
             abort(403, 'Azione non autorizzata. Solo l\'organizzatore può rifiutare le richieste.');
         }
 
-        // Verifica lo stato della richiesta
+        // Verifico lo stato attuale della richiesta
         if ($participation->status !== 'pending') {
             return back()->with('error', 'Questa richiesta è già stata elaborata.');
         }
 
         $participation->update(['status' => 'rejected']);
 
-        // Invia notifica al richiedente
+        // Notifico l'utente del rifiuto
         if ($participation->user) {
             $participation->user->notify(new \App\Notifications\SimpleNotification(
                 'Richiesta di partecipazione rifiutata',
                 "La tua richiesta di partecipazione al cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} è stata rifiutata dall'organizzatore.",
-                null // Non cliccabile
+                null // Niente link
             ));
         }
 

@@ -30,7 +30,7 @@ class Outing extends Model
         'approval_deadline' => 'datetime'
     ];
 
-    // Rimossi startStage() e endStage()
+    // Ho rimosso startStage() e endStage() visto che non servono più
 
     public function organizer()
     {
@@ -47,7 +47,7 @@ class Outing extends Model
         return $this->hasMany(ParticipationRequest::class);
     }
 
-    // Scopes
+    // Scope locali per i filtri delle query
     public function scopePublished($query)
     {
         return $query->where('status', 'published');

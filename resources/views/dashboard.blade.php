@@ -148,11 +148,17 @@
                                         <td>
                                             @if($req->outing->date >= now() && in_array($req->outing->status, ['published']))
                                                 @if($req->outing->organizer_id !== auth()->id())
-                                                    <form action="{{ route('participations.destroy', $req->id) }}" method="POST" onsubmit="return confirm('Sicuro di voler annullare la tua partecipazione?');">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-xmark"></i> Annulla</button>
-                                                    </form>
+                                                    {{-- Mostro "Annulla" solo se la partecipazione non è già stata revocata (es. a seguito di un ban) --}}
+                                                    @if(in_array($req->status, ['accepted', 'pending']))
+                                                        <form action="{{ route('participations.destroy', $req->id) }}" method="POST" onsubmit="return confirm('Sicuro di voler annullare la tua partecipazione?');">
+                                                            @csrf
+                                                            @method('DELETE')
+                                                            <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-xmark"></i> Annulla</button>
+                                                        </form>
+                                                    @else
+                                                        {{-- Partecipazione già revocata (es. per ban): nessuna azione disponibile --}}
+                                                        <span class="text-muted small">—</span>
+                                                    @endif
                                                 @else
                                                     <div class="d-flex flex-column align-items-center">
                                                         <span class="text-muted small mb-1"><i class="fa-solid fa-user-tie"></i> Organizzatore</span>

@@ -173,9 +173,50 @@
                         @endif
                     @elseif($userRequest)
                         @if($userRequest->status == 'pending')
-                            <div class="alert alert-info">Richiesta inviata. In attesa di approvazione.</div>
+                            <div class="alert alert-info mb-3">Richiesta inviata. In attesa di approvazione.</div>
+                            {{-- Bottone annulla iscrizione per uscite future ancora pubblicabili --}}
+                            @if($outing->date >= now() && $outing->status === 'published')
+                                <form action="{{ route('participations.destroy', $userRequest->id) }}" method="POST"
+                                      onsubmit="return confirm('Sicuro di voler ritirare la tua richiesta di partecipazione?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-outline-danger w-100 rounded-pill">
+                                        <i class="fa-solid fa-xmark me-1"></i> Ritira Richiesta
+                                    </button>
+                                </form>
+                            @endif
                         @elseif($userRequest->status == 'accepted')
-                            <div class="alert alert-success">Sei iscritto a questa uscita! <i class="fa-solid fa-check"></i></div>
+                            <div class="alert alert-success mb-3">Sei iscritto a questa uscita! <i class="fa-solid fa-check"></i></div>
+                            {{-- Bottone annulla iscrizione per uscite future ancora pubblicabili --}}
+                            @if($outing->date >= now() && $outing->status === 'published')
+                                <form action="{{ route('participations.destroy', $userRequest->id) }}" method="POST"
+                                      onsubmit="return confirm('Sicuro di voler annullare la tua partecipazione?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="btn btn-outline-danger w-100 rounded-pill">
+                                        <i class="fa-solid fa-xmark me-1"></i> Annulla Iscrizione
+                                    </button>
+                                </form>
+                            @endif
+                        @elseif($userRequest->status == 'rejected')
+                            {{-- Partecipazione revocata (es. per ban) --}}
+                            @if($outing->date >= now() && $outing->status === 'published' && $acceptedCount < $outing->max_participants)
+                                {{-- L'uscita è ancora disponibile: offro la possibilità di re-iscriversi --}}
+                                <div class="alert alert-warning mb-3">
+                                    <i class="fa-solid fa-circle-info me-1"></i> La tua partecipazione precedente era stata revocata. Puoi iscriverti nuovamente.
+                                </div>
+                                <form action="{{ route('participations.store', $outing->id) }}" method="POST">
+                                    @csrf
+                                    <button type="submit" class="btn btn-custom btn-primary-custom btn-lg w-100">
+                                        <i class="fa-solid fa-arrow-right-to-bracket me-1"></i> Richiedi Partecipazione
+                                    </button>
+                                </form>
+                            @else
+                                {{-- Uscita non più disponibile o posti esauriti --}}
+                                <div class="alert alert-danger">
+                                    <i class="fa-solid fa-ban me-1"></i> La tua partecipazione a questa uscita è stata revocata.
+                                </div>
+                            @endif
                         @endif
                     @elseif($isFull)
                         <div class="alert alert-danger">Spiacenti, l'uscita ha raggiunto il limite massimo di partecipanti.</div>

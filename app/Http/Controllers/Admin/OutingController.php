@@ -18,7 +18,7 @@ class OutingController extends Controller
 
         $outing->update(['status' => 'published']);
 
-        // Iscrivi automaticamente l'organizzatore all'uscita appena approvata
+        // Iscrivo automaticamente l'organizzatore all'uscita appena approvata
         if ($outing->organizer_id) {
             \App\Models\ParticipationRequest::updateOrCreate(
                 [
@@ -30,11 +30,11 @@ class OutingController extends Controller
                 ]
             );
 
-            // Invia notifica all'organizzatore
+            // Notifico l'organizzatore dell'approvazione
             $outing->organizer->notify(new \App\Notifications\SimpleNotification(
                 'Proposta di cammino approvata',
                 "La tua proposta per il cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} è stata approvata dall'amministratore.",
-                null // Non cliccabile
+                null
             ));
         }
 
@@ -46,7 +46,7 @@ class OutingController extends Controller
             return back()->with('error', 'Questa uscita non può essere rifiutata.');
         }
 
-        // VULN-06 FIX: Validazione lunghezza motivazione
+        // Valido la lunghezza della motivazione
         $request->validate(['reason' => 'nullable|string|max:2000']);
 
         $reason = $request->input('reason');
@@ -64,7 +64,7 @@ class OutingController extends Controller
             $outing->organizer->notify(new \App\Notifications\SimpleNotification(
                 'Proposta di cammino rifiutata',
                 "La tua proposta per il cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} è stata rifiutata dall'amministratore." . ($reason ? " Motivazione: {$reason}" : ""),
-                null // Non cliccabile
+                null
             ));
         }
 
@@ -77,7 +77,7 @@ class OutingController extends Controller
             return back()->with('error', 'Questa uscita è già annullata.');
         }
 
-        // VULN-06 FIX: Validazione lunghezza motivazione
+        // Valido la lunghezza della motivazione
         $request->validate(['reason' => 'nullable|string|max:2000']);
 
         $reason = $request->input('reason');
@@ -91,14 +91,14 @@ class OutingController extends Controller
             'notes' => $notes
         ]);
 
-        // Notifica tutti gli iscritti accettati
+        // Notifico tutti gli iscritti accettati dell'annullamento
         $participants = $outing->participationRequests()->where('status', 'accepted')->with('user')->get();
         foreach ($participants as $participant) {
             if ($participant->user) {
                 $participant->user->notify(new \App\Notifications\SimpleNotification(
                     'Cammino annullato dall\'amministratore',
                     "Il cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} a cui eri iscritto è stato annullato dall'amministratore." . ($reason ? " Motivazione: {$reason}" : ""),
-                    null // Non cliccabile
+                    null
                 ));
             }
         }
@@ -109,7 +109,7 @@ class OutingController extends Controller
 
     public function index(Request $request)
     {
-        // VULN-04 FIX: Validazione dei filtri con valori ammessi
+        // Valido i filtri prima di usarli nella query
         $request->validate([
             'type'   => 'nullable|in:official,user',
             'status' => 'nullable|in:pending,published,concluded,cancelled,rejected',
@@ -127,7 +127,6 @@ class OutingController extends Controller
             $query->where('status', $request->status);
         }
 
-        // Ordinamento di default per data di creazione discendente
         $outings = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
 
         return view('admin.outings.index', compact('outings'));
@@ -157,7 +156,7 @@ class OutingController extends Controller
             'meeting_point'   => 'required|string|max:255',
             'max_participants' => 'required|integer|min:1|max:50',
             'difficulty'      => 'required|in:facile,medio,difficile',
-            'notes'           => 'nullable|string|max:5000', // VULN-06 FIX
+            'notes'           => 'nullable|string|max:5000',
         ]);
 
         if ($validated['route_type'] === 'standard') {
@@ -170,7 +169,7 @@ class OutingController extends Controller
         unset($validated['route_type']);
 
         $validated['type'] = 'official';
-        $validated['status'] = 'published'; // Le uscite ufficiali nascono già pubblicate
+        $validated['status'] = 'published'; // Le uscite ufficiali sono pubblicate direttamente
 
         Outing::create($validated);
 
@@ -195,11 +194,11 @@ class OutingController extends Controller
             'meeting_point'   => 'required|string|max:255',
             'max_participants' => 'required|integer|min:1|max:50',
             'difficulty'      => 'required|in:facile,medio,difficile',
-            'notes'           => 'nullable|string|max:5000', // VULN-06 FIX
+            'notes'           => 'nullable|string|max:5000',
             'status'          => 'required|in:pending,published,concluded,cancelled,rejected',
         ]);
 
-        // FAIL-05 FIX: Impedisce all'admin di cambiare lo stato di un'uscita conclusa (state machine)
+        // Blocco la transizione di stato per uscite già concluse
         if ($outing->status === 'concluded' && $validated['status'] !== 'concluded') {
             return back()->withErrors(['status' => 'Non puoi modificare lo stato di un\'uscita già conclusa.']);
         }
@@ -220,14 +219,14 @@ class OutingController extends Controller
 
     public function destroy(Outing $outing)
     {
-        // FAIL-07 FIX: Notifica tutti i partecipanti iscritti prima dell'eliminazione
+        // Prima di eliminare, notifico tutti i partecipanti iscritti
         $participants = $outing->participationRequests()->where('status', 'accepted')->with('user')->get();
         foreach ($participants as $participant) {
             if ($participant->user) {
                 $participant->user->notify(new \App\Notifications\SimpleNotification(
                     'Cammino eliminato dall\'amministratore',
                     "Il cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} a cui eri iscritto è stato rimosso definitivamente dal sistema.",
-                    null // Non cliccabile
+                    null
                 ));
             }
         }

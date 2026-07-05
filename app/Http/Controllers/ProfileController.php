@@ -26,7 +26,7 @@ class ProfileController extends Controller
      */
     public function showUser(\App\Models\User $user): View
     {
-        // FAIL-08 FIX: Prevenire la visualizzazione dei profili admin (IDOR)
+        // Nascondo il profilo degli admin: non devono essere visibili/esplorabili dagli utenti
         if ($user->role === 'admin') {
             abort(403, 'Profilo non disponibile.');
         }
@@ -47,7 +47,7 @@ class ProfileController extends Controller
         $validated = $request->validated();
 
         if ($request->hasFile('profile_photo')) {
-            // Se c'è già una vecchia foto profilo, la cancello per non lasciare file orfani
+            // Elimino la vecchia foto prima di salvare quella nuova, per non lasciare file orfani
             if ($user->profile_photo_path) {
                 \Illuminate\Support\Facades\Storage::disk('public')->delete($user->profile_photo_path);
             }
@@ -77,8 +77,8 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        // Fix VULN-09: Se l'utente organizza uscite ancora attive, non gli permetto di cancellarsi.
-        // Altrimenti la cancellazione a cascata farebbe sparire uscite, partecipazioni e credenziali degli altri utenti!
+        // Se l'utente organizza ancora uscite attive, non può cancellare l'account:
+        // la cancellazione a cascata farebbe sparire uscite, partecipazioni e credenziali degli altri
         $activeOutingsCount = $user->outings()
             ->whereIn('status', ['published', 'pending'])
             ->count();

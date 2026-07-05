@@ -24,7 +24,7 @@ class CheckBanned
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            // Fix BUG-01: Se la richiesta è AJAX o JSON (tipo per le notifiche o per iscriversi via fetch),
+            // Se la richiesta è AJAX o JSON (tipo per le notifiche o per isriversi via fetch),
             // non possiamo fare un redirect HTML normale. Quindi rimando subito un 403 in JSON
             // senza far andare avanti la richiesta al controller.
             if ($request->expectsJson() || $request->ajax()) {

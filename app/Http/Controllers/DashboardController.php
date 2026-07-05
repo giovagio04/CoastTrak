@@ -6,15 +6,9 @@ use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
-    /**
-     * INFO-01 FIX: La logica del dashboard è stata spostata da web.php
-     * in questo controller dedicato, per migliorare testabilità e manutenibilità.
-     * VULN-11 FIX: Uso dell'operatore null-safe (?->) su ->outing->date
-     * per prevenire potenziali TypeError in caso di dati inconsistenti.
-     */
     public function __invoke(Request $request)
     {
-        // Redirect dell'admin alla sua area dedicata
+        // Se l'utente è admin, lo rimando direttamente alla sua area
         if (auth()->user()->role === 'admin') {
             return redirect()->route('admin.outings.index');
         }
@@ -113,8 +107,7 @@ class DashboardController extends Controller
             }
         }
 
-        // VULN-11 FIX: Operatore null-safe (?->) per prevenire TypeError
-        // nel caso in cui una participation_request abbia un outing nullo (dati corrotti).
+        // Ordino per data in modo sicuro usando l'operatore null-safe, nel caso un'uscita collegata sia stata eliminata
         $participations = $query->get()->sortByDesc(fn($p) => $p->outing?->date);
 
         return view('dashboard', compact('participations'));

@@ -9,7 +9,7 @@ class OutingController extends Controller
 {
     public function index(Request $request)
     {
-        // Validazione dei dati di input della ricerca
+        // Validazione input della ricerca
         $request->validate([
             'start_location'  => 'nullable|string|max:100',
             'end_location'    => 'nullable|string|max:100|different:start_location',
@@ -26,34 +26,30 @@ class OutingController extends Controller
             'date_to.after_or_equal'      => 'La data di fine deve essere successiva o uguale alla data di inizio.',
         ]);
 
-        // Recupero solo le uscite visibili al pubblico
+        // Mostro solo le uscite pubblicate
         $query = Outing::whereIn('status', ['published'])
             ->with(['organizer', 'guide'])
             ->withCount(['participationRequests as accepted_count' => function ($q) {
                 $q->where('status', 'accepted');
             }]);
 
-        // Filtro per Tipo (Ufficiale / Tra Utenti)
         if ($request->filled('type') && $request->type !== 'all') {
             $query->where('type', $request->type);
         }
 
-        // Filtro per Difficoltà
         if ($request->filled('difficulty') && $request->difficulty !== 'all') {
             $query->where('difficulty', $request->difficulty);
         }
 
-        // Filtro per Data Da
         if ($request->filled('date_from')) {
             $query->whereDate('date', '>=', $request->date_from);
         }
 
-        // Filtro per Data A
         if ($request->filled('date_to')) {
             $query->whereDate('date', '<=', $request->date_to);
         }
 
-        // Filtro per Località di Partenza
+        // Filtro per partenza: gestisco anche il caso "Cammino Completo"
         if ($request->filled('start_location')) {
             $start = $request->start_location;
             $query->where(function ($q) use ($start) {
@@ -66,7 +62,7 @@ class OutingController extends Controller
             });
         }
 
-        // Filtro per Località di Arrivo
+        // Filtro per arrivo: gestisco anche il caso "Cammino Completo"
         if ($request->filled('end_location')) {
             $end = $request->end_location;
             $query->where(function ($q) use ($end) {
@@ -79,7 +75,6 @@ class OutingController extends Controller
             });
         }
 
-        // Filtro "Solo posti disponibili"
         if ($request->boolean('available_only')) {
             $query->whereRaw('(
                 SELECT COUNT(*) FROM participation_requests
@@ -95,7 +90,7 @@ class OutingController extends Controller
 
     public function show(Outing $outing)
     {
-        // Controllo accessi: se l'uscita non è pubblica, solo admin o organizzatore possono vederla
+        // Se l'uscita non è pubblica, solo admin o organizzatore possono vederla
         if (!in_array($outing->status, ['published', 'concluded'])) {
             if (!auth()->check() || (auth()->user()->role !== 'admin' && $outing->organizer_id !== auth()->id())) {
                 abort(403, 'Accesso negato: l\'uscita non è ancora visibile al pubblico.');

@@ -7,9 +7,6 @@ use Illuminate\Http\Request;
 
 class NotificationController extends Controller
 {
-    /**
-     * Get the notifications list and unread count for the authenticated user.
-     */
     public function index(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -21,7 +18,8 @@ class NotificationController extends Controller
                 $title = $notification->data['title'] ?? 'Notifica';
                 $actionUrl = $notification->data['action_url'] ?? null;
 
-                // Forziamo a null l'action_url per specifiche notifiche che non devono essere cliccabili
+                // Alcune notifiche non devono essere cliccabili (es. proposte approvate/rifiutate):
+                // in questi casi azzero l'action_url anche se fosse presente nel DB
                 $titleLower = strtolower($title);
                 if (
                     str_contains($titleLower, 'proposta di cammino approvata') ||
@@ -50,9 +48,6 @@ class NotificationController extends Controller
         ]);
     }
 
-    /**
-     * Mark a single notification as read.
-     */
     public function markAsRead(Request $request, string $id): JsonResponse
     {
         $notification = $request->user()->notifications()->findOrFail($id);
@@ -61,9 +56,6 @@ class NotificationController extends Controller
         return response()->json(['success' => true]);
     }
 
-    /**
-     * Mark all notifications as read.
-     */
     public function markAllAsRead(Request $request): JsonResponse
     {
         $request->user()->unreadNotifications->markAsRead();
@@ -71,9 +63,6 @@ class NotificationController extends Controller
         return response()->json(['success' => true]);
     }
 
-    /**
-     * Delete a single notification.
-     */
     public function destroy(Request $request, string $id): JsonResponse
     {
         $notification = $request->user()->notifications()->findOrFail($id);
@@ -82,9 +71,6 @@ class NotificationController extends Controller
         return response()->json(['success' => true]);
     }
 
-    /**
-     * Delete all notifications.
-     */
     public function destroyAll(Request $request): JsonResponse
     {
         $request->user()->notifications()->delete();

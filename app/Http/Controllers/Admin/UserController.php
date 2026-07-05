@@ -10,9 +10,6 @@ use Illuminate\Http\Request;
 
 class UserController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(Request $request)
     {
         $query = User::where('role', 'user');
@@ -25,7 +22,7 @@ class UserController extends Controller
             });
         }
 
-        // VULN-10 FIX: Validazione dei filtri della lista utenti
+        // Valido i filtri per non accettare valori arbitrari
         $request->validate([
             'search'     => 'nullable|string|max:255',
             'min_trails' => 'nullable|integer|min:0|max:100',
@@ -45,9 +42,6 @@ class UserController extends Controller
         return view('admin.users.index', compact('users'));
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(User $user)
     {
         $user->load([
@@ -64,9 +58,6 @@ class UserController extends Controller
         return view('admin.users.show', compact('user'));
     }
 
-    /**
-     * Ban the specified user.
-     */
     public function ban(Request $request, User $user)
     {
         if ($user->role === 'admin') {
@@ -77,14 +68,14 @@ class UserController extends Controller
             'reason' => 'nullable|string|max:1000',
         ]);
 
-        // Usare assegnazione diretta invece di update() perché is_banned e ban_reason
-        // sono esclusi da $fillable per sicurezza (anti mass-assignment).
-        // Con update() verrebbero ignorati silenziosamente — questo era il bug.
+        // Uso l'assegnazione diretta invece di update() perché is_banned e ban_reason
+        // sono fuori dal $fillable per prevenire mass-assignment.
+        // Con update() verrebbero ignorati silenziosamente.
         $user->is_banned  = true;
         $user->ban_reason = $request->reason;
         $user->save();
 
-        // Rimuoviamo l'utente da tutte le uscite future non ancora concluse
+        // Rimuovo l'utente da tutte le uscite future non ancora concluse
         ParticipationRequest::where('user_id', $user->id)
             ->whereIn('status', ['accepted', 'pending'])
             ->whereHas('outing', function ($q) {
@@ -93,8 +84,7 @@ class UserController extends Controller
             })
             ->update(['status' => 'rejected']);
 
-        // Annulliamo definitivamente le uscite che l'utente ha organizzato e che non si sono ancora tenute.
-        // Se l'organizzatore è bannato, il cammino non può più aver luogo.
+        // Annullo anche le uscite che ha organizzato e non si sono ancora tenute
         Outing::where('organizer_id', $user->id)
             ->whereIn('status', ['pending', 'published'])
             ->where('date', '>=', now()->toDateString())
@@ -103,12 +93,9 @@ class UserController extends Controller
         return back()->with('success', 'Utente bannato con successo e rimosso dalle uscite future.');
     }
 
-    /**
-     * Unban the specified user.
-     */
     public function unban(User $user)
     {
-        // Stessa cosa dell'unban: assegnazione diretta per bypassare $fillable
+        // Stessa logica del ban: assegnazione diretta per aggirare $fillable
         $user->is_banned  = false;
         $user->ban_reason = null;
         $user->save();

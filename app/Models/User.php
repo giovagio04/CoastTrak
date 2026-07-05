@@ -14,10 +14,9 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
-     * Campi assegnabili in massa.
-     * NOTA DI SICUREZZA: 'role', 'is_banned' e 'ban_reason' sono intenzionalmente
-     * esclusi per prevenire privilege escalation via mass assignment.
-     * Questi campi vengono impostati solo da codice controllato (controller admin).
+     * 'role', 'is_banned' e 'ban_reason' sono esclusi intenzionalmente dal mass-assignment:
+     * vengono impostati solo tramite assegnazione diretta nei controller admin,
+     * così nessuno può fare privilege escalation via POST.
      */
     protected $fillable = [
         'name',
@@ -28,11 +27,6 @@ class User extends Authenticatable
         'profile_photo_path',
     ];
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [

@@ -20,10 +20,10 @@ function recordCrash($nomeTest, $descrizione, $exception) {
     echo "[CRASH] $nomeTest fallito!\n";
 }
 
-// 1. Creiamo un utente fake
+// Utente temporaneo usato come base per tutti i test
 $user = User::factory()->create(['name' => 'Chaos Tester']);
 
-// TEST 1: Data Estrema in Outing
+// Test 1: passo una data assurda direttamente al DB, scavalcando la validazione HTML
 try {
     $outing = Outing::create([
         'type' => 'user',
@@ -42,7 +42,7 @@ try {
     recordCrash('Data Estrema Outing', 'Inserimento di data enorme nel DB (bypassing HTML validation)', $e);
 }
 
-// TEST 2: Limiti numerici su Max Participants (-5)
+// Test 2: vedo se il DB accetta un numero di partecipanti negativo
 try {
     $outing2 = Outing::create([
         'type' => 'user',
@@ -61,9 +61,9 @@ try {
     recordCrash('Max Participants Negativo', 'Inserimento di partecipanti massimi in negativo', $e);
 }
 
-// TEST 3: Stringa gigante
+// Test 3: inserisco 1MB di testo nel campo notes per vedere se il DB esplode
 try {
-    $giantString = str_repeat("A", 1000000); // 1 MB
+    $giantString = str_repeat("A", 1000000);
     Outing::create([
         'type' => 'user',
         'is_full_trail' => false,
@@ -82,9 +82,9 @@ try {
     recordCrash('Stringa Gigante Notes', 'Inserimento 1MB stringa nel DB nel campo notes', $e);
 }
 
-// TEST 4: Orphan Delete
+// Test 4: elimino l'utente e verifico se le sue uscite rimangono orfane (CASCADE attivo?)
 try {
-    $user->delete(); 
+    $user->delete();
     $check = Outing::find($outing2->id);
     if ($check && $check->organizer === null) {
          throw new \Exception("Orphan record detectato: outing senza organizer_id in CASCADE (provoca null pointer in blade su \$outing->organizer->name)");
@@ -94,7 +94,7 @@ try {
     recordCrash('Orphan User Deletion', 'L\'eliminazione di un utente lascia le sue uscite orfane.', $e);
 }
 
-// TEST 5: Partecipazione a un'uscita cancellata e/o orfana
+// Test 5: bypassando il controller, iscrivo un utente a un'uscita già cancellata
 try {
     $user2 = User::factory()->create();
     $outing3 = Outing::create([
@@ -105,10 +105,10 @@ try {
         'meeting_point' => 'Test',
         'max_participants' => 10,
         'difficulty' => 'facile',
-        'status' => 'cancelled' // Stato cancellato
+        'status' => 'cancelled'
     ]);
     
-    // Forziamo un'iscrizione a livello DB, poi carichiamo la relazione
+    // Scrivo direttamente nel DB, senza passare dal controller
     $req = ParticipationRequest::create([
         'user_id' => $user2->id,
         'outing_id' => $outing3->id,

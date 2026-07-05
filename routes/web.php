@@ -15,14 +15,14 @@ Route::get('/', function () {
 Route::get('/outings', [OutingController::class, 'index'])->name('outings.index');
 Route::get('/outings/{outing}', [OutingController::class, 'show'])->name('outings.show');
 
-// Fix INFO-01: Ho spostato tutta la logica della dashboard dentro DashboardController
+// Ho spostato tutta la logica della dashboard dentro DashboardController
 Route::get('/dashboard', DashboardController::class)
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
-    // Fix INFO-02: Metto un rate limit per l'iscrizione (max 20 richieste al minuto)
-    // per evitare spam ed evitare di sovraccaricare il database.
+    // rate limit per l'iscrizione (max 20 richieste al minuto)
+    // per evitare spam ed evitare di sovraccariare il database.
     Route::middleware('throttle:20,1')->group(function () {
         Route::post('/outings/{outing}/participate', [\App\Http\Controllers\ParticipationController::class, 'store'])->name('participations.store');
         Route::delete('/participations/{participation}', [\App\Http\Controllers\ParticipationController::class, 'destroy'])->name('participations.destroy');

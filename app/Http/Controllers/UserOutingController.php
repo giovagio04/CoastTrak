@@ -33,7 +33,7 @@ class UserOutingController extends Controller
             'meeting_point'   => 'required|string|max:255',
             'max_participants' => 'required|integer|min:2|max:15',
             'difficulty'      => 'required|in:facile,medio,difficile',
-            'notes'           => 'nullable|string|max:5000', // Fix VULN-06: Valido la lunghezza delle note per evitare testi giganti
+            'notes'           => 'nullable|string|max:5000', // max 5000 caratteri per non intasare il DB
         ]);
 
         if ($validated['route_type'] === 'standard') {
@@ -48,27 +48,24 @@ class UserOutingController extends Controller
         $validated['type'] = 'user';
         $validated['organizer_id'] = auth()->id();
         $validated['status'] = 'pending';
-        // Diamo all'admin 24 ore per approvare questa proposta
+        // Do 24 ore all'admin per valutare la proposta
         $validated['approval_deadline'] = Carbon::now()->addHours(24);
 
         $outing = Outing::create($validated);
 
-        // Mando la notifica a tutti gli admin per avvisarli della proposta
+        // Notifico tutti gli admin della nuova proposta
         $admins = \App\Models\User::where('role', 'admin')->get();
         foreach ($admins as $admin) {
             $admin->notify(new \App\Notifications\SimpleNotification(
                 'Nuova proposta di cammino',
                 "L'utente '" . auth()->user()->name . "' ha proposto il cammino '" . $outing->stage_name . "' per la data " . $outing->date->format('d/m/Y') . ".",
-                route('admin.outings.show', $outing->id) // Link cliccabile per andare alla pagina
+                route('admin.outings.show', $outing->id)
             ));
         }
 
         return redirect()->route('dashboard')->with('success', 'La tua uscita è stata proposta! L\'amministratore la valuterà entro 24 ore.');
     }
 
-    /**
-     * Cancel the specified outing by the organizer.
-     */
     public function cancel(Request $request, Outing $outing)
     {
         if ($outing->organizer_id !== auth()->id()) {
@@ -79,7 +76,7 @@ class UserOutingController extends Controller
             return back()->with('error', 'Questa uscita è già stata annullata.');
         }
 
-        // Fix VULN-06: Controllo che la motivazione dell'annullamento non superi i 2000 caratteri
+        // Valido la motivazione per non accettare testi troppo lunghi
         $request->validate(['reason' => 'nullable|string|max:2000']);
 
         $reason = $request->input('reason');
@@ -93,7 +90,7 @@ class UserOutingController extends Controller
             'notes' => $notes
         ]);
 
-        // Avviso tutti gli iscritti confermati che l'uscita è saltata
+        // Avviso tutti i partecipanti confermati che l'uscita non si farà
         $participants = $outing->participationRequests()
             ->where('status', 'accepted')
             ->where('user_id', '!=', $outing->organizer_id)
@@ -105,18 +102,18 @@ class UserOutingController extends Controller
                 $participant->user->notify(new \App\Notifications\SimpleNotification(
                     'Cammino annullato dall\'organizzatore',
                     "L'organizzatore ha annullato il cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} a cui eri iscritto." . ($reason ? " Motivazione: {$reason}" : ""),
-                    null // Qui non serve il link
+                    null 
                 ));
             }
         }
 
-        // Avviso anche gli admin che l'organizzatore ha annullato l'uscita
+        // Informo gli admin che l'uscita è saltata
         $admins = \App\Models\User::where('role', 'admin')->get();
         foreach ($admins as $admin) {
             $admin->notify(new \App\Notifications\SimpleNotification(
                 'Cammino tra utenti annullato dall\'organizzatore',
                 "L'organizzatore '" . auth()->user()->name . "' ha annullato il cammino '" . $outing->stage_name . "' del " . $outing->date->format('d/m/Y') . "." . ($reason ? " Motivazione: {$reason}" : ""),
-                null // Qui non serve il link
+                null 
             ));
         }
 

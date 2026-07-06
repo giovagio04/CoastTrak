@@ -48,7 +48,7 @@ class DashboardController extends Controller
         $userId = auth()->id();
 
         $query = \App\Models\ParticipationRequest::where('user_id', $userId)
-            ->with(['outing.organizer', 'outing.guide'])
+            ->with(['outing.organizer'])
             ->whereHas('outing');
 
         // Filtro Tipo

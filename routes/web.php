@@ -4,7 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\OutingController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Admin\OutingController as AdminOutingController;
-use App\Http\Controllers\Admin\GuideController as AdminGuideController;
+
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -56,7 +56,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('outings/{outing}/reject', [\App\Http\Controllers\Admin\OutingController::class, 'reject'])->name('outings.reject');
     Route::post('outings/{outing}/cancel', [\App\Http\Controllers\Admin\OutingController::class, 'cancel'])->name('outings.cancel');
     Route::resource('outings', AdminOutingController::class);
-    Route::resource('guides', AdminGuideController::class);
+
     Route::get('users', [\App\Http\Controllers\Admin\UserController::class, 'index'])->name('users.index');
     Route::get('users/{user}', [\App\Http\Controllers\Admin\UserController::class, 'show'])->name('users.show');
     Route::post('users/{user}/ban', [\App\Http\Controllers\Admin\UserController::class, 'ban'])->name('users.ban');

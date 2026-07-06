@@ -82,9 +82,7 @@
                                 <li class="mb-2"><i class="fa-solid fa-user-check fa-fw text-success"></i> <strong>Iscritti Attuali:</strong> {{ $outing->participationRequests->where('status', 'accepted')->count() }}</li>
                             @endif
                             
-                            @if($outing->type == 'official' && $outing->guide)
-                                <li class="mt-3"><i class="fa-solid fa-compass fa-fw text-info"></i> <strong>Guida Assegnata:</strong> {{ $outing->guide->name }}</li>
-                            @elseif($outing->type == 'user' && $outing->organizer)
+                            @if($outing->type == 'user' && $outing->organizer)
                                 <li class="mt-3">
                                     <i class="fa-solid fa-user-tie fa-fw text-info"></i> 
                                     <strong>Organizzatore:</strong> {{ $outing->organizer->name }}

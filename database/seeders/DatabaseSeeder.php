@@ -4,7 +4,7 @@ namespace Database\Seeders;
 
 use App\Models\User;
 use App\Models\Stage;
-use App\Models\Guide;
+
 use App\Models\Outing;
 use App\Models\ParticipationRequest;
 use App\Models\DigitalCredential;
@@ -94,21 +94,14 @@ class DatabaseSeeder extends Seeder
             'difficulty' => 'medio'
         ]);
 
-        // 4. Creo le guide ambientali
-        $guide1 = Guide::create([
-            'name' => 'Giuseppe Trek',
-            'description' => 'Esperto del territorio calabrese.',
-            'experience_count' => 15,
-            'specializations' => 'Flora e fauna locale'
-        ]);
 
-        // 5. Creo le uscite ufficiali
+        // 4. Creo le uscite ufficiali
         $outing1 = Outing::create([
             'type' => 'official',
             'is_full_trail' => false,
             'start_location' => $stage1->start_point,
             'end_location' => $stage1->end_point,
-            'guide_id' => $guide1->id,
+
             'date' => Carbon::now()->addDays(10),
             'meeting_point' => 'Piazza di Soverato, ore 8:00',
             'max_participants' => 20,
@@ -122,7 +115,7 @@ class DatabaseSeeder extends Seeder
             'is_full_trail' => false,
             'start_location' => $stage1->start_point,
             'end_location' => $stage1->end_point,
-            'guide_id' => $guide1->id,
+
             'date' => Carbon::now()->subDays(5),
             'meeting_point' => 'Piazza di Soverato',
             'max_participants' => 15,
@@ -150,7 +143,7 @@ class DatabaseSeeder extends Seeder
             'is_full_trail' => true,
             'start_location' => 'Soverato',
             'end_location' => 'Pizzo',
-            'guide_id' => $guide1->id,
+
             'date' => Carbon::now()->subDays(10),
             'meeting_point' => 'Piazza di Soverato',
             'max_participants' => 15,
@@ -171,7 +164,34 @@ class DatabaseSeeder extends Seeder
             'completed_at' => Carbon::now()->subDays(9)
         ]);
 
-        // 7. Uscite tra utenti (mario può crearne una perché ha completato la prima tappa)
+        // Uscita ufficiale completa del passato per far sì che Mario possa organizzare uscite
+        // (canCreateOuting() richiede almeno un cammino completo nello storico)
+        $outingFullMario = Outing::create([
+            'type'             => 'official',
+            'is_full_trail'    => true,
+            'start_location'   => 'Soverato',
+            'end_location'     => 'Pizzo',
+            'date'             => Carbon::now()->subDays(20),
+            'meeting_point'    => 'Piazza di Soverato, ore 7:30',
+            'max_participants' => 20,
+            'difficulty'       => 'difficile',
+            'status'           => 'concluded',
+        ]);
+
+        ParticipationRequest::create([
+            'outing_id' => $outingFullMario->id,
+            'user_id'   => $user1->id,
+            'status'    => 'accepted',
+        ]);
+
+        DigitalCredential::create([
+            'user_id'      => $user1->id,
+            'stage_id'     => null, // null = cammino intero
+            'outing_id'    => $outingFullMario->id,
+            'completed_at' => Carbon::now()->subDays(19),
+        ]);
+
+        // 7. Uscite tra utenti (mario può crearne una perché ha completato il cammino completo)
         $outingUser = Outing::create([
             'type' => 'user',
             'is_full_trail' => false,

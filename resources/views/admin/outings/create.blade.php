@@ -57,15 +57,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-bold">Guida Assegnata (Opzionale)</label>
-                    <select name="guide_id" class="form-select">
-                        <option value="">Nessuna guida</option>
-                        @foreach($guides as $guide)
-                            <option value="{{ $guide->id }}">{{ $guide->name }}</option>
-                        @endforeach
-                    </select>
-                </div>
+
             </div>
 
             <div class="row mb-3">

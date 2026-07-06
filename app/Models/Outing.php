@@ -15,7 +15,6 @@ class Outing extends Model
         'start_location',
         'end_location',
         'organizer_id',
-        'guide_id',
         'date',
         'meeting_point',
         'max_participants',
@@ -37,10 +36,6 @@ class Outing extends Model
         return $this->belongsTo(User::class, 'organizer_id');
     }
 
-    public function guide()
-    {
-        return $this->belongsTo(Guide::class);
-    }
 
     public function participationRequests()
     {

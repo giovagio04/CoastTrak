@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Outing;
 use App\Models\Stage;
-use App\Models\Guide;
+
 use Illuminate\Http\Request;
 
 class OutingController extends Controller
@@ -115,7 +115,7 @@ class OutingController extends Controller
             'status' => 'nullable|in:pending,published,concluded,cancelled,rejected',
         ]);
 
-        $query = Outing::with(['guide', 'participationRequests']);
+        $query = Outing::with(['participationRequests']);
 
         // Filtro per Tipo
         if ($request->filled('type')) {
@@ -134,15 +134,14 @@ class OutingController extends Controller
 
     public function show(Outing $outing)
     {
-        $outing->load(['guide', 'organizer', 'participationRequests.user']);
+        $outing->load(['organizer', 'participationRequests.user']);
         return view('admin.outings.show', compact('outing'));
     }
 
     public function create()
     {
         $locations = ['Soverato', 'Petrizzi', 'Monterosso Calabro', 'Pizzo'];
-        $guides = Guide::all();
-        return view('admin.outings.create', compact('locations', 'guides'));
+        return view('admin.outings.create', compact('locations'));
     }
 
     public function store(Request $request)
@@ -151,7 +150,7 @@ class OutingController extends Controller
             'route_type'      => 'required|in:standard,custom',
             'start_location'  => 'required_if:route_type,custom|nullable|string|max:255',
             'end_location'    => 'required_if:route_type,custom|nullable|string|max:255|different:start_location',
-            'guide_id'        => 'nullable|exists:guides,id',
+
             'date'            => 'required|date|after_or_equal:today|before_or_equal:+3 years',
             'meeting_point'   => 'required|string|max:255',
             'max_participants' => 'required|integer|min:1|max:50',
@@ -179,8 +178,7 @@ class OutingController extends Controller
     public function edit(Outing $outing)
     {
         $locations = ['Soverato', 'Petrizzi', 'Monterosso Calabro', 'Pizzo'];
-        $guides = Guide::all();
-        return view('admin.outings.edit', compact('outing', 'locations', 'guides'));
+        return view('admin.outings.edit', compact('outing', 'locations'));
     }
 
     public function update(Request $request, Outing $outing)
@@ -189,7 +187,7 @@ class OutingController extends Controller
             'route_type'      => 'required|in:standard,custom',
             'start_location'  => 'required_if:route_type,custom|nullable|string|max:255',
             'end_location'    => 'required_if:route_type,custom|nullable|string|max:255|different:start_location',
-            'guide_id'        => 'nullable|exists:guides,id',
+
             'date'            => 'required|date|after_or_equal:today|before_or_equal:+3 years',
             'meeting_point'   => 'required|string|max:255',
             'max_participants' => 'required|integer|min:1|max:50',

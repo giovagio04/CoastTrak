@@ -28,7 +28,7 @@ class OutingController extends Controller
 
         // Mostro solo le uscite pubblicate
         $query = Outing::whereIn('status', ['published'])
-            ->with(['organizer', 'guide'])
+            ->with(['organizer'])
             ->withCount(['participationRequests as accepted_count' => function ($q) {
                 $q->where('status', 'accepted');
             }]);
@@ -97,7 +97,7 @@ class OutingController extends Controller
             }
         }
 
-        $outing->load(['organizer', 'guide', 'participationRequests.user']);
+        $outing->load(['organizer', 'participationRequests.user']);
         
         return view('outings.show', compact('outing'));
     }

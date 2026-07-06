@@ -248,9 +248,7 @@
                         <i class="fa-solid fa-users text-secondary me-2"></i> Posti max: {{ $outing->max_participants }}
                     </p>
                     
-                    @if($outing->guide)
-                        <p class="small text-muted mb-0"><i class="fa-solid fa-compass me-1"></i> Guida: {{ $outing->guide->name }}</p>
-                    @elseif($outing->organizer)
+                    @if($outing->organizer)
                         <p class="small text-muted mb-0">
                             <i class="fa-solid fa-user me-1"></i> 
                             Organizzatore: {{ $outing->organizer->name }}

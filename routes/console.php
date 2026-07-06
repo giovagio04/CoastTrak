@@ -9,3 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 Schedule::command('outings:reject-expired')->hourly();
+Schedule::command('outings:update-concluded')->daily();

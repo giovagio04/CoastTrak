@@ -26,24 +26,31 @@ class UserOutingController extends Controller
         }
 
         $validated = $request->validate([
-            'route_type'      => 'required|in:standard,custom',
-            'start_location'  => 'required_if:route_type,custom|nullable|string|max:255',
-            'end_location'    => 'required_if:route_type,custom|nullable|string|max:255|different:start_location',
-            'date'            => 'required|date|after:today|before_or_equal:+3 years',
-            'meeting_point'   => 'required|string|max:255',
-            'max_participants' => 'required|integer|min:2|max:15',
-            'difficulty'      => 'required|in:facile,medio,difficile',
-            'notes'           => 'nullable|string|max:5000', // max 5000 caratteri per non intasare il DB
+            'route_type'         => 'required|in:standard,custom',
+            'standard_direction' => 'required_if:route_type,standard|in:sp,ps',
+            'start_location'     => 'required_if:route_type,custom|nullable|string|max:255',
+            'end_location'       => 'required_if:route_type,custom|nullable|string|max:255|different:start_location',
+            'date'               => 'required|date|after:today|before_or_equal:+3 years',
+            'meeting_point'      => 'required|string|max:255',
+            'max_participants'   => 'required|integer|min:2|max:15',
+            'difficulty'         => 'required|in:facile,medio,difficile',
+            'notes'              => 'nullable|string|max:5000', // max 5000 caratteri per non intasare il DB
         ]);
 
         if ($validated['route_type'] === 'standard') {
             $validated['is_full_trail'] = true;
-            $validated['start_location'] = null;
-            $validated['end_location'] = null;
+            if ($validated['standard_direction'] === 'sp') {
+                $validated['start_location'] = 'Soverato';
+                $validated['end_location'] = 'Pizzo';
+            } else {
+                $validated['start_location'] = 'Pizzo';
+                $validated['end_location'] = 'Soverato';
+            }
         } else {
             $validated['is_full_trail'] = false;
         }
         unset($validated['route_type']);
+        unset($validated['standard_direction']);
 
         $validated['type'] = 'user';
         $validated['organizer_id'] = auth()->id();

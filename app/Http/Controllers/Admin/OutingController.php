@@ -147,9 +147,10 @@ class OutingController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'route_type'      => 'required|in:standard,custom',
-            'start_location'  => 'required_if:route_type,custom|nullable|string|max:255',
-            'end_location'    => 'required_if:route_type,custom|nullable|string|max:255|different:start_location',
+            'route_type'         => 'required|in:standard,custom',
+            'standard_direction' => 'required_if:route_type,standard|in:sp,ps',
+            'start_location'     => 'required_if:route_type,custom|nullable|string|max:255',
+            'end_location'       => 'required_if:route_type,custom|nullable|string|max:255|different:start_location',
 
             'date'            => 'required|date|after_or_equal:today|before_or_equal:+3 years',
             'meeting_point'   => 'required|string|max:255',
@@ -160,12 +161,18 @@ class OutingController extends Controller
 
         if ($validated['route_type'] === 'standard') {
             $validated['is_full_trail'] = true;
-            $validated['start_location'] = null;
-            $validated['end_location'] = null;
+            if ($validated['standard_direction'] === 'sp') {
+                $validated['start_location'] = 'Soverato';
+                $validated['end_location'] = 'Pizzo';
+            } else {
+                $validated['start_location'] = 'Pizzo';
+                $validated['end_location'] = 'Soverato';
+            }
         } else {
             $validated['is_full_trail'] = false;
         }
         unset($validated['route_type']);
+        unset($validated['standard_direction']);
 
         $validated['type'] = 'official';
         $validated['status'] = 'published'; // Le uscite ufficiali sono pubblicate direttamente
@@ -184,9 +191,10 @@ class OutingController extends Controller
     public function update(Request $request, Outing $outing)
     {
         $validated = $request->validate([
-            'route_type'      => 'required|in:standard,custom',
-            'start_location'  => 'required_if:route_type,custom|nullable|string|max:255',
-            'end_location'    => 'required_if:route_type,custom|nullable|string|max:255|different:start_location',
+            'route_type'         => 'required|in:standard,custom',
+            'standard_direction' => 'required_if:route_type,standard|in:sp,ps',
+            'start_location'     => 'required_if:route_type,custom|nullable|string|max:255',
+            'end_location'       => 'required_if:route_type,custom|nullable|string|max:255|different:start_location',
 
             'date'            => 'required|date|after_or_equal:today|before_or_equal:+3 years',
             'meeting_point'   => 'required|string|max:255',
@@ -203,12 +211,18 @@ class OutingController extends Controller
 
         if ($validated['route_type'] === 'standard') {
             $validated['is_full_trail'] = true;
-            $validated['start_location'] = null;
-            $validated['end_location'] = null;
+            if ($validated['standard_direction'] === 'sp') {
+                $validated['start_location'] = 'Soverato';
+                $validated['end_location'] = 'Pizzo';
+            } else {
+                $validated['start_location'] = 'Pizzo';
+                $validated['end_location'] = 'Soverato';
+            }
         } else {
             $validated['is_full_trail'] = false;
         }
         unset($validated['route_type']);
+        unset($validated['standard_direction']);
 
         $outing->update($validated);
 

@@ -296,7 +296,8 @@
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-4">
-                    <p class="text-muted text-justify">Questa azione è irreversibile. Tutti i tuoi dati, le tue partecipazioni e le tue credenziali verranno persi per sempre.</p>
+                    <p class="text-muted text-justify">Questa azione è irreversibile. Tutti i tuoi dati, le tue partecipazioni e le tue credenziali verranno persi per sempre. <strong class="text-danger">Inoltre, tutte le uscite attive di cui sei organizzatore verranno automaticamente annullate.</strong></p>
+
                     <p class="text-muted fw-bold">Inserisci la tua password attuale per confermare l'operazione:</p>
                     
                     <div class="mb-3">

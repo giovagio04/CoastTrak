@@ -141,7 +141,6 @@ class DatabaseSeeder extends Seeder
         $outingFullPast = Outing::create([
             'type' => 'official',
             'is_full_trail' => true,
-            'guide_id' => $guide1->id,
             'date' => Carbon::now()->subDays(10),
             'meeting_point' => 'Piazza di Soverato',
             'max_participants' => 15,
@@ -224,7 +223,7 @@ class DatabaseSeeder extends Seeder
             'max_participants' => 5,
             'difficulty' => 'medio',
             'status' => 'published',
-            'notes' => 'TEST ANTIGRAVITY'
+            'notes' => ''
         ]);
 
         ParticipationRequest::create([

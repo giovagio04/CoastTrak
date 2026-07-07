@@ -77,17 +77,14 @@ class ProfileController extends Controller
 
         $user = $request->user();
 
-        // Se l'utente organizza ancora uscite attive, non può cancellare l'account:
-        // la cancellazione a cascata farebbe sparire uscite, partecipazioni e credenziali degli altri
-        $activeOutingsCount = $user->outings()
-            ->whereIn('status', ['published', 'pending'])
-            ->count();
+        // Annulliamo automaticamente le uscite attive organizzate dall'utente
+        $user->outings()->whereNotIn('status', ['concluded', 'rejected', 'cancelled'])->update([
+            'status' => 'cancelled',
+        ]);
 
-        if ($activeOutingsCount > 0) {
-            return Redirect::route('profile.show')->withErrors([
-                'account_deletion' => "Non puoi eliminare l'account mentre sei organizzatore di {$activeOutingsCount} uscita/e attiva/e. Annulla prima le tue uscite pubblicati o in attesa di approvazione.",
-            ], 'userDeletion');
-        }
+        // Scolleghiamo tutte le uscite organizzate dall'utente (anche quelle concluse)
+        // per evitare che il cascade delete le elimini dal DB cancellando le credenziali altrui.
+        $user->outings()->update(['organizer_id' => null]);
 
         Auth::logout();
 

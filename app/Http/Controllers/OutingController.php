@@ -85,7 +85,25 @@ class OutingController extends Controller
 
         $outings = $query->orderBy('date', 'asc')->get();
 
-        return view('outings.index', compact('outings'));
+        // IDs delle uscite a cui l'utente loggato è iscritto (o è organizzatore/admin):
+        // serve nella view per decidere quale livello di dettaglio mostrare per ogni card.
+        $enrolledOutingIds = collect();
+        if (auth()->check()) {
+            if (auth()->user()->role === 'admin') {
+                // L'admin vede tutto: usiamo tutti gli ID delle uscite caricate
+                $enrolledOutingIds = $outings->pluck('id');
+            } else {
+                $enrolledOutingIds = \App\Models\ParticipationRequest::where('user_id', auth()->id())
+                    ->where('status', 'accepted')
+                    ->pluck('outing_id');
+                // Aggiungo le uscite di cui è organizzatore
+                $organizerIds = $outings->where('organizer_id', auth()->id())->pluck('id');
+                $enrolledOutingIds = $enrolledOutingIds->merge($organizerIds)->unique();
+            }
+        }
+
+        return view('outings.index', compact('outings', 'enrolledOutingIds'));
+
     }
 
     public function show(Outing $outing)

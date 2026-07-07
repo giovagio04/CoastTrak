@@ -62,6 +62,17 @@
 
                 <hr class="my-4">
 
+                @php
+                    // Determino il livello di accesso dell'utente corrente per questa uscita
+                    $showUserRequest  = auth()->check() ? $outing->participationRequests->where('user_id', auth()->id())->first() : null;
+                    $isEnrolled       = $showUserRequest && $showUserRequest->status === 'accepted';
+                    $isOutingOrganizer = auth()->check() && $outing->organizer_id === auth()->id();
+                    $isAdminViewing   = auth()->check() && auth()->user()->role === 'admin';
+                    $hasFullAccess    = $isEnrolled || $isOutingOrganizer || $isAdminViewing;
+                @endphp
+
+                @if($hasFullAccess)
+                {{-- LIVELLO 1: Iscritto / Organizzatore / Admin — vede tutti i dettagli --}}
                 <div class="row g-4">
                     <div class="col-md-6">
                         <h5 class="fw-bold text-muted mb-3">Dettagli Logistici</h5>
@@ -69,7 +80,7 @@
                             <li class="mb-2"><i class="fa-regular fa-calendar fa-fw text-primary"></i> <strong>Data:</strong> {{ $outing->date->format('d/m/Y') }}</li>
                             <li class="mb-2"><i class="fa-solid fa-map-pin fa-fw text-danger"></i> <strong>Ritrovo:</strong> {{ $outing->meeting_point }}</li>
                             <li class="mb-2"><i class="fa-solid fa-route fa-fw text-success"></i> <strong>Distanza:</strong> {{ $outing->is_full_trail ? '55.0 km' : 'Personalizzata' }}</li>
-                            <li class="mb-2"><i class="fa-solid fa-mountain fa-fw text-warning"></i> <strong>Difficoltà:</strong> {{ ucfirst($outing->difficulty) }}</li>
+                            <li class="mb-2"><i class="fa-solid fa-mountain fa-fw text-warning"></i> <strong>Difficolt&agrave;:</strong> {{ ucfirst($outing->difficulty) }}</li>
                         </ul>
                     </div>
                     <div class="col-md-6">
@@ -81,12 +92,11 @@
                                 <li class="mb-2"><i class="fa-solid fa-users fa-fw text-secondary"></i> <strong>Posti Totali:</strong> {{ $outing->max_participants }}</li>
                                 <li class="mb-2"><i class="fa-solid fa-user-check fa-fw text-success"></i> <strong>Iscritti Attuali:</strong> {{ $outing->participationRequests->where('status', 'accepted')->count() }}</li>
                             @endif
-                            
                             @if($outing->type == 'user' && $outing->organizer)
                                 <li class="mt-3">
-                                    <i class="fa-solid fa-user-tie fa-fw text-info"></i> 
+                                    <i class="fa-solid fa-user-tie fa-fw text-info"></i>
                                     <strong>Organizzatore:</strong> {{ $outing->organizer->name }}
-                                    @if(auth()->check() && auth()->id() === $outing->organizer_id)
+                                    @if(auth()->id() === $outing->organizer_id)
                                         <span class="badge bg-secondary ms-1">Tu</span>
                                     @endif
                                 </li>
@@ -94,12 +104,60 @@
                         </ul>
                     </div>
                 </div>
-
                 @if($outing->notes)
                     <div class="alert alert-warning mt-4 border-warning border-start border-4 border-top-0 border-end-0 border-bottom-0 rounded-0">
                         <h6 class="fw-bold"><i class="fa-solid fa-circle-info"></i> Note dell'Organizzatore</h6>
                         <p class="mb-0">{{ $outing->notes }}</p>
                     </div>
+                @endif
+
+                @elseif(auth()->check())
+                {{-- LIVELLO 2: Registrato ma non iscritto — vede solo le statistiche, non la logistica --}}
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <h5 class="fw-bold text-muted mb-3">Dettagli Logistici</h5>
+                        <div class="d-flex flex-column align-items-start gap-2 py-2 px-3 rounded-3" style="background:rgba(13,110,253,0.05); border:1.5px dashed rgba(13,110,253,0.2);">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-lock" style="color:#6c757d; opacity:0.6;"></i>
+                                <span class="fw-semibold text-muted" style="font-size:0.9rem;">Data, ritrovo e difficolt&agrave;</span>
+                            </div>
+                            <small class="text-muted">Visibili solo dopo l'iscrizione al cammino.</small>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="fw-bold text-muted mb-3">Partecipazione</h5>
+                        <ul class="list-unstyled">
+                            @if($outing->status == 'concluded')
+                                <li class="mb-2"><i class="fa-solid fa-users fa-fw text-secondary"></i> <strong>Partecipanti Totali:</strong> {{ $outing->participationRequests->where('status', 'accepted')->count() }}</li>
+                            @else
+                                <li class="mb-2"><i class="fa-solid fa-users fa-fw text-secondary"></i> <strong>Posti Totali:</strong> {{ $outing->max_participants }}</li>
+                                <li class="mb-2"><i class="fa-solid fa-user-check fa-fw text-success"></i> <strong>Iscritti Attuali:</strong> {{ $outing->participationRequests->where('status', 'accepted')->count() }}</li>
+                            @endif
+                            @if($outing->type == 'user' && $outing->organizer)
+                                <li class="mt-3">
+                                    <i class="fa-solid fa-user-tie fa-fw text-info"></i>
+                                    <strong>Organizzatore:</strong> {{ $outing->organizer->name }}
+                                </li>
+                            @endif
+                        </ul>
+                    </div>
+                </div>
+
+                @else
+                {{-- LIVELLO 3: Ospite non registrato — banner completo --}}
+                <div class="d-flex flex-column align-items-center justify-content-center py-4 px-3 rounded-3 text-center" style="background: rgba(13,110,253,0.05); border: 1.5px dashed rgba(13,110,253,0.25);">
+                    <i class="fa-solid fa-lock mb-3" style="font-size: 2.2rem; color: #6c757d; opacity: 0.5;"></i>
+                    <h5 class="fw-bold mb-1">Dettagli riservati agli iscritti</h5>
+                    <p class="text-muted mb-3" style="max-width: 380px;">Data, punto di ritrovo, difficolt&agrave; e disponibilit&agrave; sono visibili solo dopo la registrazione. Entra a far parte della community!</p>
+                    <div class="d-flex gap-2 flex-wrap justify-content-center">
+                        <a href="{{ route('login') }}" class="btn btn-primary rounded-pill px-4">
+                            <i class="fa-solid fa-right-to-bracket me-1"></i> Accedi
+                        </a>
+                        <a href="{{ route('register') }}" class="btn btn-outline-primary rounded-pill px-4">
+                            <i class="fa-solid fa-user-plus me-1"></i> Registrati
+                        </a>
+                    </div>
+                </div>
                 @endif
             </div>
         </div>
@@ -233,11 +291,11 @@
         </div>
     </div>
 
-    {{-- Nuova card: Partecipanti Iscritti --}}
+    {{-- Card Partecipanti: visibilità a 3 livelli --}}
     <div class="card shadow-sm border-0 mt-4">
         <div class="card-body p-4">
             <h5 class="fw-bold mb-3"><i class="fa-solid fa-users text-success me-2"></i>Partecipanti Iscritti</h5>
-            
+
             @php
                 $acceptedParticipants = $outing->participationRequests->where('status', 'accepted');
             @endphp
@@ -250,12 +308,24 @@
                         <li class="list-group-item px-0 py-2 d-flex align-items-center justify-content-between border-0 @if(!$loop->last) border-bottom @endif">
                             <div class="d-flex align-items-center">
                                 <i class="fa-solid fa-circle-user text-secondary me-2 fs-5"></i>
-                                @if(auth()->check())
+
+                                @if($hasFullAccess)
+                                    {{-- Iscritto/Organizzatore/Admin: nome cliccabile --}}
                                     <a href="{{ route('profiles.show', $req->user->id) }}" class="text-decoration-none fw-bold text-dark" onmouseover="this.style.color='#0d6efd'" onmouseout="this.style.color='#212529'" style="transition: color 0.2s;">
                                         {{ $req->user->name }}
                                     </a>
+
+                                @elseif(auth()->check())
+                                    {{-- Registrato non iscritto: organizzatore visibile, altri blurrati --}}
+                                    @if($req->user_id === $outing->organizer_id)
+                                        <span class="fw-bold">{{ $req->user->name }}</span>
+                                    @else
+                                        <span class="fw-bold" style="filter:blur(5px); user-select:none; pointer-events:none;" title="Iscriviti per vedere i partecipanti">{{ $req->user->name }}</span>
+                                    @endif
+
                                 @else
-                                    <span class="fw-bold text-dark">{{ $req->user->name }}</span>
+                                    {{-- Ospite: tutti blurrati, incluso l'organizzatore --}}
+                                    <span class="fw-bold" style="filter:blur(5px); user-select:none; pointer-events:none;">{{ $req->user->name }}</span>
                                 @endif
                             </div>
                             @if($req->user_id === $outing->organizer_id)
@@ -264,6 +334,12 @@
                         </li>
                     @endforeach
                 </ul>
+
+                @if(!$hasFullAccess && auth()->check())
+                    <p class="text-muted small mt-3 mb-0"><i class="fa-solid fa-eye-slash me-1"></i> I nomi dei partecipanti sono nascosti. Iscriviti al cammino per vederli.</p>
+                @elseif(!auth()->check())
+                    <p class="text-muted small mt-3 mb-0"><i class="fa-solid fa-eye-slash me-1"></i> <a href="{{ route('login') }}">Accedi</a> per vedere i partecipanti.</p>
+                @endif
             @endif
         </div>
     </div>

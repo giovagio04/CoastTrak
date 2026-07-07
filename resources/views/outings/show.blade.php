@@ -360,7 +360,7 @@
                     <p class="mb-3">Sei sicuro di voler annullare questa uscita? Questa operazione è definitiva e notificherà i partecipanti.</p>
                     <div class="mb-3">
                         <label for="reason" class="form-label fw-bold">Motivazione dell'Annullamento (Sarà mostrata nei dettagli del cammino):</label>
-                        <textarea class="form-control" id="reason" name="reason" rows="3" placeholder="Scrivi il motivo (es. condizioni meteo sfavorevoli, imprevisto personale)..." required></textarea>
+                        <textarea class="form-control" id="reason" name="reason" rows="3" placeholder="Scrivi il motivo (es. condizioni meteo sfavorevoli, imprevisto personale)... (Opzionale)"></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">

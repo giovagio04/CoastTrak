@@ -141,6 +141,8 @@ class DatabaseSeeder extends Seeder
         $outingFullPast = Outing::create([
             'type' => 'official',
             'is_full_trail' => true,
+            'start_location' => 'Soverato',
+            'end_location' => 'Pizzo',
             'date' => Carbon::now()->subDays(10),
             'meeting_point' => 'Piazza di Soverato',
             'max_participants' => 15,
@@ -166,6 +168,8 @@ class DatabaseSeeder extends Seeder
         $outingFullMario = Outing::create([
             'type'             => 'official',
             'is_full_trail'    => true,
+            'start_location'   => 'Soverato',
+            'end_location'     => 'Pizzo',
             'date'             => Carbon::now()->subDays(20),
             'meeting_point'    => 'Piazza di Soverato, ore 7:30',
             'max_participants' => 20,
@@ -217,6 +221,8 @@ class DatabaseSeeder extends Seeder
         $outingMaria = Outing::create([
             'type' => 'user',
             'is_full_trail' => true,
+            'start_location' => 'Soverato',
+            'end_location' => 'Pizzo',
             'organizer_id' => $user3->id,
             'date' => Carbon::now()->addDays(20),
             'meeting_point' => 'Piazza di Soverato',

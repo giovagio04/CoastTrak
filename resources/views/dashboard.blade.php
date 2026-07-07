@@ -79,6 +79,8 @@
                     </button>
 
                     <form action="{{ route('dashboard') }}" method="GET" id="dashFilterForm">
+                        <input type="hidden" name="route_type_filter" id="hRouteTypeFilter" value="{{ request('route_type_filter', 'all') }}">
+                        <input type="hidden" name="full_direction" id="hFullDirection" value="{{ request('full_direction', 'soverato-pizzo') }}">
                         <input type="hidden" name="start_location" id="hStart"        value="{{ request('start_location') }}">
                         <input type="hidden" name="end_location"   id="hEnd"          value="{{ request('end_location') }}">
                         <input type="hidden" name="type"           id="hType"         value="{{ request('type', 'all') }}">
@@ -137,12 +139,16 @@
                                             @endif
                                         </td>
                                         <td>
-                                            @if($req->status == 'accepted')
-                                                <span class="badge bg-success">Accettata</span>
-                                            @elseif($req->status == 'pending')
-                                                <span class="badge bg-warning text-dark">In attesa</span>
+                                            @if($req->outing->organizer_id === auth()->id())
+                                                <span class="text-muted fw-bold">—</span>
                                             @else
-                                                <span class="badge bg-danger">Annullata</span>
+                                                @if($req->status == 'accepted')
+                                                    <span class="badge bg-success">Accettata</span>
+                                                @elseif($req->status == 'pending')
+                                                    <span class="badge bg-warning text-dark">In attesa</span>
+                                                @else
+                                                    <span class="badge bg-danger">Annullata</span>
+                                                @endif
                                             @endif
                                         </td>
                                         <td>
@@ -261,33 +267,59 @@
                     </div>
                 </div>
 
-                <!-- Partenza -->
+                <!-- Tipo Percorso (Completo o Personalizzato) -->
                 <div class="mb-4">
                     <p class="fw-bold mb-2 d-flex align-items-center gap-2">
-                        <i class="fa-solid fa-flag text-warning"></i> Partenza
+                        <i class="fa-solid fa-route text-info"></i> Tipo di Percorso
                     </p>
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent border-end-0">
-                            <i class="fa-solid fa-flag text-muted"></i>
-                        </span>
-                        <input type="text" id="mStart" class="form-control border-start-0"
-                               placeholder="es. Soverato" value="{{ request('start_location') }}">
-                    </div>
+                    <select id="mRouteTypeFilter" class="form-select form-select-lg">
+                        <option value="all" {{ request('route_type_filter', 'all') === 'all' ? 'selected' : '' }}>Tutti i percorsi</option>
+                        <option value="full" {{ request('route_type_filter') === 'full' ? 'selected' : '' }}>Cammino Completo</option>
+                        <option value="custom" {{ request('route_type_filter') === 'custom' ? 'selected' : '' }}>Cammino Personalizzato</option>
+                    </select>
                 </div>
 
-                <hr class="my-2">
-
-                <!-- Arrivo -->
-                <div class="mb-4">
+                <!-- Direzione Cammino Completo -->
+                <div class="mb-4" id="sectionFullDirection" style="display: none;">
                     <p class="fw-bold mb-2 d-flex align-items-center gap-2">
-                        <i class="fa-solid fa-location-dot text-danger"></i> Arrivo
+                        <i class="fa-solid fa-arrow-right-arrow-left text-primary"></i> Direzione
                     </p>
-                    <div class="input-group">
-                        <span class="input-group-text bg-transparent border-end-0">
-                            <i class="fa-solid fa-location-dot text-muted"></i>
-                        </span>
-                        <input type="text" id="mEnd" class="form-control border-start-0"
-                               placeholder="es. Pizzo" value="{{ request('end_location') }}">
+                    <select id="mFullDirection" class="form-select form-select-lg">
+                        <option value="soverato-pizzo" {{ request('full_direction', 'soverato-pizzo') === 'soverato-pizzo' ? 'selected' : '' }}>Soverato a Pizzo (consigliato)</option>
+                        <option value="pizzo-soverato" {{ request('full_direction') === 'pizzo-soverato' ? 'selected' : '' }}>Pizzo a Soverato</option>
+                    </select>
+                </div>
+
+                <!-- Tappe Cammino Personalizzato -->
+                <div id="sectionCustomRoute" style="display: none;">
+                    <!-- Partenza -->
+                    <div class="mb-4">
+                        <p class="fw-bold mb-2 d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-flag text-warning"></i> Partenza
+                        </p>
+                        <select id="mStart" class="form-select form-select-lg">
+                            <option value="">Qualsiasi</option>
+                            <option value="Soverato" {{ request('start_location') === 'Soverato' ? 'selected' : '' }}>Soverato</option>
+                            <option value="Petrizzi" {{ request('start_location') === 'Petrizzi' ? 'selected' : '' }}>Petrizzi</option>
+                            <option value="Monterosso Calabro" {{ request('start_location') === 'Monterosso Calabro' ? 'selected' : '' }}>Monterosso Calabro</option>
+                            <option value="Pizzo" {{ request('start_location') === 'Pizzo' ? 'selected' : '' }}>Pizzo</option>
+                        </select>
+                    </div>
+
+                    <hr class="my-2">
+
+                    <!-- Arrivo -->
+                    <div class="mb-4">
+                        <p class="fw-bold mb-2 d-flex align-items-center gap-2">
+                            <i class="fa-solid fa-location-dot text-danger"></i> Arrivo
+                        </p>
+                        <select id="mEnd" class="form-select form-select-lg">
+                            <option value="">Qualsiasi</option>
+                            <option value="Soverato" {{ request('end_location') === 'Soverato' ? 'selected' : '' }}>Soverato</option>
+                            <option value="Petrizzi" {{ request('end_location') === 'Petrizzi' ? 'selected' : '' }}>Petrizzi</option>
+                            <option value="Monterosso Calabro" {{ request('end_location') === 'Monterosso Calabro' ? 'selected' : '' }}>Monterosso Calabro</option>
+                            <option value="Pizzo" {{ request('end_location') === 'Pizzo' ? 'selected' : '' }}>Pizzo</option>
+                        </select>
                     </div>
                 </div>
 
@@ -421,6 +453,10 @@
 document.addEventListener('DOMContentLoaded', function () {
 
     // Elementi del modal
+    const mRouteTypeFilter = document.getElementById('mRouteTypeFilter');
+    const sectionFullDirection = document.getElementById('sectionFullDirection');
+    const mFullDirection = document.getElementById('mFullDirection');
+    const sectionCustomRoute = document.getElementById('sectionCustomRoute');
     const mStart        = document.getElementById('mStart');
     const mEnd          = document.getElementById('mEnd');
     const mType         = document.getElementById('mType');
@@ -432,8 +468,41 @@ document.addEventListener('DOMContentLoaded', function () {
     const mAvailableOnly = document.getElementById('mAvailableOnly');
 
     // Campi hidden del form
+    const hRouteTypeFilter = document.getElementById('hRouteTypeFilter');
+    const hFullDirection = document.getElementById('hFullDirection');
     const hStart         = document.getElementById('hStart');
     const hEnd           = document.getElementById('hEnd');
+
+    function toggleRouteSections() {
+        if (mRouteTypeFilter.value === 'full') {
+            sectionFullDirection.style.display = 'block';
+            sectionCustomRoute.style.display = 'none';
+        } else if (mRouteTypeFilter.value === 'custom') {
+            sectionFullDirection.style.display = 'none';
+            sectionCustomRoute.style.display = 'block';
+        } else {
+            sectionFullDirection.style.display = 'none';
+            sectionCustomRoute.style.display = 'none';
+        }
+    }
+    
+    function disableSelectedLocation() {
+        const startVal = mStart.value;
+        Array.from(mEnd.options).forEach(opt => {
+            if (opt.value && opt.value === startVal) {
+                opt.disabled = true;
+            } else {
+                opt.disabled = false;
+            }
+        });
+    }
+
+    mRouteTypeFilter.addEventListener('change', toggleRouteSections);
+    mStart.addEventListener('change', disableSelectedLocation);
+    
+    // Inizializzazione
+    toggleRouteSections();
+    disableSelectedLocation();
     const hType          = document.getElementById('hType');
     const hDiff          = document.getElementById('hDiff');
     const hStatus        = document.getElementById('hStatus');
@@ -460,9 +529,11 @@ document.addEventListener('DOMContentLoaded', function () {
         errorList.innerHTML = '';
     }
 
-    [mStart, mEnd, mType, mDiff, mStatus, mRole, mDateFrom, mDateTo, mAvailableOnly].forEach(el => {
-        el.addEventListener('input', hideModalErrors);
-        el.addEventListener('change', hideModalErrors);
+    [mRouteTypeFilter, mFullDirection, mStart, mEnd, mType, mDiff, mStatus, mRole, mDateFrom, mDateTo, mAvailableOnly].forEach(el => {
+        if (el) {
+            el.addEventListener('input', hideModalErrors);
+            el.addEventListener('change', hideModalErrors);
+        }
     });
 
     function validate() {
@@ -477,16 +548,18 @@ document.addEventListener('DOMContentLoaded', function () {
         today.setHours(0, 0, 0, 0);
 
         // Controllo 1: partenza e arrivo diversi
-        if (startLoc && endLoc && startLoc.toLowerCase() === endLoc.toLowerCase()) {
+        if (mRouteTypeFilter.value === 'custom' && startLoc && endLoc && startLoc.toLowerCase() === endLoc.toLowerCase()) {
             errors.push('La località di partenza e quella di arrivo devono essere diverse.');
         }
 
         // Controllo 2: lunghezza massima località
-        if (startLoc.length > 100) {
-            errors.push('La località di partenza non può superare i 100 caratteri.');
-        }
-        if (endLoc.length > 100) {
-            errors.push('La località di arrivo non può superare i 100 caratteri.');
+        if (mRouteTypeFilter.value === 'custom') {
+            if (startLoc.length > 100) {
+                errors.push('La località di partenza non può superare i 100 caratteri.');
+            }
+            if (endLoc.length > 100) {
+                errors.push('La località di arrivo non può superare i 100 caratteri.');
+            }
         }
 
         // Controllo 3: Data Da – non precedente ad oggi
@@ -521,8 +594,27 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
         hideModalErrors();
-        hStart.value         = mStart.value.trim();
-        hEnd.value           = mEnd.value.trim();
+        
+        let finalRouteType = mRouteTypeFilter.value;
+        let finalStart = mStart.value.trim();
+        let finalEnd = mEnd.value.trim();
+        let finalFullDirection = mFullDirection.value;
+
+        // Auto-switch a completo se custom route corrisponde a un cammino completo
+        if (finalRouteType === 'custom') {
+            if (finalStart === 'Soverato' && finalEnd === 'Pizzo') {
+                finalRouteType = 'full';
+                finalFullDirection = 'soverato-pizzo';
+            } else if (finalStart === 'Pizzo' && finalEnd === 'Soverato') {
+                finalRouteType = 'full';
+                finalFullDirection = 'pizzo-soverato';
+            }
+        }
+
+        hRouteTypeFilter.value = finalRouteType;
+        hFullDirection.value = finalFullDirection;
+        hStart.value         = finalStart;
+        hEnd.value           = finalEnd;
         hType.value          = mType.value;
         hDiff.value          = mDiff.value;
         hStatus.value        = mStatus.value;
@@ -535,9 +627,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Azzera Filtri
     document.getElementById('dashBtnReset').addEventListener('click', function () {
+        mRouteTypeFilter.value = 'all';
+        mFullDirection.value = 'soverato-pizzo';
         mStart.value          = '';
         mEnd.value            = '';
         mType.value           = 'all';
+        toggleRouteSections();
+        disableSelectedLocation();
         mDiff.value           = 'all';
         mStatus.value         = 'all';
         mRole.value           = 'all';

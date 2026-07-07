@@ -50,24 +50,15 @@
                         </div>
                     </div>
 
-                    <!-- Opzioni per Cammino Completo -->
-                    <div id="standard_route_selectors" class="mt-3 p-3 rounded-3 border border-secondary-subtle" style="display: {{ $outing->is_full_trail ? 'block' : 'none' }};">
-                        <label class="form-label small fw-bold mb-2">Direzione del Cammino</label>
-                        <div class="form-check mb-2">
-                            <input class="form-check-input" type="radio" name="standard_direction" id="dir_sp" value="sp" {{ !$outing->is_full_trail || $outing->start_location !== 'Pizzo' ? 'checked' : '' }}>
-                            <label class="form-check-label" for="dir_sp">
-                                Soverato &rarr; Pizzo <span class="badge bg-success ms-2" style="font-size:0.7rem;">Consigliato</span>
-                            </label>
-                        </div>
-                        <div class="form-check">
-                            <input class="form-check-input" type="radio" name="standard_direction" id="dir_ps" value="ps" {{ $outing->is_full_trail && $outing->start_location === 'Pizzo' ? 'checked' : '' }}>
-                            <label class="form-check-label" for="dir_ps">
-                                Pizzo &rarr; Soverato
-                            </label>
-                        </div>
+                    <div id="full_route_selectors" class="mt-3" style="display: {{ $outing->is_full_trail ? 'block' : 'none' }};">
+                        <label for="full_direction" class="form-label small fw-bold">Direzione Cammino</label>
+                        <select name="full_direction" id="full_direction" class="form-select" style="max-width: 300px;">
+                            <option value="soverato-pizzo" {{ $outing->start_location == 'Soverato' ? 'selected' : '' }}>Soverato ➔ Pizzo (Consigliato)</option>
+                            <option value="pizzo-soverato" {{ $outing->start_location == 'Pizzo' ? 'selected' : '' }}>Pizzo ➔ Soverato</option>
+                        </select>
                     </div>
 
-                    <div id="custom_route_selectors" class="mt-3 p-3 rounded-3 border border-secondary-subtle" style="display: {{ !$outing->is_full_trail ? 'block' : 'none' }};">
+                    <div id="custom_route_selectors" class="mt-3" style="display: {{ !$outing->is_full_trail ? 'block' : 'none' }};">
                         <div class="row">
                             <div class="col-6">
                                 <label for="start_location" class="form-label small fw-bold">Tappa di Partenza</label>
@@ -135,18 +126,18 @@
 function toggleCustomRoute() {
     const isCustom = document.getElementById('route_custom').checked;
     const customSelectors = document.getElementById('custom_route_selectors');
-    const standardSelectors = document.getElementById('standard_route_selectors');
+    const fullSelectors = document.getElementById('full_route_selectors');
     const startStage = document.getElementById('start_location');
     const endStage = document.getElementById('end_location');
 
     if (isCustom) {
         customSelectors.style.display = 'block';
-        standardSelectors.style.display = 'none';
+        fullSelectors.style.display = 'none';
         startStage.required = true;
         endStage.required = true;
     } else {
         customSelectors.style.display = 'none';
-        standardSelectors.style.display = 'block';
+        fullSelectors.style.display = 'block';
         startStage.required = false;
         endStage.required = false;
     }

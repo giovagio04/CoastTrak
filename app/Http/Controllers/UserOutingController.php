@@ -26,20 +26,20 @@ class UserOutingController extends Controller
         }
 
         $validated = $request->validate([
-            'route_type'         => 'required|in:standard,custom',
-            'standard_direction' => 'required_if:route_type,standard|in:sp,ps',
-            'start_location'     => 'required_if:route_type,custom|nullable|string|max:255',
-            'end_location'       => 'required_if:route_type,custom|nullable|string|max:255|different:start_location',
-            'date'               => 'required|date|after:today|before_or_equal:+3 years',
-            'meeting_point'      => 'required|string|max:255',
-            'max_participants'   => 'required|integer|min:2|max:15',
-            'difficulty'         => 'required|in:facile,medio,difficile',
-            'notes'              => 'nullable|string|max:5000', // max 5000 caratteri per non intasare il DB
+            'route_type'      => 'required|in:standard,custom',
+            'full_direction'  => 'required_if:route_type,standard|nullable|in:soverato-pizzo,pizzo-soverato',
+            'start_location'  => 'required_if:route_type,custom|nullable|string|max:255',
+            'end_location'    => 'required_if:route_type,custom|nullable|string|max:255|different:start_location',
+            'date'            => 'required|date|after:today|before_or_equal:+3 years',
+            'meeting_point'   => 'required|string|max:255',
+            'max_participants' => 'required|integer|min:2|max:15',
+            'difficulty'      => 'required|in:facile,medio,difficile',
+            'notes'           => 'nullable|string|max:5000', // max 5000 caratteri per non intasare il DB
         ]);
 
         if ($validated['route_type'] === 'standard') {
             $validated['is_full_trail'] = true;
-            if ($validated['standard_direction'] === 'sp') {
+            if ($validated['full_direction'] === 'soverato-pizzo') {
                 $validated['start_location'] = 'Soverato';
                 $validated['end_location'] = 'Pizzo';
             } else {
@@ -50,7 +50,7 @@ class UserOutingController extends Controller
             $validated['is_full_trail'] = false;
         }
         unset($validated['route_type']);
-        unset($validated['standard_direction']);
+        unset($validated['full_direction']);
 
         $validated['type'] = 'user';
         $validated['organizer_id'] = auth()->id();
@@ -59,6 +59,13 @@ class UserOutingController extends Controller
         $validated['approval_deadline'] = Carbon::now()->addHours(24);
 
         $outing = Outing::create($validated);
+
+        // Iscrivo automaticamente l'organizzatore all'uscita per renderla visibile nella sua dashboard (gestione uscite)
+        \App\Models\ParticipationRequest::create([
+            'user_id' => auth()->id(),
+            'outing_id' => $outing->id,
+            'status' => 'accepted', // L'organizzatore è implicitamente accettato, è l'uscita a essere 'pending'
+        ]);
 
         // Notifico tutti gli admin della nuova proposta
         $admins = \App\Models\User::where('role', 'admin')->get();

@@ -15,6 +15,8 @@ class DashboardController extends Controller
 
         // Validazione dei filtri
         $request->validate([
+            'route_type_filter' => 'nullable|in:all,full,custom',
+            'full_direction'  => 'nullable|string',
             'start_location'  => 'nullable|string|max:100',
             'end_location'    => [
                 'nullable', 'string', 'max:100',
@@ -76,16 +78,52 @@ class DashboardController extends Controller
             $query->whereHas('outing', fn($q) => $q->whereDate('date', '<=', $request->date_to));
         }
 
-        // Filtro Partenza
-        if ($request->filled('start_location')) {
-            $start = $request->start_location;
-            $query->whereHas('outing', fn($q) => $q->where('start_location', 'LIKE', '%' . $start . '%'));
-        }
+        $routeType = $request->input('route_type_filter', 'all');
 
-        // Filtro Arrivo
-        if ($request->filled('end_location')) {
-            $end = $request->end_location;
-            $query->whereHas('outing', fn($q) => $q->where('end_location', 'LIKE', '%' . $end . '%'));
+        if ($routeType === 'full') {
+            $query->whereHas('outing', function ($q) use ($request) {
+                $q->where('is_full_trail', true);
+                if ($request->filled('full_direction')) {
+                    if ($request->full_direction === 'soverato-pizzo') {
+                        $q->where('start_location', 'Soverato')->where('end_location', 'Pizzo');
+                    } elseif ($request->full_direction === 'pizzo-soverato') {
+                        $q->where('start_location', 'Pizzo')->where('end_location', 'Soverato');
+                    }
+                }
+            });
+        } elseif ($routeType === 'custom') {
+            $query->whereHas('outing', fn($q) => $q->where('is_full_trail', false));
+            if ($request->filled('start_location')) {
+                $query->whereHas('outing', fn($q) => $q->where('start_location', $request->start_location));
+            }
+            if ($request->filled('end_location')) {
+                $query->whereHas('outing', fn($q) => $q->where('end_location', $request->end_location));
+            }
+        } else {
+            // Retrocompatibilità
+            if ($request->filled('start_location')) {
+                $start = $request->start_location;
+                $query->whereHas('outing', function ($q) use ($start) {
+                    $q->where('start_location', 'LIKE', '%' . $start . '%')
+                      ->orWhere(function ($sq) use ($start) {
+                          if (stripos('Soverato', $start) !== false || stripos('Cammino Completo', $start) !== false) {
+                              $sq->where('is_full_trail', true);
+                          }
+                      });
+                });
+            }
+
+            if ($request->filled('end_location')) {
+                $end = $request->end_location;
+                $query->whereHas('outing', function ($q) use ($end) {
+                    $q->where('end_location', 'LIKE', '%' . $end . '%')
+                      ->orWhere(function ($sq) use ($end) {
+                          if (stripos('Pizzo', $end) !== false || stripos('Cammino Completo', $end) !== false) {
+                              $sq->where('is_full_trail', true);
+                          }
+                      });
+                });
+            }
         }
 
         // Filtro Solo posti disponibili

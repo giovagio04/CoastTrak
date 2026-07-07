@@ -9,8 +9,9 @@ class OutingController extends Controller
 {
     public function index(Request $request)
     {
-        // Validazione input della ricerca
         $request->validate([
+            'route_type_filter' => 'nullable|in:all,full,custom',
+            'full_direction'  => 'nullable|string',
             'start_location'  => 'nullable|string|max:100',
             'end_location'    => 'nullable|string|max:100|different:start_location',
             'type'            => 'nullable|in:all,official,user',
@@ -49,30 +50,50 @@ class OutingController extends Controller
             $query->whereDate('date', '<=', $request->date_to);
         }
 
-        // Filtro per partenza: gestisco anche il caso "Cammino Completo"
-        if ($request->filled('start_location')) {
-            $start = $request->start_location;
-            $query->where(function ($q) use ($start) {
-                $q->where('start_location', 'LIKE', '%' . $start . '%')
-                  ->orWhere(function ($sq) use ($start) {
-                      if (stripos('Soverato', $start) !== false || stripos('Cammino Completo', $start) !== false) {
-                          $sq->where('is_full_trail', true);
-                      }
-                  });
-            });
-        }
+        $routeType = $request->input('route_type_filter', 'all');
 
-        // Filtro per arrivo: gestisco anche il caso "Cammino Completo"
-        if ($request->filled('end_location')) {
-            $end = $request->end_location;
-            $query->where(function ($q) use ($end) {
-                $q->where('end_location', 'LIKE', '%' . $end . '%')
-                  ->orWhere(function ($sq) use ($end) {
-                      if (stripos('Pizzo', $end) !== false || stripos('Cammino Completo', $end) !== false) {
-                          $sq->where('is_full_trail', true);
-                      }
-                  });
-            });
+        if ($routeType === 'full') {
+            $query->where('is_full_trail', true);
+            if ($request->filled('full_direction')) {
+                if ($request->full_direction === 'soverato-pizzo') {
+                    $query->where('start_location', 'Soverato')->where('end_location', 'Pizzo');
+                } elseif ($request->full_direction === 'pizzo-soverato') {
+                    $query->where('start_location', 'Pizzo')->where('end_location', 'Soverato');
+                }
+            }
+        } elseif ($routeType === 'custom') {
+            $query->where('is_full_trail', false);
+            if ($request->filled('start_location')) {
+                $query->where('start_location', $request->start_location);
+            }
+            if ($request->filled('end_location')) {
+                $query->where('end_location', $request->end_location);
+            }
+        } else {
+            // Retrocompatibilità
+            if ($request->filled('start_location')) {
+                $start = $request->start_location;
+                $query->where(function ($q) use ($start) {
+                    $q->where('start_location', 'LIKE', '%' . $start . '%')
+                      ->orWhere(function ($sq) use ($start) {
+                          if (stripos('Soverato', $start) !== false || stripos('Cammino Completo', $start) !== false) {
+                              $sq->where('is_full_trail', true);
+                          }
+                      });
+                });
+            }
+
+            if ($request->filled('end_location')) {
+                $end = $request->end_location;
+                $query->where(function ($q) use ($end) {
+                    $q->where('end_location', 'LIKE', '%' . $end . '%')
+                      ->orWhere(function ($sq) use ($end) {
+                          if (stripos('Pizzo', $end) !== false || stripos('Cammino Completo', $end) !== false) {
+                              $sq->where('is_full_trail', true);
+                          }
+                      });
+                });
+            }
         }
 
         if ($request->boolean('available_only')) {

@@ -64,6 +64,9 @@ class Outing extends Model
             return 'Cammino Completo (' . $this->start_location . ' ➔ ' . $this->end_location . ')';
         }
         if ($this->is_full_trail) {
+            if ($this->start_location && $this->end_location) {
+                return 'Cammino Completo (' . $this->start_location . ' ➔ ' . $this->end_location . ')';
+            }
             return 'Cammino Completo (55km)';
         }
         if ($this->start_location && $this->end_location) {

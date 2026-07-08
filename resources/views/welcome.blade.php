@@ -289,10 +289,11 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
             </ul>
-            <ul class="navbar-nav align-items-center">
-                <li class="nav-item me-3">
-                    <button id="themeToggle" class="btn btn-link text-secondary p-1" title="Cambia tema" style="font-size: 1.25rem; text-decoration: none; border: none; background: transparent;">
-                        <i id="themeToggleIcon" class="fa-solid fa-moon"></i>
+            <ul class="navbar-nav align-items-lg-center">
+                <li class="nav-item me-lg-3">
+                    <button id="themeToggle" class="btn btn-link nav-link d-flex align-items-center w-100 text-start p-2 p-lg-1" title="Cambia tema" style="border: none; background: transparent;">
+                        <i id="themeToggleIcon" class="fa-solid fa-moon" style="font-size: 1.25rem;"></i>
+                        <span class="d-lg-none ms-3">Cambia tema</span>
                     </button>
                 </li>
                 @auth
@@ -303,25 +304,25 @@
                         <li class="nav-item">
                             <a class="nav-link text-danger" href="{{ route('admin.users.index') }}">Gestione Utenti</a>
                         </li>
-                        <li class="nav-item d-flex align-items-center ms-2">
-                            <form method="POST" action="{{ route('logout') }}" class="m-0">
+                        <li class="nav-item w-100 ms-lg-2 mt-3 mt-lg-0 mb-2 mb-lg-0">
+                            <form method="POST" action="{{ route('logout') }}" class="m-0 d-grid d-lg-block">
                                 @csrf
-                                <button type="submit" class="btn btn-outline-danger btn-sm px-3">
+                                <button type="submit" class="btn btn-outline-danger px-3 py-2 py-lg-1">
                                     Esci
                                 </button>
                             </form>
                         </li>
                     @else
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('dashboard') }}">Area Personale</a>
+                            <a class="nav-link p-2 p-lg-2" href="{{ route('dashboard') }}">Area Personale</a>
                         </li>
                     @endif
                 @else
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('login') }}">Accedi</a>
+                        <a class="nav-link p-2 p-lg-2" href="{{ route('login') }}">Accedi</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('register') }}">Registrati</a>
+                        <a class="nav-link p-2 p-lg-2" href="{{ route('register') }}">Registrati</a>
                     </li>
                 @endauth
             </ul>

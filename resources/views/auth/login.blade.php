@@ -72,13 +72,8 @@
         </div>
 
         {{-- Azioni --}}
-        <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-            @if (Route::has('password.request'))
-                <a href="{{ route('password.request') }}" class="auth-link-secondary">
-                    Password dimenticata?
-                </a>
-            @endif
-            <button type="submit" class="btn btn-auth-primary ms-auto">
+        <div class="d-grid mt-4">
+            <button type="submit" class="btn btn-auth-primary w-100">
                 <i class="fa-solid fa-right-to-bracket me-2"></i>Accedi
             </button>
         </div>

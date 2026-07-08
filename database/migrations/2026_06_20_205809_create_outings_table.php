@@ -11,15 +11,16 @@ return new class extends Migration
         Schema::create('outings', function (Blueprint $table) {
             $table->id();
             $table->enum('type', ['official', 'user'])->default('official');
-            $table->foreignId('stage_id')->constrained()->onDelete('cascade');
+            $table->boolean('is_full_trail')->default(false);
+            $table->string('start_location')->nullable();
+            $table->string('end_location')->nullable();
             $table->foreignId('organizer_id')->nullable()->constrained('users')->onDelete('cascade');
-            $table->foreignId('guide_id')->nullable()->constrained()->onDelete('set null');
             $table->date('date');
             $table->string('meeting_point');
             $table->integer('max_participants');
             $table->enum('difficulty', ['facile', 'medio', 'difficile'])->default('medio');
             $table->text('notes')->nullable();
-            $table->enum('status', ['pending', 'published', 'open', 'closed', 'concluded', 'cancelled'])->default('pending');
+            $table->string('status')->default('pending');
             $table->timestamp('approval_deadline')->nullable();
             $table->timestamps();
         });

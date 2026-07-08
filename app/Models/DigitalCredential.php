@@ -11,7 +11,6 @@ class DigitalCredential extends Model
 
     protected $fillable = [
         'user_id',
-        'stage_id',
         'outing_id',
         'completed_at'
     ];
@@ -23,11 +22,6 @@ class DigitalCredential extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
-    }
-
-    public function stage()
-    {
-        return $this->belongsTo(Stage::class);
     }
 
     public function outing()

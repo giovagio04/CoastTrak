@@ -45,7 +45,6 @@ class UserController extends Controller
     public function show(User $user)
     {
         $user->load([
-            'digitalCredentials.stage',
             'digitalCredentials.outing',
             'outings' => function ($q) {
                 $q->orderBy('date', 'desc');

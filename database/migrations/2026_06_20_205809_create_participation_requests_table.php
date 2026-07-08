@@ -13,6 +13,7 @@ return new class extends Migration
             $table->foreignId('outing_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->enum('status', ['pending', 'accepted', 'rejected', 'cancelled'])->default('pending');
+            $table->unique(['outing_id', 'user_id']);
             $table->timestamps();
         });
     }

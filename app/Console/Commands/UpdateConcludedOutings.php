@@ -42,24 +42,12 @@ class UpdateConcludedOutings extends Command
             $outing->update(['status' => 'concluded']);
             $count++;
 
-            // Determino lo stage_id (null se è l'intero cammino o un percorso custom non censito)
-            $stageId = null;
-            if (!$outing->is_full_trail && $outing->start_location && $outing->end_location) {
-                $stage = \App\Models\Stage::where('start_point', $outing->start_location)
-                    ->where('end_point', $outing->end_location)
-                    ->first();
-                if ($stage) {
-                    $stageId = $stage->id;
-                }
-            }
-
             // Rilascio le credenziali digitali a tutti i partecipanti accettati
             foreach ($outing->participationRequests as $request) {
                 $credential = \App\Models\DigitalCredential::firstOrCreate([
                     'user_id'   => $request->user_id,
                     'outing_id' => $outing->id,
                 ], [
-                    'stage_id'     => $stageId,
                     'completed_at' => Carbon::now(),
                 ]);
 

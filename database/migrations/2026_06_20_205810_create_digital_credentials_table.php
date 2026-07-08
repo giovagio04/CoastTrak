@@ -11,7 +11,6 @@ return new class extends Migration
         Schema::create('digital_credentials', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('stage_id')->constrained()->onDelete('cascade');
             $table->foreignId('outing_id')->constrained()->onDelete('cascade');
             $table->timestamp('completed_at')->useCurrent();
             $table->timestamps();

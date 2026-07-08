@@ -50,11 +50,6 @@ class User extends Authenticatable
         return $this->hasMany(DigitalCredential::class);
     }
 
-    public function hasCompletedStage($stageId)
-    {
-        return $this->digitalCredentials()->where('stage_id', $stageId)->exists();
-    }
-
     public function completedFullTrailsCount()
     {
         return $this->digitalCredentials()->whereHas('outing', function ($query) {

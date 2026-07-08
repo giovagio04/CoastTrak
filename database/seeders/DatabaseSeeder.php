@@ -3,8 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use App\Models\Stage;
-
 use App\Models\Outing;
 use App\Models\ParticipationRequest;
 use App\Models\DigitalCredential;
@@ -63,44 +61,15 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
         ]);
 
-        // 3. Creo le tre tappe del cammino
-        $stage1 = Stage::create([
-            'number' => 1,
-            'name' => 'Tappa 1 – Soverato → Petrizzi',
-            'description' => 'La prima tappa del cammino che dal Mar Ionio entra nell\'entroterra.',
-            'distance_km' => 12.5,
-            'start_point' => 'Soverato',
-            'end_point' => 'Petrizzi',
-            'difficulty' => 'facile'
-        ]);
-
-        $stage2 = Stage::create([
-            'number' => 2,
-            'name' => 'Tappa 2 – Petrizzi → Monterosso Calabro',
-            'description' => 'Tappa centrale impegnativa tra i boschi delle Serre.',
-            'distance_km' => 23.5,
-            'start_point' => 'Petrizzi',
-            'end_point' => 'Monterosso Calabro',
-            'difficulty' => 'difficile'
-        ]);
-
-        $stage3 = Stage::create([
-            'number' => 3,
-            'name' => 'Tappa 3 – Monterosso Calabro → Pizzo',
-            'description' => 'L\'arrivo sul Mar Tirreno.',
-            'distance_km' => 19.0,
-            'start_point' => 'Monterosso Calabro',
-            'end_point' => 'Pizzo',
-            'difficulty' => 'medio'
-        ]);
+        // Tappe rimosse, usiamo le stringhe per le location
 
 
         // 4. Creo le uscite ufficiali
         $outing1 = Outing::create([
             'type' => 'official',
             'is_full_trail' => false,
-            'start_location' => $stage1->start_point,
-            'end_location' => $stage1->end_point,
+            'start_location' => 'Soverato',
+            'end_location' => 'Petrizzi',
 
             'date' => Carbon::now()->addDays(10),
             'meeting_point' => 'Piazza di Soverato, ore 8:00',
@@ -113,8 +82,8 @@ class DatabaseSeeder extends Seeder
         $outingPast = Outing::create([
             'type' => 'official',
             'is_full_trail' => false,
-            'start_location' => $stage1->start_point,
-            'end_location' => $stage1->end_point,
+            'start_location' => 'Soverato',
+            'end_location' => 'Petrizzi',
 
             'date' => Carbon::now()->subDays(5),
             'meeting_point' => 'Piazza di Soverato',
@@ -132,7 +101,6 @@ class DatabaseSeeder extends Seeder
 
         DigitalCredential::create([
             'user_id' => $user1->id,
-            'stage_id' => $stage1->id,
             'outing_id' => $outingPast->id,
             'completed_at' => Carbon::now()->subDays(4)
         ]);
@@ -158,7 +126,6 @@ class DatabaseSeeder extends Seeder
 
         DigitalCredential::create([
             'user_id' => $user3->id,
-            'stage_id' => null, // Metto null così indica il cammino intero
             'outing_id' => $outingFullPast->id,
             'completed_at' => Carbon::now()->subDays(9)
         ]);
@@ -185,7 +152,6 @@ class DatabaseSeeder extends Seeder
 
         DigitalCredential::create([
             'user_id'      => $user1->id,
-            'stage_id'     => null, // null = cammino intero
             'outing_id'    => $outingFullMario->id,
             'completed_at' => Carbon::now()->subDays(19),
         ]);
@@ -194,8 +160,8 @@ class DatabaseSeeder extends Seeder
         $outingUser = Outing::create([
             'type' => 'user',
             'is_full_trail' => false,
-            'start_location' => $stage2->start_point,
-            'end_location' => $stage2->end_point,
+            'start_location' => 'Petrizzi',
+            'end_location' => 'Monterosso Calabro',
             'organizer_id' => $user1->id,
             'date' => Carbon::now()->addDays(15),
             'meeting_point' => 'Piazza di Petrizzi',

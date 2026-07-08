@@ -179,6 +179,20 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
             overflow: hidden;
         }
+
+        @media (max-width: 991.98px) {
+            .notification-dropdown {
+                width: 100%;
+                border-radius: 0 !important;
+                border: none !important;
+                box-shadow: none !important;
+                background-color: transparent !important;
+            }
+            .notification-dropdown .bg-body-secondary {
+                background-color: transparent !important;
+                border-bottom: 1px solid var(--bs-border-color-translucent) !important;
+            }
+        }
         
         .notification-dropdown .animate-bell {
             display: inline-block;
@@ -296,16 +310,16 @@
                     </li>
                 @endif
             </ul>
-            <ul class="navbar-nav align-items-center">
-                <li class="nav-item me-3">
-                    <button id="themeToggle" class="btn btn-link text-secondary p-1" title="Cambia tema" style="font-size: 1.25rem; text-decoration: none; border: none; background: transparent;">
-                        <i id="themeToggleIcon" class="fa-solid fa-moon"></i>
+            <ul class="navbar-nav align-items-lg-center mt-3 mt-lg-0">
+                <li class="nav-item me-lg-3 mb-2 mb-lg-0">
+                    <button id="themeToggle" class="btn btn-link text-secondary p-1" title="Cambia tema" style="font-size: 1.25rem; text-decoration: none; border: none; background: transparent; padding-left: 0 !important;">
+                        <i id="themeToggleIcon" class="fa-solid fa-moon"></i> <span class="d-lg-none ms-1 text-decoration-none" style="font-size: 1rem;">Cambia tema</span>
                     </button>
                 </li>
                 @auth
-                    <li class="nav-item dropdown me-2 position-relative d-flex align-items-center">
-                        <a class="nav-link position-relative text-secondary px-2" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 1.1rem; transition: color 0.2s;">
-                            <i class="fa-solid fa-bell"></i>
+                    <li class="nav-item dropdown me-lg-2 mb-3 mb-lg-0 position-relative">
+                        <a class="nav-link position-relative text-secondary px-0 px-lg-2 w-100" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" style="font-size: 1.1rem; transition: color 0.2s;">
+                            <i class="fa-solid fa-bell"></i> <span class="d-lg-none ms-1">Notifiche</span>
                             <span id="notificationBadge" class="position-absolute top-1 start-100 translate-middle badge rounded-pill bg-danger d-none" style="font-size: 0.65rem; padding: 0.25em 0.5em;">
                                 0
                             </span>
@@ -345,10 +359,10 @@
                                 Gestione Utenti
                             </a>
                         </li>
-                        <li class="nav-item d-flex align-items-center ms-2">
-                            <form method="POST" action="{{ route('logout') }}" class="m-0">
+                        <li class="nav-item d-flex align-items-center ms-lg-2 mt-2 mt-lg-0">
+                            <form method="POST" action="{{ route('logout') }}" class="m-0 w-100">
                                 @csrf
-                                <button type="submit" class="btn btn-outline-danger btn-sm px-3">
+                                <button type="submit" class="btn btn-outline-danger btn-sm px-3 d-block w-100 w-lg-auto text-start text-lg-center">
                                     Esci
                                 </button>
                             </form>
@@ -360,10 +374,10 @@
                         <li class="nav-item">
                             <a class="nav-link text-primary" href="{{ route('profile.show') }}"><i class="fa-solid fa-user"></i> Area Personale</a>
                         </li>
-                        <li class="nav-item d-flex align-items-center ms-2">
-                            <form method="POST" action="{{ route('logout') }}" class="m-0">
+                        <li class="nav-item d-flex align-items-center ms-lg-2 mt-2 mt-lg-0">
+                            <form method="POST" action="{{ route('logout') }}" class="m-0 w-100">
                                 @csrf
-                                <button type="submit" class="btn btn-outline-danger btn-sm px-3">
+                                <button type="submit" class="btn btn-outline-danger btn-sm px-3 d-block w-100 text-start text-lg-center" style="max-width: fit-content;">
                                     Esci
                                 </button>
                             </form>
@@ -373,8 +387,8 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('login') }}">Accedi</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link btn btn-custom btn-primary-custom ms-2 text-white" href="{{ route('register') }}" style="color: white !important;">Registrati</a>
+                    <li class="nav-item mt-2 mt-lg-0 ms-lg-2">
+                        <a class="nav-link btn btn-custom btn-primary-custom text-white d-inline-block" href="{{ route('register') }}" style="color: white !important;">Registrati</a>
                     </li>
                 @endauth
             </ul>

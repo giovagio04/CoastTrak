@@ -149,10 +149,11 @@
                     <i class="fa-solid fa-lock mb-3" style="font-size: 2.2rem; color: #6c757d; opacity: 0.5;"></i>
                     <h5 class="fw-bold mb-1">Dettagli riservati agli iscritti</h5>
                     <p class="text-muted mb-3" style="max-width: 380px;">Data, punto di ritrovo, difficolt&agrave; e disponibilit&agrave; sono visibili solo dopo la registrazione. Entra a far parte della community!</p>
-                    <div class="d-flex gap-2 flex-wrap justify-content-center">
-                        <a href="{{ route('login') }}" class="btn btn-primary rounded-pill px-4">
+                    <div class="d-flex align-items-center gap-2 flex-wrap justify-content-center">
+                        <a href="{{ route('login') }}" class="btn btn-outline-primary rounded-pill px-4">
                             <i class="fa-solid fa-right-to-bracket me-1"></i> Accedi
                         </a>
+                        <span class="text-muted" style="font-size: 0.75rem; font-weight: 500;">o</span>
                         <a href="{{ route('register') }}" class="btn btn-outline-primary rounded-pill px-4">
                             <i class="fa-solid fa-user-plus me-1"></i> Registrati
                         </a>
@@ -285,8 +286,11 @@
                     @endif
                 @else
                     <p class="text-muted">Devi essere registrato per partecipare.</p>
-                    <a href="{{ route('login') }}" class="btn btn-outline-primary w-100 mb-2">Accedi</a>
-                    <a href="{{ route('register') }}" class="btn btn-outline-secondary w-100">Registrati</a>
+                    <div class="d-flex flex-column align-items-center gap-2">
+                        <a href="{{ route('login') }}" class="btn btn-outline-primary w-100">Accedi</a>
+                        <span class="text-muted" style="font-size: 0.75rem; font-weight: 500;">o</span>
+                        <a href="{{ route('register') }}" class="btn btn-outline-primary w-100">Registrati</a>
+                    </div>
                 @endif
         </div>
     </div>
@@ -320,12 +324,12 @@
                                     @if($req->user_id === $outing->organizer_id)
                                         <span class="fw-bold">{{ $req->user->name }}</span>
                                     @else
-                                        <span class="fw-bold" style="filter:blur(5px); user-select:none; pointer-events:none;" title="Iscriviti per vedere i partecipanti">{{ $req->user->name }}</span>
+                                        <span class="fw-bold" style="filter:blur(5px); user-select:none; pointer-events:none;" title="Iscriviti per vedere i partecipanti">Utente Iscritto</span>
                                     @endif
 
                                 @else
                                     {{-- Ospite: tutti blurrati, incluso l'organizzatore --}}
-                                    <span class="fw-bold" style="filter:blur(5px); user-select:none; pointer-events:none;">{{ $req->user->name }}</span>
+                                    <span class="fw-bold" style="filter:blur(5px); user-select:none; pointer-events:none;">Utente Iscritto</span>
                                 @endif
                             </div>
                             @if($req->user_id === $outing->organizer_id)
@@ -338,7 +342,7 @@
                 @if(!$hasFullAccess && auth()->check())
                     <p class="text-muted small mt-3 mb-0"><i class="fa-solid fa-eye-slash me-1"></i> I nomi dei partecipanti sono nascosti. Iscriviti al cammino per vederli.</p>
                 @elseif(!auth()->check())
-                    <p class="text-muted small mt-3 mb-0"><i class="fa-solid fa-eye-slash me-1"></i> <a href="{{ route('login') }}">Accedi</a> per vedere i partecipanti.</p>
+                    <p class="text-muted small mt-3 mb-0"><i class="fa-solid fa-eye-slash me-1"></i> <a href="{{ route('login') }}" class="text-decoration-none">Accedi</a> o <a href="{{ route('register') }}" class="text-decoration-none">Registrati</a> per vedere i partecipanti.</p>
                 @endif
             @endif
         </div>

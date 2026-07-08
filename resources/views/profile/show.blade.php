@@ -119,13 +119,30 @@
                     <div class="row g-4">
                         <!-- Immagine Profilo -->
                         <div class="col-md-4 text-center border-end">
-                            @if($user->profile_photo_path)
-                                <img src="{{ asset('storage/' . $user->profile_photo_path) }}" alt="Profile Photo" class="rounded-circle img-thumbnail mb-3" style="width: 130px; height: 130px; object-fit: cover;">
-                            @else
-                                <div class="rounded-circle bg-body-secondary d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 130px; height: 130px;">
+                            <div class="position-relative d-inline-block mb-3" id="profile_photo_container">
+                                <img src="{{ $user->profile_photo_path ? asset('storage/' . $user->profile_photo_path) : '' }}" 
+                                     id="profile_photo_preview" 
+                                     alt="Profile Photo" 
+                                     class="rounded-circle img-thumbnail {{ $user->profile_photo_path ? '' : 'd-none' }}" 
+                                     style="width: 130px; height: 130px; object-fit: cover;">
+                                     
+                                <div id="profile_photo_placeholder" 
+                                     class="rounded-circle bg-body-secondary d-flex align-items-center justify-content-center mx-auto {{ $user->profile_photo_path ? 'd-none' : '' }}" 
+                                     style="width: 130px; height: 130px;">
                                     <i class="fa-solid fa-user text-secondary fa-3x"></i>
                                 </div>
-                            @endif
+                                
+                                <button type="button" 
+                                        class="btn btn-sm bg-white text-danger border-danger position-absolute rounded-circle {{ $user->profile_photo_path ? '' : 'd-none' }}" 
+                                        id="btn_remove_photo" 
+                                        style="top: 0; right: 0; width: 24px; height: 24px; padding: 0; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s; font-size: 0.75rem;" 
+                                        title="Rimuovi immagine"
+                                        onmouseover="this.classList.remove('bg-white', 'text-danger', 'border-danger'); this.classList.add('btn-danger');"
+                                        onmouseout="this.classList.remove('btn-danger'); this.classList.add('bg-white', 'text-danger', 'border-danger');">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            
                             <div class="mb-3">
                                 <label for="profile_photo" class="form-label fw-bold">Immagine Profilo</label>
                                 <input class="form-control form-control-sm @error('profile_photo') is-invalid @enderror" id="profile_photo" name="profile_photo" type="file" accept="image/*">
@@ -136,6 +153,7 @@
                                         Seleziona un'immagine valida (JPEG, PNG, GIF, WEBP) di dimensione massima 2MB.
                                     @enderror
                                 </div>
+                                <input type="hidden" name="remove_profile_photo" id="remove_profile_photo_input" value="0">
                             </div>
                         </div>
                         
@@ -403,8 +421,46 @@
                             this.value = ''; // svuota input
                             return;
                         }
+                        
+                        // Anteprima immagine
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            const preview = document.getElementById('profile_photo_preview');
+                            const placeholder = document.getElementById('profile_photo_placeholder');
+                            const removeBtn = document.getElementById('btn_remove_photo');
+                            
+                            preview.src = e.target.result;
+                            preview.classList.remove('d-none');
+                            if (placeholder) placeholder.classList.add('d-none');
+                            if (removeBtn) removeBtn.classList.remove('d-none');
+                            
+                            document.getElementById('remove_profile_photo_input').value = '0';
+                        };
+                        reader.readAsDataURL(file);
                     }
                 });
+                
+                // Gestione pulsante rimozione foto (X)
+                const btnRemovePhoto = document.getElementById('btn_remove_photo');
+                if (btnRemovePhoto) {
+                    btnRemovePhoto.addEventListener('click', function() {
+                        photoInput.value = ''; // Reset file input
+                        clearError(photoInput);
+                        
+                        const preview = document.getElementById('profile_photo_preview');
+                        const placeholder = document.getElementById('profile_photo_placeholder');
+                        const removeInput = document.getElementById('remove_profile_photo_input');
+                        
+                        // Nascondi preview e bottone X
+                        preview.classList.add('d-none');
+                        preview.src = '';
+                        this.classList.add('d-none');
+                        
+                        if (placeholder) placeholder.classList.remove('d-none');
+                        
+                        removeInput.value = '1';
+                    });
+                }
             }
 
             // Validazione all'invio del form

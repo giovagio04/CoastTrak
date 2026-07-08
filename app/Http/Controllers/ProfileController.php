@@ -53,6 +53,11 @@ class ProfileController extends Controller
             }
             $path = $request->file('profile_photo')->store('profile-photos', 'public');
             $validated['profile_photo_path'] = $path;
+        } elseif ($request->boolean('remove_profile_photo')) {
+            if ($user->profile_photo_path) {
+                \Illuminate\Support\Facades\Storage::disk('public')->delete($user->profile_photo_path);
+            }
+            $validated['profile_photo_path'] = null;
         }
 
         $user->fill($validated);

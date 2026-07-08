@@ -302,10 +302,16 @@
                         {{-- Ospite non registrato --}}
                         <div class="d-flex flex-column align-items-center justify-content-center py-3 text-center" style="min-height: 90px;">
                             <i class="fa-solid fa-lock text-muted mb-2" style="font-size: 1.4rem; opacity: 0.5;"></i>
-                            <p class="text-muted small mb-1">Accedi per vedere data, ritrovo e disponibilità.</p>
-                            <a href="{{ route('login') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
-                                <i class="fa-solid fa-right-to-bracket me-1"></i> Accedi
-                            </a>
+                            <p class="text-muted small mb-2">Accedi/Registrati per vedere data, ritrovo e disponibilità.</p>
+                            <div class="d-flex align-items-center gap-2">
+                                <a href="{{ route('login') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    <i class="fa-solid fa-right-to-bracket me-1"></i> Accedi
+                                </a>
+                                <span class="text-muted" style="font-size: 0.75rem; font-weight: 500;">o</span>
+                                <a href="{{ route('register') }}" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                                    <i class="fa-solid fa-user-plus me-1"></i> Registrati
+                                </a>
+                            </div>
                         </div>
                     @endif
                 </div>

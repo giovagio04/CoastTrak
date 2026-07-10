@@ -201,8 +201,8 @@
 
     <!-- Gestione Organizzazione Uscite -->
     <div class="col-lg-4 col-md-5">
-        <div class="card shadow-sm border-0 h-100">
-            <div class="card-body d-flex flex-column justify-content-between p-4">
+        <div class="card shadow-sm border-0">
+            <div class="card-body p-4">
                 <div>
                     <div class="d-flex align-items-center mb-3">
                         <div class="bg-primary bg-opacity-10 text-primary rounded p-2 me-3" style="width: 42px; height: 42px; display: flex; align-items: center; justify-content: center;">

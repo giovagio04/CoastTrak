@@ -17,7 +17,7 @@ Route::get('/outings/{outing}', [OutingController::class, 'show'])->name('outing
 
 // Ho spostato tutta la logica della dashboard dentro DashboardController
 Route::get('/dashboard', DashboardController::class)
-    ->middleware(['auth', 'verified'])
+    ->middleware('auth')
     ->name('dashboard');
 
 Route::middleware('auth')->group(function () {

@@ -4,8 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Outing;
-use App\Models\Stage;
-
 use Illuminate\Http\Request;
 
 class OutingController extends Controller

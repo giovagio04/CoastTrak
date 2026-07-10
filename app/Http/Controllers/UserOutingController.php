@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Outing;
-use App\Models\Stage;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 

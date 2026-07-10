@@ -39,14 +39,31 @@
         ]);
     @endphp
 
-    <button type="button" class="btn btn-outline-secondary position-relative" data-bs-toggle="modal" data-bs-target="#filterModal">
-        <i class="fa-solid fa-sliders me-2"></i>Filtri Avanzati
-        @if(count($activeFilters) > 0)
-            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                {{ count($activeFilters) }}
-            </span>
-        @endif
-    </button>
+    @auth
+        {{-- Utente loggato: bottone filtri completo --}}
+        <button type="button" class="btn btn-outline-secondary position-relative" data-bs-toggle="modal" data-bs-target="#filterModal">
+            <i class="fa-solid fa-sliders me-2"></i>Filtri Avanzati
+            @if(count($activeFilters) > 0)
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                    {{ count($activeFilters) }}
+                </span>
+            @endif
+        </button>
+    @else
+        {{-- Ospite non loggato: bottone disabilitato con lucchetto --}}
+        <span
+            data-bs-toggle="tooltip"
+            data-bs-placement="bottom"
+            title="Accedi o registrati per usare i filtri avanzati"
+        >
+            <button type="button" class="btn btn-outline-secondary" disabled style="pointer-events: none;">
+                <i class="fa-solid fa-lock me-2 text-muted"></i>Filtri Avanzati
+            </button>
+        </span>
+        <a href="{{ route('login') }}" class="btn btn-outline-primary">
+            <i class="fa-solid fa-right-to-bracket me-1"></i> Accedi per filtrare
+        </a>
+    @endauth
 
     <form action="{{ route('outings.index') }}" method="GET" id="filterForm">
         <!-- Campi nascosti che ricevono i valori dal modal -->

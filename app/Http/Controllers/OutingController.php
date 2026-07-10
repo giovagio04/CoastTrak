@@ -34,74 +34,79 @@ class OutingController extends Controller
                 $q->where('status', 'accepted');
             }]);
 
-        if ($request->filled('type') && $request->type !== 'all') {
-            $query->where('type', $request->type);
-        }
+        // Applica i filtri SOLO se l'utente è autenticato.
+        // Questo previene la "Data Inference" da parte di utenti guest
+        // che potrebbero manipolare i parametri dell'URL.
+        if (auth()->check()) {
+            if ($request->filled('type') && $request->type !== 'all') {
+                $query->where('type', $request->type);
+            }
 
-        if ($request->filled('difficulty') && $request->difficulty !== 'all') {
-            $query->where('difficulty', $request->difficulty);
-        }
+            if ($request->filled('difficulty') && $request->difficulty !== 'all') {
+                $query->where('difficulty', $request->difficulty);
+            }
 
-        if ($request->filled('date_from')) {
-            $query->whereDate('date', '>=', $request->date_from);
-        }
+            if ($request->filled('date_from')) {
+                $query->whereDate('date', '>=', $request->date_from);
+            }
 
-        if ($request->filled('date_to')) {
-            $query->whereDate('date', '<=', $request->date_to);
-        }
+            if ($request->filled('date_to')) {
+                $query->whereDate('date', '<=', $request->date_to);
+            }
 
-        $routeType = $request->input('route_type_filter', 'all');
+            $routeType = $request->input('route_type_filter', 'all');
 
-        if ($routeType === 'full') {
-            $query->where('is_full_trail', true);
-            if ($request->filled('full_direction')) {
-                if ($request->full_direction === 'soverato-pizzo') {
-                    $query->where('start_location', 'Soverato')->where('end_location', 'Pizzo');
-                } elseif ($request->full_direction === 'pizzo-soverato') {
-                    $query->where('start_location', 'Pizzo')->where('end_location', 'Soverato');
+            if ($routeType === 'full') {
+                $query->where('is_full_trail', true);
+                if ($request->filled('full_direction')) {
+                    if ($request->full_direction === 'soverato-pizzo') {
+                        $query->where('start_location', 'Soverato')->where('end_location', 'Pizzo');
+                    } elseif ($request->full_direction === 'pizzo-soverato') {
+                        $query->where('start_location', 'Pizzo')->where('end_location', 'Soverato');
+                    }
+                }
+            } elseif ($routeType === 'custom') {
+                $query->where('is_full_trail', false);
+                if ($request->filled('start_location')) {
+                    $query->where('start_location', $request->start_location);
+                }
+                if ($request->filled('end_location')) {
+                    $query->where('end_location', $request->end_location);
+                }
+            } else {
+                // Retrocompatibilità
+                if ($request->filled('start_location')) {
+                    $start = $request->start_location;
+                    $query->where(function ($q) use ($start) {
+                        $q->where('start_location', 'LIKE', '%' . $start . '%')
+                          ->orWhere(function ($sq) use ($start) {
+                              if (stripos('Soverato', $start) !== false || stripos('Cammino Completo', $start) !== false) {
+                                  $sq->where('is_full_trail', true);
+                              }
+                          });
+                    });
+                }
+
+                if ($request->filled('end_location')) {
+                    $end = $request->end_location;
+                    $query->where(function ($q) use ($end) {
+                        $q->where('end_location', 'LIKE', '%' . $end . '%')
+                          ->orWhere(function ($sq) use ($end) {
+                              if (stripos('Pizzo', $end) !== false || stripos('Cammino Completo', $end) !== false) {
+                                  $sq->where('is_full_trail', true);
+                              }
+                          });
+                    });
                 }
             }
-        } elseif ($routeType === 'custom') {
-            $query->where('is_full_trail', false);
-            if ($request->filled('start_location')) {
-                $query->where('start_location', $request->start_location);
-            }
-            if ($request->filled('end_location')) {
-                $query->where('end_location', $request->end_location);
-            }
-        } else {
-            // Retrocompatibilità
-            if ($request->filled('start_location')) {
-                $start = $request->start_location;
-                $query->where(function ($q) use ($start) {
-                    $q->where('start_location', 'LIKE', '%' . $start . '%')
-                      ->orWhere(function ($sq) use ($start) {
-                          if (stripos('Soverato', $start) !== false || stripos('Cammino Completo', $start) !== false) {
-                              $sq->where('is_full_trail', true);
-                          }
-                      });
-                });
-            }
 
-            if ($request->filled('end_location')) {
-                $end = $request->end_location;
-                $query->where(function ($q) use ($end) {
-                    $q->where('end_location', 'LIKE', '%' . $end . '%')
-                      ->orWhere(function ($sq) use ($end) {
-                          if (stripos('Pizzo', $end) !== false || stripos('Cammino Completo', $end) !== false) {
-                              $sq->where('is_full_trail', true);
-                          }
-                      });
-                });
+            if ($request->boolean('available_only')) {
+                $query->whereRaw('(
+                    SELECT COUNT(*) FROM participation_requests
+                    WHERE participation_requests.outing_id = outings.id
+                    AND participation_requests.status = ?
+                ) < outings.max_participants', ['accepted']);
             }
-        }
-
-        if ($request->boolean('available_only')) {
-            $query->whereRaw('(
-                SELECT COUNT(*) FROM participation_requests
-                WHERE participation_requests.outing_id = outings.id
-                AND participation_requests.status = ?
-            ) < outings.max_participants', ['accepted']);
         }
 
         $outings = $query->orderBy('date', 'asc')->get();

@@ -167,7 +167,15 @@ class OutingController extends Controller
                 $validated['end_location'] = 'Soverato';
             }
         } else {
-            $validated['is_full_trail'] = false;
+            // Se seleziona personalizzato ma mette estremi completi, consideralo completo
+            if (
+                ($validated['start_location'] === 'Soverato' && $validated['end_location'] === 'Pizzo') ||
+                ($validated['start_location'] === 'Pizzo' && $validated['end_location'] === 'Soverato')
+            ) {
+                $validated['is_full_trail'] = true;
+            } else {
+                $validated['is_full_trail'] = false;
+            }
         }
         unset($validated['route_type']);
         unset($validated['full_direction']);
@@ -217,7 +225,14 @@ class OutingController extends Controller
                 $validated['end_location'] = 'Soverato';
             }
         } else {
-            $validated['is_full_trail'] = false;
+            if (
+                ($validated['start_location'] === 'Soverato' && $validated['end_location'] === 'Pizzo') ||
+                ($validated['start_location'] === 'Pizzo' && $validated['end_location'] === 'Soverato')
+            ) {
+                $validated['is_full_trail'] = true;
+            } else {
+                $validated['is_full_trail'] = false;
+            }
         }
         unset($validated['route_type']);
         unset($validated['full_direction']);

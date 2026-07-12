@@ -30,10 +30,43 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="mb-2">
-                        <label class="form-label fw-bold"><i class="fa-solid fa-medal text-warning"></i> Min. Cammini Completati</label>
-                        <input type="number" class="form-control" name="min_trails" value="{{ request('min_trails') }}" min="0" placeholder="Es. 1">
-                        <small class="text-muted">Mostra solo utenti che hanno completato almeno N cammini interi.</small>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold"><i class="fa-solid fa-medal text-warning"></i> Min. Cammini</label>
+                            <input type="number" class="form-control" name="min_trails" value="{{ request('min_trails') }}" min="0" placeholder="Es. 1">
+                            <small class="text-muted d-block mt-1">Cammini interi completati.</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label fw-bold"><i class="fa-solid fa-route text-primary"></i> Min. Tappe</label>
+                            <input type="number" class="form-control" name="min_stages" value="{{ request('min_stages') }}" min="0" placeholder="Es. 5">
+                            <small class="text-muted d-block mt-1">Tappe parziali completate.</small>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold"><i class="fa-solid fa-user-shield text-primary"></i> Stato Account</label>
+                            <select class="form-select" name="status">
+                                <option value="all" {{ request('status') === 'all' ? 'selected' : '' }}>Tutti</option>
+                                <option value="active" {{ request('status') === 'active' ? 'selected' : '' }}>Attivi</option>
+                                <option value="banned" {{ request('status') === 'banned' ? 'selected' : '' }}>Bannati</option>
+                            </select>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold"><i class="fa-solid fa-calendar-plus text-success"></i> Data Registrazione</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Da</span>
+                                <input type="date" class="form-control" name="registered_from" value="{{ request('registered_from') }}">
+                                <span class="input-group-text">A</span>
+                                <input type="date" class="form-control" name="registered_to" value="{{ request('registered_to') }}">
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label fw-bold"><i class="fa-solid fa-cake-candles text-danger"></i> Data di Nascita</label>
+                            <div class="input-group">
+                                <span class="input-group-text">Da</span>
+                                <input type="date" class="form-control" name="birth_from" value="{{ request('birth_from') }}">
+                                <span class="input-group-text">A</span>
+                                <input type="date" class="form-control" name="birth_to" value="{{ request('birth_to') }}">
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -70,8 +103,11 @@
                             <td><a href="mailto:{{ $user->email }}" class="text-decoration-none">{{ $user->email }}</a></td>
                             <td>{{ $user->created_at->format('d/m/Y') }}</td>
                             <td>
-                                <span class="badge bg-success rounded-pill">
+                                <span class="badge bg-success rounded-pill" style="min-width: 24px;" title="Cammini interi completati">
                                     {{ $user->completedFullTrailsCount() }}
+                                </span>
+                                <span class="badge bg-primary rounded-pill ms-1" style="min-width: 24px;" title="Tappe parziali completate">
+                                    {{ $user->completedSingleStagesCount() }}
                                 </span>
                             </td>
                         </tr>

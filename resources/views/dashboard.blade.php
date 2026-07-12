@@ -183,6 +183,11 @@
                             </tbody>
                         </table>
                     </div>
+                    @if($participations->hasPages())
+                        <div class="mt-4 px-2">
+                            {{ $participations->links('pagination::bootstrap-5') }}
+                        </div>
+                    @endif
                 @else
                     <div class="py-4 text-center">
                         <i class="fa-solid fa-compass fa-2x mb-2 text-secondary-emphasis" style="opacity: 0.5;"></i>
@@ -224,16 +229,28 @@
                         </button>
                         <div class="mt-2 text-muted small text-start">
                             <i class="fa-solid fa-triangle-exclamation text-warning me-1"></i>
-                            <span class="fst-italic">Inserisci la tua <a href="{{ route('profile.show') }}" class="text-warning fw-semibold">data di nascita nel profilo</a> per sbloccare questa funzione.</span>
+                            <span class="fst-italic">
+                                Inserisci la tua <a href="{{ route('profile.show') }}" class="text-warning fw-semibold">data di nascita nel profilo</a>
+                                @if(!auth()->user()->canCreateOuting())
+                                    e completa un cammino intero
+                                @endif
+                                per sbloccare questa funzione.
+                            </span>
                         </div>
-                    @elseif(!auth()->user()->isAdult())
+                    @elseif(auth()->user()->date_of_birth->diffInYears(now()) < 18)
                         {{-- Minorenne --}}
                         <button class="btn btn-secondary w-100 py-2 fw-semibold shadow-sm" disabled style="cursor: not-allowed; opacity: 0.65;">
                             <i class="fa-solid fa-lock me-1"></i> Proponi un'uscita
                         </button>
                         <div class="mt-2 text-muted small text-start">
                             <i class="fa-solid fa-ban text-danger me-1"></i>
-                            <span class="fst-italic">Devi avere almeno 18 anni per proporre un cammino.</span>
+                            <span class="fst-italic">
+                                Devi avere almeno 18 anni
+                                @if(!auth()->user()->canCreateOuting())
+                                    e aver completato un cammino intero
+                                @endif
+                                per proporre un cammino.
+                            </span>
                         </div>
                     @elseif(auth()->user()->canCreateOuting())
                         <a href="{{ route('user.outings.create') }}" class="btn btn-success w-100 py-2 fw-semibold shadow-sm">

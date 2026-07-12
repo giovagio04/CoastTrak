@@ -304,17 +304,28 @@
                         <li class="nav-item">
                             <a class="nav-link text-danger" href="{{ route('admin.users.index') }}">Gestione Utenti</a>
                         </li>
-                        <li class="nav-item w-100 ms-lg-2 mt-3 mt-lg-0 mb-2 mb-lg-0">
-                            <form method="POST" action="{{ route('logout') }}" class="m-0 d-grid d-lg-block">
+                        <li class="nav-item d-flex align-items-center ms-lg-2 mt-2 mt-lg-0 mb-2 mb-lg-0">
+                            <form method="POST" action="{{ route('logout') }}" class="m-0 w-100">
                                 @csrf
-                                <button type="submit" class="btn btn-outline-danger px-3 py-2 py-lg-1">
+                                <button type="submit" class="btn btn-outline-danger btn-sm px-3 py-2 py-lg-1 d-block w-100 w-lg-auto text-start text-lg-center">
                                     Esci
                                 </button>
                             </form>
                         </li>
                     @else
                         <li class="nav-item">
-                            <a class="nav-link p-2 p-lg-2" href="{{ route('dashboard') }}">Area Personale</a>
+                            <a class="nav-link p-2 p-lg-2" href="{{ route('dashboard') }}">Gestione Uscite</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link p-2 p-lg-2 text-primary" href="{{ route('profile.show') }}"><i class="fa-solid fa-user"></i> Area Personale</a>
+                        </li>
+                        <li class="nav-item d-flex align-items-center ms-lg-2 mt-2 mt-lg-0 mb-2 mb-lg-0">
+                            <form method="POST" action="{{ route('logout') }}" class="m-0 w-100">
+                                @csrf
+                                <button type="submit" class="btn btn-outline-danger btn-sm px-3 py-2 py-lg-1 d-block w-100 w-lg-auto text-start text-lg-center">
+                                    Esci
+                                </button>
+                            </form>
                         </li>
                     @endif
                 @else

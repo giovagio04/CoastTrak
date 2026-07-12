@@ -85,19 +85,22 @@
             </div>
 
             <div class="row mb-3">
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label class="form-label fw-bold">Data Uscita</label>
                     <input type="date" name="date" class="form-control" value="{{ $outing->date->format('Y-m-d') }}" required>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Punto di Ritrovo</label>
-                    <input type="text" name="meeting_point" class="form-control" value="{{ $outing->meeting_point }}" required>
-                </div>
-                <div class="col-md-2">
+                <div class="col-md-6">
                     <label class="form-label fw-bold">Posti Max</label>
                     <input type="number" name="max_participants" class="form-control" min="1" max="50" value="{{ $outing->max_participants }}" required>
                 </div>
-                <div class="col-md-2">
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-8">
+                    <label class="form-label fw-bold">Punto di Ritrovo</label>
+                    <input type="text" name="meeting_point" class="form-control" value="{{ $outing->meeting_point }}" required>
+                </div>
+                <div class="col-md-4">
                     <label class="form-label fw-bold">Difficoltà</label>
                     <select name="difficulty" class="form-select" required>
                         <option value="facile" {{ $outing->difficulty == 'facile' ? 'selected' : '' }}>Facile</option>

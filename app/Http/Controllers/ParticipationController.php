@@ -20,7 +20,7 @@ class ParticipationController extends Controller
         }
 
         // Verifica che l'utente abbia almeno 18 anni
-        if (!$user->isAdult()) {
+        if ($user->date_of_birth->diffInYears(now()) < 18) {
             return back()->with('error', 'Devi avere almeno 18 anni per partecipare a un cammino.');
         }
 

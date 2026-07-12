@@ -63,12 +63,10 @@
                 <hr class="my-4">
 
                 @php
-                    // Determino il livello di accesso dell'utente corrente per questa uscita
-                    $showUserRequest  = auth()->check() ? $outing->participationRequests->where('user_id', auth()->id())->first() : null;
-                    $isEnrolled       = $showUserRequest && $showUserRequest->status === 'accepted';
+                    // Accesso completo: qualsiasi utente registrato vede tutti i dettagli
+                    $showUserRequest   = auth()->check() ? $outing->participationRequests->where('user_id', auth()->id())->first() : null;
                     $isOutingOrganizer = auth()->check() && $outing->organizer_id === auth()->id();
-                    $isAdminViewing   = auth()->check() && auth()->user()->role === 'admin';
-                    $hasFullAccess    = $isEnrolled || $isOutingOrganizer || $isAdminViewing;
+                    $hasFullAccess     = auth()->check();
                 @endphp
 
                 @if($hasFullAccess)
@@ -111,54 +109,6 @@
                     </div>
                 @endif
 
-                @elseif(auth()->check())
-                {{-- LIVELLO 2: Registrato ma non iscritto — vede solo le statistiche, non la logistica --}}
-                <div class="row g-4">
-                    <div class="col-md-6">
-                        <h5 class="fw-bold text-muted mb-3">Dettagli Logistici</h5>
-                        <div class="d-flex flex-column align-items-start gap-2 py-2 px-3 rounded-3" style="background:rgba(13,110,253,0.05); border:1.5px dashed rgba(13,110,253,0.2);">
-                            <div class="d-flex align-items-center gap-2">
-                                <i class="fa-solid fa-lock" style="color:#6c757d; opacity:0.6;"></i>
-                                <span class="fw-semibold text-muted" style="font-size:0.9rem;">Data, ritrovo e difficolt&agrave;</span>
-                            </div>
-                            <small class="text-muted">Visibili solo dopo l'iscrizione al cammino.</small>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <h5 class="fw-bold text-muted mb-3">Partecipazione</h5>
-                        <ul class="list-unstyled">
-                            @if($outing->status == 'concluded')
-                                <li class="mb-2"><i class="fa-solid fa-users fa-fw text-secondary"></i> <strong>Partecipanti Totali:</strong> {{ $outing->participationRequests->where('status', 'accepted')->count() }}</li>
-                            @else
-                                <li class="mb-2"><i class="fa-solid fa-users fa-fw text-secondary"></i> <strong>Posti Totali:</strong> {{ $outing->max_participants }}</li>
-                                <li class="mb-2"><i class="fa-solid fa-user-check fa-fw text-success"></i> <strong>Iscritti Attuali:</strong> {{ $outing->participationRequests->where('status', 'accepted')->count() }}</li>
-                            @endif
-                            @if($outing->type == 'user' && $outing->organizer)
-                                <li class="mt-3">
-                                    <i class="fa-solid fa-user-tie fa-fw text-info"></i>
-                                    <strong>Organizzatore:</strong> {{ $outing->organizer->name }}
-                                </li>
-                            @endif
-                        </ul>
-                    </div>
-                </div>
-
-                @else
-                {{-- LIVELLO 3: Ospite non registrato — banner completo --}}
-                <div class="d-flex flex-column align-items-center justify-content-center py-4 px-3 rounded-3 text-center" style="background: rgba(13,110,253,0.05); border: 1.5px dashed rgba(13,110,253,0.25);">
-                    <i class="fa-solid fa-lock mb-3" style="font-size: 2.2rem; color: #6c757d; opacity: 0.5;"></i>
-                    <h5 class="fw-bold mb-1">Dettagli riservati agli iscritti</h5>
-                    <p class="text-muted mb-3" style="max-width: 380px;">Data, punto di ritrovo, difficolt&agrave; e disponibilit&agrave; sono visibili solo dopo la registrazione. Entra a far parte della community!</p>
-                    <div class="d-flex align-items-center gap-2 flex-wrap justify-content-center">
-                        <a href="{{ route('login') }}" class="btn btn-outline-primary rounded-pill px-4">
-                            <i class="fa-solid fa-right-to-bracket me-1"></i> Accedi
-                        </a>
-                        <span class="text-muted" style="font-size: 0.75rem; font-weight: 500;">o</span>
-                        <a href="{{ route('register') }}" class="btn btn-outline-primary rounded-pill px-4">
-                            <i class="fa-solid fa-user-plus me-1"></i> Registrati
-                        </a>
-                    </div>
-                </div>
                 @endif
             </div>
         </div>
@@ -219,7 +169,7 @@
                         <div class="alert alert-success">
                             <i class="fa-solid fa-user-tie"></i> Sei l'organizzatore di questa uscita!
                         </div>
-                        @if(in_array($outing->status, ['pending', 'published']))
+                        @if($outing->status === 'published')
                             <a href="{{ route('user.outings.edit', $outing->id) }}" class="btn btn-outline-primary w-100 rounded-pill mt-2">
                                 <i class="fa-solid fa-pen-to-square me-1"></i> Modifica Uscita
                             </a>
@@ -293,7 +243,7 @@
                             <a href="{{ route('profile.show') }}" class="btn btn-warning w-100 rounded-pill">
                                 <i class="fa-solid fa-user-pen me-1"></i> Completa il profilo
                             </a>
-                        @elseif(!auth()->user()->isAdult())
+                        @elseif(auth()->user()->date_of_birth->diffInYears(now()) < 18)
                             {{-- Utente minorenne --}}
                             <div class="alert alert-danger text-start">
                                 <i class="fa-solid fa-ban me-1"></i>
@@ -337,22 +287,13 @@
                             <div class="d-flex align-items-center">
                                 <i class="fa-solid fa-circle-user text-secondary me-2 fs-5"></i>
 
-                                @if($hasFullAccess)
-                                    {{-- Iscritto/Organizzatore/Admin: nome cliccabile --}}
+                                @if(auth()->check())
+                                    {{-- Utente registrato: nome sempre cliccabile --}}
                                     <a href="{{ route('profiles.show', $req->user->id) }}" class="text-decoration-none fw-bold text-dark" onmouseover="this.style.color='#0d6efd'" onmouseout="this.style.color='#212529'" style="transition: color 0.2s;">
                                         {{ $req->user->name }}
                                     </a>
-
-                                @elseif(auth()->check())
-                                    {{-- Registrato non iscritto: organizzatore visibile, altri blurrati --}}
-                                    @if($req->user_id === $outing->organizer_id)
-                                        <span class="fw-bold">{{ $req->user->name }}</span>
-                                    @else
-                                        <span class="fw-bold" style="filter:blur(5px); user-select:none; pointer-events:none;" title="Iscriviti per vedere i partecipanti">Utente Iscritto</span>
-                                    @endif
-
                                 @else
-                                    {{-- Ospite: tutti blurrati, incluso l'organizzatore --}}
+                                    {{-- Ospite: blurrato --}}
                                     <span class="fw-bold" style="filter:blur(5px); user-select:none; pointer-events:none;">Utente Iscritto</span>
                                 @endif
                             </div>
@@ -363,9 +304,7 @@
                     @endforeach
                 </ul>
 
-                @if(!$hasFullAccess && auth()->check())
-                    <p class="text-muted small mt-3 mb-0"><i class="fa-solid fa-eye-slash me-1"></i> I nomi dei partecipanti sono nascosti. Iscriviti al cammino per vederli.</p>
-                @elseif(!auth()->check())
+                @if(!auth()->check())
                     <p class="text-muted small mt-3 mb-0"><i class="fa-solid fa-eye-slash me-1"></i> <a href="{{ route('login') }}" class="text-decoration-none">Accedi</a> o <a href="{{ route('register') }}" class="text-decoration-none">Registrati</a> per vedere i partecipanti.</p>
                 @endif
             @endif

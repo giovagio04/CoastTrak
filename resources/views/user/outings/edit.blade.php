@@ -90,7 +90,7 @@
                             <label class="form-label fw-bold">Data Proposta</label>
                             <input type="date" name="date" class="form-control"
                                 value="{{ $outing->date->format('Y-m-d') }}"
-                                min="{{ date('Y-m-d') }}"
+                                min="{{ date('Y-m-d', strtotime('+1 day')) }}"
                                 max="{{ date('Y-m-d', strtotime('+3 years')) }}"
                                 required>
                         </div>

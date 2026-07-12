@@ -84,7 +84,7 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Data Proposta</label>
-                            <input type="date" name="date" class="form-control" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d', strtotime('+3 years')) }}" required>
+                            <input type="date" name="date" class="form-control" min="{{ date('Y-m-d', strtotime('+1 day')) }}" max="{{ date('Y-m-d', strtotime('+3 years')) }}" required>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-bold">Posti Massimi (tu incluso)</label>

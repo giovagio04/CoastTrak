@@ -22,10 +22,15 @@ class UserController extends Controller
             });
         }
 
-        // Valido i filtri per non accettare valori arbitrari
         $request->validate([
-            'search'     => 'nullable|string|max:255',
-            'min_trails' => 'nullable|integer|min:0|max:100',
+            'search'          => 'nullable|string|max:255',
+            'min_trails'      => 'nullable|integer|min:0|max:100',
+            'min_stages'      => 'nullable|integer|min:0|max:1000',
+            'status'          => 'nullable|in:all,active,banned',
+            'registered_from' => 'nullable|date',
+            'registered_to'   => 'nullable|date|after_or_equal:registered_from',
+            'birth_from'      => 'nullable|date',
+            'birth_to'        => 'nullable|date|after_or_equal:birth_from',
         ]);
 
         if ($request->filled('min_trails')) {
@@ -35,6 +40,39 @@ class UserController extends Controller
                     $oq->where('is_full_trail', true);
                 });
             }, '>=', $minTrails);
+        }
+
+        if ($request->filled('min_stages')) {
+            $minStages = $request->min_stages;
+            $query->whereHas('digitalCredentials', function ($q) {
+                $q->whereHas('outing', function ($oq) {
+                    $oq->where('is_full_trail', false);
+                });
+            }, '>=', $minStages);
+        }
+
+        if ($request->filled('status') && $request->status !== 'all') {
+            if ($request->status === 'banned') {
+                $query->where('is_banned', true);
+            } else {
+                $query->where('is_banned', false);
+            }
+        }
+
+        if ($request->filled('registered_from')) {
+            $query->whereDate('created_at', '>=', $request->registered_from);
+        }
+
+        if ($request->filled('registered_to')) {
+            $query->whereDate('created_at', '<=', $request->registered_to);
+        }
+
+        if ($request->filled('birth_from')) {
+            $query->where('date_of_birth', '>=', $request->birth_from);
+        }
+
+        if ($request->filled('birth_to')) {
+            $query->where('date_of_birth', '<=', $request->birth_to);
         }
 
         $users = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();

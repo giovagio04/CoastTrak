@@ -44,17 +44,6 @@ class User extends Authenticatable
         return !is_null($this->date_of_birth);
     }
 
-    /**
-     * Verifica se l'utente ha almeno 18 anni.
-     */
-    public function isAdult(): bool
-    {
-        if (!$this->hasBirthDate()) {
-            return false;
-        }
-        return $this->date_of_birth->diffInYears(now()) >= 18;
-    }
-
     public function outings()
     {
         return $this->hasMany(Outing::class, 'organizer_id');

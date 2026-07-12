@@ -38,6 +38,8 @@
                 value="{{ old('email') }}"
                 class="form-control auth-input @error('email') is-invalid @enderror"
                 placeholder="tuaemail@esempio.it"
+                pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"
+                title="Inserisci un indirizzo email valido (es: nome@dominio.it)"
                 required
                 autocomplete="username"
             >
@@ -46,6 +48,27 @@
                     <i class="fa-solid fa-circle-exclamation me-1"></i>{{ $message }}
                 </div>
             @enderror
+        </div>
+
+        {{-- Data di Nascita --}}
+        <div class="mb-3">
+            <label for="date_of_birth" class="form-label auth-label">Data di Nascita</label>
+            <input
+                id="date_of_birth"
+                type="date"
+                name="date_of_birth"
+                value="{{ old('date_of_birth') }}"
+                class="form-control auth-input @error('date_of_birth') is-invalid @enderror"
+                min="{{ now()->subYears(100)->format('Y-m-d') }}"
+                max="{{ now()->subYears(18)->format('Y-m-d') }}"
+                required
+            >
+            @error('date_of_birth')
+                <div class="invalid-feedback">
+                    <i class="fa-solid fa-circle-exclamation me-1"></i>{{ $message }}
+                </div>
+            @enderror
+            <small class="text-muted d-block mt-1">Devi avere almeno 18 anni per iscriverti.</small>
         </div>
 
         {{-- Password --}}

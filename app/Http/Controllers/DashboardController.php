@@ -145,8 +145,22 @@ class DashboardController extends Controller
             }
         }
 
-        // Ordino per data in modo sicuro usando l'operatore null-safe, nel caso un'uscita collegata sia stata eliminata
-        $participations = $query->get()->sortByDesc(fn($p) => $p->outing?->date);
+        // Ordino per stato e data usando un join per poter ordinare lato DB e usare la paginazione
+        $participations = $query->join('outings', 'participation_requests.outing_id', '=', 'outings.id')
+            ->orderByRaw("
+                CASE outings.status
+                    WHEN 'published' THEN 1
+                    WHEN 'pending' THEN 2
+                    WHEN 'concluded' THEN 3
+                    WHEN 'rejected' THEN 4
+                    WHEN 'cancelled' THEN 5
+                    ELSE 6
+                END
+            ")
+            ->orderBy('outings.date', 'desc')
+            ->select('participation_requests.*') // select solo le colonne originali per evitare conflitti
+            ->paginate(10)
+            ->withQueryString();
 
         return view('dashboard', compact('participations'));
     }

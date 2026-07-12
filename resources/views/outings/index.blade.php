@@ -282,7 +282,7 @@
                     </small>
                 </div>
                 <div class="card-body">
-                    @php $cardFullAccess = auth()->check() && $enrolledOutingIds->contains($outing->id); @endphp
+                    @php $cardFullAccess = auth()->check(); @endphp
                     @if($cardFullAccess)
                         <p class="card-text">
                             <i class="fa-regular fa-calendar text-primary me-2"></i>
@@ -303,18 +303,6 @@
                                 @endif
                             </p>
                         @endif
-                    @elseif(auth()->check())
-                        {{-- Registrato ma non iscritto: solo statistiche aggregate --}}
-                        <p class="card-text mb-1">
-                            <i class="fa-solid fa-users text-secondary me-2"></i> Posti max: {{ $outing->max_participants }}
-                        </p>
-                        <p class="card-text mb-3">
-                            <i class="fa-solid fa-user-check text-success me-2"></i> Iscritti: {{ $outing->accepted_count }}
-                        </p>
-                        <div class="d-flex align-items-center gap-2 mt-2 p-2 rounded-2" style="background:rgba(13,110,253,0.06); border:1px dashed rgba(13,110,253,0.2);">
-                            <i class="fa-solid fa-lock text-muted" style="font-size:0.9rem; opacity:0.6;"></i>
-                            <small class="text-muted">Iscriviti per vedere data e ritrovo.</small>
-                        </div>
                     @else
                         {{-- Ospite non registrato --}}
                         <div class="d-flex flex-column align-items-center justify-content-center py-3 text-center" style="min-height: 90px;">

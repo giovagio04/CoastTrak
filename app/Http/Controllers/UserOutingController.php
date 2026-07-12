@@ -16,7 +16,7 @@ class UserOutingController extends Controller
                 ->with('error', 'Devi inserire la tua data di nascita nel profilo prima di poter proporre un cammino.');
         }
 
-        if (!auth()->user()->isAdult()) {
+        if (auth()->user()->date_of_birth->diffInYears(now()) < 18) {
             return redirect()->route('dashboard')
                 ->with('error', 'Devi avere almeno 18 anni per proporre un cammino.');
         }
@@ -37,7 +37,7 @@ class UserOutingController extends Controller
                 ->with('error', 'Devi inserire la tua data di nascita nel profilo prima di poter proporre un cammino.');
         }
 
-        if (!auth()->user()->isAdult()) {
+        if (auth()->user()->date_of_birth->diffInYears(now()) < 18) {
             abort(403, 'Devi avere almeno 18 anni per proporre un cammino.');
         }
 
@@ -67,7 +67,14 @@ class UserOutingController extends Controller
                 $validated['end_location'] = 'Soverato';
             }
         } else {
-            $validated['is_full_trail'] = false;
+            if (
+                ($validated['start_location'] === 'Soverato' && $validated['end_location'] === 'Pizzo') ||
+                ($validated['start_location'] === 'Pizzo' && $validated['end_location'] === 'Soverato')
+            ) {
+                $validated['is_full_trail'] = true;
+            } else {
+                $validated['is_full_trail'] = false;
+            }
         }
         unset($validated['route_type']);
         unset($validated['full_direction']);
@@ -106,9 +113,9 @@ class UserOutingController extends Controller
             abort(403, 'Non hai i permessi per modificare questo cammino.');
         }
 
-        if (!in_array($outing->status, ['pending', 'published'])) {
+        if ($outing->status !== 'published') {
             return redirect()->route('outings.show', $outing->id)
-                ->with('error', 'Non è possibile modificare un\'uscita già conclusa o annullata.');
+                ->with('error', 'L\'uscita non può essere modificata in questo stato (in approvazione, conclusa o annullata).');
         }
 
         $locations = ['Soverato', 'Petrizzi', 'Monterosso Calabro', 'Pizzo'];
@@ -121,9 +128,9 @@ class UserOutingController extends Controller
             abort(403, 'Non hai i permessi per modificare questo cammino.');
         }
 
-        if (!in_array($outing->status, ['pending', 'published'])) {
+        if ($outing->status !== 'published') {
             return redirect()->route('outings.show', $outing->id)
-                ->with('error', 'Non è possibile modificare un\'uscita già conclusa o annullata.');
+                ->with('error', 'L\'uscita non può essere modificata in questo stato (in approvazione, conclusa o annullata).');
         }
 
         $validated = $request->validate([
@@ -148,7 +155,14 @@ class UserOutingController extends Controller
                 $validated['end_location']   = 'Soverato';
             }
         } else {
-            $validated['is_full_trail'] = false;
+            if (
+                ($validated['start_location'] === 'Soverato' && $validated['end_location'] === 'Pizzo') ||
+                ($validated['start_location'] === 'Pizzo' && $validated['end_location'] === 'Soverato')
+            ) {
+                $validated['is_full_trail'] = true;
+            } else {
+                $validated['is_full_trail'] = false;
+            }
         }
         unset($validated['route_type']);
         unset($validated['full_direction']);

@@ -31,6 +31,8 @@
                 value="{{ old('email') }}"
                 class="form-control auth-input @error('email') is-invalid @enderror"
                 placeholder="tuaemail@esempio.it"
+                pattern="[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}"
+                title="Inserisci un indirizzo email valido (es: nome@dominio.it)"
                 required
                 autofocus
                 autocomplete="username"

@@ -173,7 +173,7 @@
                             
                             <div class="mb-3">
                                 <label for="date_of_birth" class="form-label fw-bold">Data di Nascita</label>
-                                <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror" id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth', $user->date_of_birth) }}" min="1900-01-01" max="{{ date('Y-m-d') }}">
+                                <input type="date" class="form-control @error('date_of_birth') is-invalid @enderror" id="date_of_birth" name="date_of_birth" value="{{ old('date_of_birth', $user->date_of_birth ? $user->date_of_birth->format('Y-m-d') : '') }}" min="{{ now()->subYears(100)->format('Y-m-d') }}" max="{{ now()->subYears(18)->format('Y-m-d') }}">
                                 <div class="invalid-feedback" id="date_of_birth-feedback">
                                     @error('date_of_birth')
                                         {{ $message }}

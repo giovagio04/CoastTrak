@@ -69,19 +69,22 @@
             </div>
 
             <div class="row mb-3">
-                <div class="col-md-4">
+                <div class="col-md-6">
                     <label class="form-label fw-bold">Data Uscita</label>
-                    <input type="date" name="date" class="form-control" min="{{ date('Y-m-d') }}" max="{{ date('Y-m-d', strtotime('+3 years')) }}" required>
+                    <input type="date" name="date" class="form-control" min="{{ date('Y-m-d', strtotime('+1 day')) }}" max="{{ date('Y-m-d', strtotime('+3 years')) }}" required>
                 </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">Punto di Ritrovo e Orario</label>
-                    <input type="text" name="meeting_point" class="form-control" placeholder="es. Piazza di Soverato, ore 8:00" required>
-                </div>
-                <div class="col-md-2">
+                <div class="col-md-6">
                     <label class="form-label fw-bold">Posti Max</label>
                     <input type="number" name="max_participants" class="form-control" min="1" max="50" required>
                 </div>
-                <div class="col-md-2">
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-8">
+                    <label class="form-label fw-bold">Punto di Ritrovo e Orario</label>
+                    <input type="text" name="meeting_point" class="form-control" placeholder="es. Piazza di Soverato, ore 8:00" required>
+                </div>
+                <div class="col-md-4">
                     <label class="form-label fw-bold">Difficoltà</label>
                     <select name="difficulty" class="form-select" required>
                         <option value="facile">Facile</option>

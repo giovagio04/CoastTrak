@@ -15,193 +15,208 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Creo l'Admin
-        // NOTA: 'role' è escluso da $fillable per sicurezza.
-        // Uso updateQuietly per forzare il ruolo admin senza passare da mass-assignment.
         $admin = User::create([
             'name'     => 'Amministratore',
             'email'    => 'admin@coasttrack.it',
             'password' => Hash::make('password'),
+            'date_of_birth' => '1980-01-01',
         ]);
         $admin->updateQuietly(['role' => 'admin']);
 
-        // 2. Creo gli utenti normali
-        $user1 = User::create([
+        // 2. Mario Rossi (id=2)
+        $mario = User::create([
             'name'     => 'Mario Rossi',
             'email'    => 'mario@example.com',
             'password' => Hash::make('password'),
+            'date_of_birth' => '1985-05-15',
         ]);
 
-        $user2 = User::create([
+        // 3. Luigi Verdi (id=3)
+        $luigi = User::create([
             'name'     => 'Luigi Verdi',
             'email'    => 'luigi@example.com',
             'password' => Hash::make('password'),
+            'date_of_birth' => '1990-10-20',
         ]);
 
-        $user3 = User::create([
+        // 4. Maria Bianchi (id=4)
+        $maria = User::create([
             'name'     => 'Maria Bianchi',
             'email'    => 'maria@example.com',
             'password' => Hash::make('password'),
+            'date_of_birth' => '1992-02-14',
+            'profile_photo_path' => 'profile_photos/maria.png',
         ]);
 
-        $user4 = User::create([
-            'name'     => 'Stefano Neri',
-            'email'    => 'stefano@example.com',
+        // 5. Giovanni (id=5)
+        $giovanni = User::create([
+            'name'     => 'Giovanni',
+            'email'    => 'giovanni@example.com',
             'password' => Hash::make('password'),
+            'date_of_birth' => '1995-07-22',
         ]);
 
-        $user5 = User::create([
-            'name'     => 'Awais',
-            'email'    => 'awais@example.com',
+        // 6. Francesco (id=6)
+        $francesco = User::create([
+            'name'     => 'Francesco',
+            'email'    => 'francesco@example.com',
             'password' => Hash::make('password'),
+            'date_of_birth' => '1998-11-05',
         ]);
 
-        $userGiulia = User::create([
-            'name'     => 'Giulia Neri',
-            'email'    => 'giulia@example.com',
-            'password' => Hash::make('password'),
-        ]);
-
-        // Tappe rimosse, usiamo le stringhe per le location
-
-
-        // 4. Creo le uscite ufficiali
-        $outing1 = Outing::create([
-            'type' => 'official',
-            'is_full_trail' => false,
-            'start_location' => 'Soverato',
-            'end_location' => 'Petrizzi',
-
-            'date' => Carbon::now()->addDays(10),
-            'meeting_point' => 'Piazza di Soverato, ore 8:00',
-            'max_participants' => 20,
-            'difficulty' => 'facile',
-            'status' => 'published'
-        ]);
-
-        // Un'uscita del passato già conclusa
-        $outingPast = Outing::create([
-            'type' => 'official',
-            'is_full_trail' => false,
-            'start_location' => 'Soverato',
-            'end_location' => 'Petrizzi',
-
-            'date' => Carbon::now()->subDays(5),
-            'meeting_point' => 'Piazza di Soverato',
-            'max_participants' => 15,
-            'difficulty' => 'facile',
-            'status' => 'concluded'
-        ]);
-
-        // 6. Registro le partecipazioni all'uscita conclusa (così si creano le credenziali digitali)
-        ParticipationRequest::create([
-            'outing_id' => $outingPast->id,
-            'user_id' => $user1->id,
-            'status' => 'accepted'
-        ]);
-
-        DigitalCredential::create([
-            'user_id' => $user1->id,
-            'outing_id' => $outingPast->id,
-            'completed_at' => Carbon::now()->subDays(4)
-        ]);
-
-        // Uscita completa del passato per far sì che Maria abbia completato tutto il cammino
-        $outingFullPast = Outing::create([
-            'type' => 'official',
-            'is_full_trail' => true,
-            'start_location' => 'Soverato',
-            'end_location' => 'Pizzo',
-            'date' => Carbon::now()->subDays(10),
-            'meeting_point' => 'Piazza di Soverato',
-            'max_participants' => 15,
-            'difficulty' => 'difficile',
-            'status' => 'concluded'
-        ]);
-
-        ParticipationRequest::create([
-            'outing_id' => $outingFullPast->id,
-            'user_id' => $user3->id,
-            'status' => 'accepted'
-        ]);
-
-        DigitalCredential::create([
-            'user_id' => $user3->id,
-            'outing_id' => $outingFullPast->id,
-            'completed_at' => Carbon::now()->subDays(9)
-        ]);
-
-        // Uscita ufficiale completa del passato per far sì che Mario possa organizzare uscite
-        // (canCreateOuting() richiede almeno un cammino completo nello storico)
-        $outingFullMario = Outing::create([
+        // ==========================================
+        // CAMMINI CONCLUSI (PER ABILITARE MARIA E MARIO)
+        // ==========================================
+        
+        // Cammino completo concluso di Maria
+        $outingMariaPast = Outing::create([
             'type'             => 'official',
             'is_full_trail'    => true,
             'start_location'   => 'Soverato',
             'end_location'     => 'Pizzo',
-            'date'             => Carbon::now()->subDays(20),
-            'meeting_point'    => 'Piazza di Soverato, ore 7:30',
+            'date'             => Carbon::now()->subDays(30),
+            'meeting_point'    => 'Piazza di Soverato',
             'max_participants' => 20,
             'difficulty'       => 'difficile',
             'status'           => 'concluded',
         ]);
 
         ParticipationRequest::create([
-            'outing_id' => $outingFullMario->id,
-            'user_id'   => $user1->id,
+            'outing_id' => $outingMariaPast->id,
+            'user_id'   => $maria->id,
             'status'    => 'accepted',
         ]);
 
         DigitalCredential::create([
-            'user_id'      => $user1->id,
-            'outing_id'    => $outingFullMario->id,
-            'completed_at' => Carbon::now()->subDays(19),
+            'user_id'      => $maria->id,
+            'outing_id'    => $outingMariaPast->id,
+            'completed_at' => Carbon::now()->subDays(29),
         ]);
 
-        // 7. Uscite tra utenti (mario può crearne una perché ha completato il cammino completo)
-        $outingUser = Outing::create([
-            'type' => 'user',
-            'is_full_trail' => false,
-            'start_location' => 'Petrizzi',
-            'end_location' => 'Monterosso Calabro',
-            'organizer_id' => $user1->id,
-            'date' => Carbon::now()->addDays(15),
-            'meeting_point' => 'Piazza di Petrizzi',
+        // Cammino completo concluso di Mario
+        $outingMarioPast = Outing::create([
+            'type'             => 'official',
+            'is_full_trail'    => true,
+            'start_location'   => 'Pizzo',
+            'end_location'     => 'Soverato',
+            'date'             => Carbon::now()->subDays(40),
+            'meeting_point'    => 'Piazza di Pizzo',
+            'max_participants' => 20,
+            'difficulty'       => 'difficile',
+            'status'           => 'concluded',
+        ]);
+
+        ParticipationRequest::create([
+            'outing_id' => $outingMarioPast->id,
+            'user_id'   => $mario->id,
+            'status'    => 'accepted',
+        ]);
+
+        DigitalCredential::create([
+            'user_id'      => $mario->id,
+            'outing_id'    => $outingMarioPast->id,
+            'completed_at' => Carbon::now()->subDays(39),
+        ]);
+
+
+        // ==========================================
+        // CAMMINI FUTURI
+        // ==========================================
+
+        // 1. Cammino Ufficiale
+        $outingOfficial = Outing::create([
+            'type'             => 'official',
+            'is_full_trail'    => false,
+            'start_location'   => 'Soverato',
+            'end_location'     => 'Petrizzi',
+            'date'             => Carbon::now()->addDays(10),
+            'meeting_point'    => 'Piazza di Soverato, ore 8:00',
+            'max_participants' => 20,
+            'difficulty'       => 'facile',
+            'status'           => 'published',
+        ]);
+
+        // Partecipanti Cammino Ufficiale
+        ParticipationRequest::create([
+            'outing_id' => $outingOfficial->id,
+            'user_id'   => $giovanni->id,
+            'status'    => 'pending',
+        ]);
+
+        ParticipationRequest::create([
+            'outing_id' => $outingOfficial->id,
+            'user_id'   => $luigi->id,
+            'status'    => 'accepted',
+        ]);
+
+
+        // 2. Cammino organizzato da Maria
+        $outingByMaria = Outing::create([
+            'type'             => 'user',
+            'is_full_trail'    => true,
+            'start_location'   => 'Pizzo',
+            'end_location'     => 'Soverato',
+            'organizer_id'     => $maria->id,
+            'date'             => Carbon::now()->addDays(15),
+            'meeting_point'    => 'Piazza di Pizzo, ore 7:00',
+            'max_participants' => 10,
+            'difficulty'       => 'difficile',
+            'status'           => 'published',
+            'notes'            => 'Portare scarpe comode!',
+        ]);
+
+        // Partecipanti Cammino Maria
+        ParticipationRequest::create([
+            'outing_id' => $outingByMaria->id,
+            'user_id'   => $maria->id,
+            'status'    => 'accepted', // Organizzatore
+        ]);
+
+        ParticipationRequest::create([
+            'outing_id' => $outingByMaria->id,
+            'user_id'   => $giovanni->id,
+            'status'    => 'pending',
+        ]);
+
+        ParticipationRequest::create([
+            'outing_id' => $outingByMaria->id,
+            'user_id'   => $luigi->id,
+            'status'    => 'accepted',
+        ]);
+
+
+        // 3. Cammino organizzato da Mario
+        $outingByMario = Outing::create([
+            'type'             => 'user',
+            'is_full_trail'    => false,
+            'start_location'   => 'Petrizzi',
+            'end_location'     => 'Monterosso Calabro',
+            'organizer_id'     => $mario->id,
+            'date'             => Carbon::now()->addDays(20),
+            'meeting_point'    => 'Piazza di Petrizzi',
             'max_participants' => 5,
-            'difficulty' => 'difficile',
-            'status' => 'published', // Facciamo finta che sia già approvata dall'admin
-            'notes' => 'Portare acqua in abbondanza!'
+            'difficulty'       => 'medio',
+            'status'           => 'published',
+            'notes'            => 'Percorso intermedio, acqua disponibile lungo la strada.',
+        ]);
+
+        // Partecipanti Cammino Mario
+        ParticipationRequest::create([
+            'outing_id' => $outingByMario->id,
+            'user_id'   => $mario->id,
+            'status'    => 'accepted', // Organizzatore
         ]);
 
         ParticipationRequest::create([
-            'outing_id' => $outingUser->id,
-            'user_id' => $user1->id,
-            'status' => 'accepted'
+            'outing_id' => $outingByMario->id,
+            'user_id'   => $francesco->id,
+            'status'    => 'pending',
         ]);
 
         ParticipationRequest::create([
-            'outing_id' => $outingUser->id,
-            'user_id' => $user2->id,
-            'status' => 'pending'
-        ]);
-
-        // Uscita completa organizzata da Maria Bianchi per i test
-        $outingMaria = Outing::create([
-            'type' => 'user',
-            'is_full_trail' => true,
-            'start_location' => 'Soverato',
-            'end_location' => 'Pizzo',
-            'organizer_id' => $user3->id,
-            'date' => Carbon::now()->addDays(20),
-            'meeting_point' => 'Piazza di Soverato',
-            'max_participants' => 5,
-            'difficulty' => 'medio',
-            'status' => 'published',
-            'notes' => ''
-        ]);
-
-        ParticipationRequest::create([
-            'outing_id' => $outingMaria->id,
-            'user_id' => $user3->id,
-            'status' => 'accepted'
+            'outing_id' => $outingByMario->id,
+            'user_id'   => $luigi->id,
+            'status'    => 'accepted',
         ]);
     }
 }

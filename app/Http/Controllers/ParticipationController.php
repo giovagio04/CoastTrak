@@ -11,6 +11,19 @@ class ParticipationController extends Controller
 {
     public function store(Request $request, Outing $outing)
     {
+        $user = auth()->user();
+
+        // Verifica che l'utente abbia inserito la data di nascita
+        if (!$user->hasBirthDate()) {
+            return redirect()->route('profile.show')
+                ->with('error', 'Devi inserire la tua data di nascita nel profilo prima di poter partecipare a un cammino.');
+        }
+
+        // Verifica che l'utente abbia almeno 18 anni
+        if (!$user->isAdult()) {
+            return back()->with('error', 'Devi avere almeno 18 anni per partecipare a un cammino.');
+        }
+
         // L'organizzatore non può iscriversi alla propria uscita
         if ($outing->organizer_id === auth()->id()) {
             return back()->with('error', 'Non puoi richiedere di partecipare al tuo stesso cammino.');

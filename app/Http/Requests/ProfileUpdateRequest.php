@@ -21,7 +21,7 @@ class ProfileUpdateRequest extends FormRequest
                 'max:255',
                 Rule::unique(User::class)->ignore($this->user()->id),
             ],
-            'date_of_birth' => ['nullable', 'date', 'before_or_equal:today', 'after:1900-01-01'],
+            'date_of_birth' => ['nullable', 'date', 'before_or_equal:' . now()->subYears(18)->format('Y-m-d'), 'after:1900-01-01'],
             'bio' => ['nullable', 'string', 'max:1000'],
             'profile_photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp', 'max:2048'], // validazione estensione e dimensione massima (2MB)
             'remove_profile_photo' => ['nullable', 'boolean'],
@@ -43,9 +43,9 @@ class ProfileUpdateRequest extends FormRequest
             'email.max' => 'L\'email non può superare i :max caratteri.',
             'email.unique' => 'Questo indirizzo email è già registrato.',
 
-            'date_of_birth.date' => 'La data di nascita deve essere una data valida.',
-            'date_of_birth.before_or_equal' => 'La data di nascita non può essere nel futuro.',
-            'date_of_birth.after' => 'La data di nascita deve essere successiva al 01/01/1900.',
+            'date_of_birth.date'            => 'La data di nascita deve essere una data valida.',
+            'date_of_birth.before_or_equal' => 'Devi avere almeno 18 anni per partecipare.',
+            'date_of_birth.after'           => 'La data di nascita deve essere successiva al 01/01/1900.',
 
             'bio.max' => 'La descrizione non può superare i :max caratteri.',
 

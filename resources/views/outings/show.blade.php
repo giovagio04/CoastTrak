@@ -283,11 +283,30 @@
                     @elseif($isFull)
                         <div class="alert alert-danger">Spiacenti, l'uscita ha raggiunto il limite massimo di partecipanti.</div>
                     @else
-                        <!-- Form reale -->
-                        <form action="{{ route('participations.store', $outing->id) }}" method="POST">
-                            @csrf
-                            <button type="submit" class="btn btn-custom btn-primary-custom btn-lg w-100">Richiedi Partecipazione</button>
-                        </form>
+                        @if(!auth()->user()->hasBirthDate())
+                            {{-- Utente senza data di nascita: blocco con avviso --}}
+                            <div class="alert alert-warning text-start">
+                                <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                                <strong>Data di nascita mancante</strong><br>
+                                <small>Devi inserire la tua data di nascita nel profilo prima di partecipare.</small>
+                            </div>
+                            <a href="{{ route('profile.show') }}" class="btn btn-warning w-100 rounded-pill">
+                                <i class="fa-solid fa-user-pen me-1"></i> Completa il profilo
+                            </a>
+                        @elseif(!auth()->user()->isAdult())
+                            {{-- Utente minorenne --}}
+                            <div class="alert alert-danger text-start">
+                                <i class="fa-solid fa-ban me-1"></i>
+                                <strong>Età non sufficiente</strong><br>
+                                <small>Devi avere almeno 18 anni per partecipare a un cammino.</small>
+                            </div>
+                        @else
+                            <!-- Form reale -->
+                            <form action="{{ route('participations.store', $outing->id) }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn btn-custom btn-primary-custom btn-lg w-100">Richiedi Partecipazione</button>
+                            </form>
+                        @endif
                     @endif
                 @else
                     <p class="text-muted">Devi essere registrato per partecipare.</p>

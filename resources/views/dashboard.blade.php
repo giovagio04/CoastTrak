@@ -217,7 +217,25 @@
                 </div>
 
                 <div class="mt-4">
-                    @if(auth()->user()->canCreateOuting())
+                    @if(!auth()->user()->hasBirthDate())
+                        {{-- Data di nascita mancante --}}
+                        <button class="btn btn-secondary w-100 py-2 fw-semibold shadow-sm" disabled style="cursor: not-allowed; opacity: 0.65;">
+                            <i class="fa-solid fa-lock me-1"></i> Proponi un'uscita
+                        </button>
+                        <div class="mt-2 text-muted small text-start">
+                            <i class="fa-solid fa-triangle-exclamation text-warning me-1"></i>
+                            <span class="fst-italic">Inserisci la tua <a href="{{ route('profile.show') }}" class="text-warning fw-semibold">data di nascita nel profilo</a> per sbloccare questa funzione.</span>
+                        </div>
+                    @elseif(!auth()->user()->isAdult())
+                        {{-- Minorenne --}}
+                        <button class="btn btn-secondary w-100 py-2 fw-semibold shadow-sm" disabled style="cursor: not-allowed; opacity: 0.65;">
+                            <i class="fa-solid fa-lock me-1"></i> Proponi un'uscita
+                        </button>
+                        <div class="mt-2 text-muted small text-start">
+                            <i class="fa-solid fa-ban text-danger me-1"></i>
+                            <span class="fst-italic">Devi avere almeno 18 anni per proporre un cammino.</span>
+                        </div>
+                    @elseif(auth()->user()->canCreateOuting())
                         <a href="{{ route('user.outings.create') }}" class="btn btn-success w-100 py-2 fw-semibold shadow-sm">
                             <i class="fa-solid fa-plus-circle me-1"></i> Proponi un'uscita
                         </a>

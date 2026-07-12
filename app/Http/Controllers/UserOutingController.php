@@ -10,6 +10,17 @@ class UserOutingController extends Controller
 {
     public function create()
     {
+        // Verifica data di nascita e maggiore età
+        if (!auth()->user()->hasBirthDate()) {
+            return redirect()->route('profile.show')
+                ->with('error', 'Devi inserire la tua data di nascita nel profilo prima di poter proporre un cammino.');
+        }
+
+        if (!auth()->user()->isAdult()) {
+            return redirect()->route('dashboard')
+                ->with('error', 'Devi avere almeno 18 anni per proporre un cammino.');
+        }
+
         if (!auth()->user()->canCreateOuting()) {
             return redirect()->route('dashboard')->with('error', 'Devi aver completato l\'intero cammino (tutte le tappe) per poter proporre un\'uscita.');
         }
@@ -20,6 +31,16 @@ class UserOutingController extends Controller
 
     public function store(Request $request)
     {
+        // Verifica data di nascita e maggiore età
+        if (!auth()->user()->hasBirthDate()) {
+            return redirect()->route('profile.show')
+                ->with('error', 'Devi inserire la tua data di nascita nel profilo prima di poter proporre un cammino.');
+        }
+
+        if (!auth()->user()->isAdult()) {
+            abort(403, 'Devi avere almeno 18 anni per proporre un cammino.');
+        }
+
         if (!auth()->user()->canCreateOuting()) {
             abort(403);
         }

@@ -21,7 +21,7 @@
         </div>
     </div>
 
-    <!-- Modal Filtri -->
+    
     <div class="modal fade" id="filterModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">

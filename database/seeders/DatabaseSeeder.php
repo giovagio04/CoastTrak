@@ -14,7 +14,6 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Creo l'Admin
         $admin = User::create([
             'name'     => 'Amministratore',
             'email'    => 'admin@coasttrack.it',
@@ -23,7 +22,6 @@ class DatabaseSeeder extends Seeder
         ]);
         $admin->updateQuietly(['role' => 'admin']);
 
-        // 2. Mario Rossi (id=2)
         $mario = User::create([
             'name'     => 'Mario Rossi',
             'email'    => 'mario@example.com',
@@ -31,7 +29,6 @@ class DatabaseSeeder extends Seeder
             'date_of_birth' => '1985-05-15',
         ]);
 
-        // 3. Luigi Verdi (id=3)
         $luigi = User::create([
             'name'     => 'Luigi Verdi',
             'email'    => 'luigi@example.com',
@@ -39,7 +36,6 @@ class DatabaseSeeder extends Seeder
             'date_of_birth' => '1990-10-20',
         ]);
 
-        // 4. Maria Bianchi (id=4)
         $maria = User::create([
             'name'     => 'Maria Bianchi',
             'email'    => 'maria@example.com',
@@ -48,7 +44,6 @@ class DatabaseSeeder extends Seeder
             'profile_photo_path' => 'profile_photos/maria.png',
         ]);
 
-        // 5. Giovanni (id=5)
         $giovanni = User::create([
             'name'     => 'Giovanni',
             'email'    => 'giovanni@example.com',
@@ -56,7 +51,6 @@ class DatabaseSeeder extends Seeder
             'date_of_birth' => '1995-07-22',
         ]);
 
-        // 6. Francesco (id=6)
         $francesco = User::create([
             'name'     => 'Francesco',
             'email'    => 'francesco@example.com',
@@ -64,11 +58,6 @@ class DatabaseSeeder extends Seeder
             'date_of_birth' => '1998-11-05',
         ]);
 
-        // ==========================================
-        // CAMMINI CONCLUSI (PER ABILITARE MARIA E MARIO)
-        // ==========================================
-        
-        // Cammino completo concluso di Maria
         $outingMariaPast = Outing::create([
             'type'             => 'official',
             'is_full_trail'    => true,
@@ -93,7 +82,6 @@ class DatabaseSeeder extends Seeder
             'completed_at' => Carbon::now()->subDays(29),
         ]);
 
-        // Cammino completo concluso di Mario
         $outingMarioPast = Outing::create([
             'type'             => 'official',
             'is_full_trail'    => true,
@@ -118,12 +106,6 @@ class DatabaseSeeder extends Seeder
             'completed_at' => Carbon::now()->subDays(39),
         ]);
 
-
-        // ==========================================
-        // CAMMINI FUTURI
-        // ==========================================
-
-        // 1. Cammino Ufficiale
         $outingOfficial = Outing::create([
             'type'             => 'official',
             'is_full_trail'    => false,
@@ -136,7 +118,6 @@ class DatabaseSeeder extends Seeder
             'status'           => 'published',
         ]);
 
-        // Partecipanti Cammino Ufficiale
         ParticipationRequest::create([
             'outing_id' => $outingOfficial->id,
             'user_id'   => $giovanni->id,
@@ -149,8 +130,6 @@ class DatabaseSeeder extends Seeder
             'status'    => 'accepted',
         ]);
 
-
-        // 2. Cammino organizzato da Maria
         $outingByMaria = Outing::create([
             'type'             => 'user',
             'is_full_trail'    => true,
@@ -165,11 +144,10 @@ class DatabaseSeeder extends Seeder
             'notes'            => 'Portare scarpe comode!',
         ]);
 
-        // Partecipanti Cammino Maria
         ParticipationRequest::create([
             'outing_id' => $outingByMaria->id,
             'user_id'   => $maria->id,
-            'status'    => 'accepted', // Organizzatore
+            'status'    => 'accepted',
         ]);
 
         ParticipationRequest::create([
@@ -184,8 +162,6 @@ class DatabaseSeeder extends Seeder
             'status'    => 'accepted',
         ]);
 
-
-        // 3. Cammino organizzato da Mario
         $outingByMario = Outing::create([
             'type'             => 'user',
             'is_full_trail'    => false,
@@ -200,11 +176,10 @@ class DatabaseSeeder extends Seeder
             'notes'            => 'Percorso intermedio, acqua disponibile lungo la strada.',
         ]);
 
-        // Partecipanti Cammino Mario
         ParticipationRequest::create([
             'outing_id' => $outingByMario->id,
             'user_id'   => $mario->id,
-            'status'    => 'accepted', // Organizzatore
+            'status'    => 'accepted',
         ]);
 
         ParticipationRequest::create([

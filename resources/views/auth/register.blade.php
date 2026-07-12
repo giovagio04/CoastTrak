@@ -1,13 +1,13 @@
 <x-guest-layout>
 
-    {{-- Titolo --}}
+    
     <h2 class="auth-title">Crea un account</h2>
     <p class="auth-subtitle">Unisciti alla comunità CoastTrack e inizia a camminare.</p>
 
     <form method="POST" action="{{ route('register') }}">
         @csrf
 
-        {{-- Nome --}}
+        
         <div class="mb-3">
             <label for="name" class="form-label auth-label">Nome</label>
             <input
@@ -28,7 +28,7 @@
             @enderror
         </div>
 
-        {{-- Email --}}
+        
         <div class="mb-3">
             <label for="email" class="form-label auth-label">Email</label>
             <input
@@ -50,7 +50,7 @@
             @enderror
         </div>
 
-        {{-- Data di Nascita --}}
+        
         <div class="mb-3">
             <label for="date_of_birth" class="form-label auth-label">Data di Nascita</label>
             <input
@@ -71,7 +71,7 @@
             <small class="text-muted d-block mt-1">Devi avere almeno 18 anni per iscriverti.</small>
         </div>
 
-        {{-- Password --}}
+        
         <div class="mb-3">
             <label for="password" class="form-label auth-label">Password</label>
             <input
@@ -90,7 +90,7 @@
             @enderror
         </div>
 
-        {{-- Conferma Password --}}
+        
         <div class="mb-4">
             <label for="password_confirmation" class="form-label auth-label">Conferma Password</label>
             <input
@@ -109,14 +109,14 @@
             @enderror
         </div>
 
-        {{-- Bottone Submit --}}
+        
         <div class="d-grid">
             <button type="submit" class="btn btn-auth-primary">
                 <i class="fa-solid fa-user-plus me-2"></i>Crea Account
             </button>
         </div>
 
-        {{-- Login --}}
+        
         <hr class="auth-divider">
         <p class="text-center mb-0" style="font-size: 0.875rem; color: var(--bs-secondary-color);">
             Hai già un account?

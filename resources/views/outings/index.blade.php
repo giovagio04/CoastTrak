@@ -8,7 +8,6 @@
     </div>
 </div>
 
-<!-- Toast container per errori server-side -->
 @if ($errors->any())
 <div class="position-fixed top-0 end-0 p-3" style="z-index: 1100;">
     @foreach ($errors->all() as $error)
@@ -25,10 +24,9 @@
 </div>
 @endif
 
-<!-- Barra filtri + form nascosto per submit -->
 <div class="d-flex align-items-center gap-2 mb-4">
 
-    <!-- Indicatori filtri attivi -->
+    
     @php
         $activeFilters = array_filter([
             request('start_location'), request('end_location'),
@@ -40,7 +38,7 @@
     @endphp
 
     @auth
-        {{-- Utente loggato: bottone filtri completo --}}
+        
         <button type="button" class="btn btn-outline-secondary position-relative" data-bs-toggle="modal" data-bs-target="#filterModal">
             <i class="fa-solid fa-sliders me-2"></i>Filtri Avanzati
             @if(count($activeFilters) > 0)
@@ -50,7 +48,7 @@
             @endif
         </button>
     @else
-        {{-- Ospite non loggato: bottone disabilitato con lucchetto --}}
+        
         <span
             data-bs-toggle="tooltip"
             data-bs-placement="bottom"
@@ -66,7 +64,7 @@
     @endauth
 
     <form action="{{ route('outings.index') }}" method="GET" id="filterForm">
-        <!-- Campi nascosti che ricevono i valori dal modal -->
+        
         <input type="hidden" name="route_type_filter" id="hRouteTypeFilter" value="{{ request('route_type_filter', 'all') }}">
         <input type="hidden" name="full_direction" id="hFullDirection" value="{{ request('full_direction', 'soverato-pizzo') }}">
         <input type="hidden" name="start_location" id="hStart" value="{{ request('start_location') }}">
@@ -85,14 +83,11 @@
     @endif
 </div>
 
-<!-- ============================================================
-     MODAL Filtri Avanzati
-============================================================ -->
 <div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
 
-            <!-- Header -->
+            
             <div class="modal-header border-bottom px-4 py-3">
                 <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="filterModalLabel">
                     <i class="fa-solid fa-sliders text-primary"></i> Filtri Avanzati
@@ -100,10 +95,10 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
             </div>
 
-            <!-- Body -->
+            
             <div class="modal-body px-4 py-3">
 
-                <!-- Banner errori client-side (nascosto di default) -->
+                
                 <div id="modalErrorBanner" class="d-none mb-3 rounded-3 p-3" style="background: #fff3cd; border-left: 4px solid #f59e0b;">
                     <div class="d-flex align-items-start gap-2">
                         <i class="fa-solid fa-triangle-exclamation mt-1" style="color: #d97706;"></i>
@@ -114,7 +109,7 @@
                     </div>
                 </div>
 
-                <!-- Tipo Percorso (Completo o Personalizzato) -->
+                
                 <div class="mb-4">
                     <p class="fw-bold mb-2 d-flex align-items-center gap-2">
                         <i class="fa-solid fa-route text-info"></i> Tipo di Percorso
@@ -126,7 +121,7 @@
                     </select>
                 </div>
 
-                <!-- Direzione Cammino Completo -->
+                
                 <div class="mb-4" id="sectionFullDirection" style="display: none;">
                     <p class="fw-bold mb-2 d-flex align-items-center gap-2">
                         <i class="fa-solid fa-arrow-right-arrow-left text-primary"></i> Direzione
@@ -137,9 +132,9 @@
                     </select>
                 </div>
 
-                <!-- Tappe Cammino Personalizzato -->
+                
                 <div id="sectionCustomRoute" style="display: none;">
-                    <!-- Partenza -->
+                    
                     <div class="mb-4">
                         <p class="fw-bold mb-2 d-flex align-items-center gap-2">
                             <i class="fa-solid fa-flag text-warning"></i> Partenza
@@ -155,7 +150,7 @@
 
                     <hr class="my-2">
 
-                    <!-- Arrivo -->
+                    
                     <div class="mb-4">
                         <p class="fw-bold mb-2 d-flex align-items-center gap-2">
                             <i class="fa-solid fa-location-dot text-danger"></i> Arrivo
@@ -172,7 +167,7 @@
 
                 <hr class="my-2">
 
-                <!-- Tipo Uscita -->
+                
                 <div class="mb-4">
                     <p class="fw-bold mb-2 d-flex align-items-center gap-2">
                         <i class="fa-solid fa-layer-group text-primary"></i> Tipo Uscita
@@ -186,7 +181,7 @@
 
                 <hr class="my-2">
 
-                <!-- Difficoltà -->
+                
                 <div class="mb-4">
                     <p class="fw-bold mb-2 d-flex align-items-center gap-2">
                         <i class="fa-solid fa-mountain-sun text-warning"></i> Difficoltà
@@ -201,7 +196,7 @@
 
                 <hr class="my-2">
 
-                <!-- Intervallo date -->
+                
                 <div class="mb-2">
                     <p class="fw-bold mb-2 d-flex align-items-center gap-2">
                         <i class="fa-solid fa-calendar-days text-success"></i> Periodo
@@ -220,7 +215,7 @@
 
                 <hr class="my-2">
 
-                <!-- Solo posti disponibili -->
+                
                 <div class="mb-2">
                     <div class="form-check form-switch d-flex align-items-center gap-2 py-2">
                         <input class="form-check-input" type="checkbox" role="switch"
@@ -233,9 +228,9 @@
                     <p class="text-muted small mb-0 ms-1">Mostra solo le uscite che non hanno ancora raggiunto il numero massimo di partecipanti.</p>
                 </div>
 
-            </div><!-- /modal-body -->
+            </div>
 
-            <!-- Footer -->
+            
             <div class="modal-footer border-top px-4 py-3 d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-secondary" id="btnResetModal">
                     Azzera Filtri
@@ -249,7 +244,6 @@
         </div>
     </div>
 </div>
-
 
 <div class="row row-cols-1 row-cols-md-3 g-4">
 
@@ -304,7 +298,7 @@
                             </p>
                         @endif
                     @else
-                        {{-- Ospite non registrato --}}
+                        
                         <div class="d-flex flex-column align-items-center justify-content-center py-3 text-center" style="min-height: 90px;">
                             <i class="fa-solid fa-lock text-muted mb-2" style="font-size: 1.4rem; opacity: 0.5;"></i>
                             <p class="text-muted small mb-2">Accedi/Registrati per vedere data, ritrovo e disponibilità.</p>
@@ -354,13 +348,13 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    // Auto-dismiss dei toast server-side dopo 5 secondi
+    
     document.querySelectorAll('.toast').forEach(function (toastEl) {
         const bsToast = new bootstrap.Toast(toastEl, { delay: 5000 });
         bsToast.show();
     });
 
-    // Elementi del modal
+    
     const mRouteTypeFilter = document.getElementById('mRouteTypeFilter');
     const sectionFullDirection = document.getElementById('sectionFullDirection');
     const mFullDirection = document.getElementById('mFullDirection');
@@ -373,7 +367,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const mDateTo   = document.getElementById('mDateTo');
     const mAvailableOnly = document.getElementById('mAvailableOnly');
 
-    // Campi hidden del form
+    
     const hRouteTypeFilter = document.getElementById('hRouteTypeFilter');
     const hFullDirection = document.getElementById('hFullDirection');
     const hStart    = document.getElementById('hStart');
@@ -406,7 +400,7 @@ document.addEventListener('DOMContentLoaded', function () {
     mRouteTypeFilter.addEventListener('change', toggleRouteSections);
     mStart.addEventListener('change', disableSelectedLocation);
     
-    // Inizializzazione
+    
     toggleRouteSections();
     disableSelectedLocation();
     const hType     = document.getElementById('hType');
@@ -415,16 +409,16 @@ document.addEventListener('DOMContentLoaded', function () {
     const hDateTo   = document.getElementById('hDateTo');
     const hAvailableOnly = document.getElementById('hAvailableOnly');
 
-    // Banner errori nel modal
+    
     const errorBanner = document.getElementById('modalErrorBanner');
     const errorList   = document.getElementById('modalErrorList');
 
     function showModalErrors(errors) {
         errorList.innerHTML = errors.map(e => `<li>${e}</li>`).join('');
         errorBanner.classList.remove('d-none');
-        // Shake animation
+        
         errorBanner.style.animation = 'none';
-        errorBanner.offsetHeight; // reflow
+        errorBanner.offsetHeight; 
         errorBanner.style.animation = 'filterShake 0.35s ease';
         errorBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
@@ -434,7 +428,7 @@ document.addEventListener('DOMContentLoaded', function () {
         errorList.innerHTML = '';
     }
 
-    // Nasconde il banner ogni volta che l'utente modifica un campo
+    
     [mRouteTypeFilter, mFullDirection, mStart, mEnd, mType, mDiff, mDateFrom, mDateTo, mAvailableOnly].forEach(el => {
         if (el) {
             el.addEventListener('input', hideModalErrors);
@@ -442,7 +436,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    // Funzione di validazione
+    
     function validate() {
         const startLoc   = mStart.value.trim();
         const endLoc     = mEnd.value.trim();
@@ -450,12 +444,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const dateToStr   = mDateTo.value;
         let errors = [];
 
-        // Controllo 1: partenza ed arrivo diversi
+        
         if (mRouteTypeFilter.value === 'custom' && startLoc && endLoc && startLoc.toLowerCase() === endLoc.toLowerCase()) {
             errors.push("La località di partenza e di arrivo devono essere diverse.");
         }
 
-        // Controllo 2: data d'inizio >= oggi
+        
         if (dateFromStr) {
             const dateFromObj = new Date(dateFromStr);
             const today = new Date();
@@ -465,7 +459,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // Controllo 3: data fine non precedente ad oggi
+        
         if (dateToStr) {
             const dateToObj = new Date(dateToStr);
             const today = new Date();
@@ -475,7 +469,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // Controllo 4: date da <= data a
+        
         if (dateFromStr && dateToStr && new Date(dateFromStr) > new Date(dateToStr)) {
             errors.push("La data di inizio non può essere successiva alla data di fine.");
         }
@@ -483,7 +477,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return errors;
     }
 
-    // "Applica Filtri": valida e, se ok, trasferisce i valori e fa submit
+    
     document.getElementById('btnApplyFilters').addEventListener('click', function () {
         const errors = validate();
         if (errors.length > 0) {
@@ -497,7 +491,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let finalEnd = mEnd.value.trim();
         let finalFullDirection = mFullDirection.value;
 
-        // Auto-switch a completo se custom route corrisponde a un cammino completo
+        
         if (finalRouteType === 'custom') {
             if (finalStart === 'Soverato' && finalEnd === 'Pizzo') {
                 finalRouteType = 'full';
@@ -520,7 +514,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('filterForm').submit();
     });
 
-    // "Azzera Filtri": svuota i campi del modal senza chiuderlo o ricaricare la pagina
+    
     document.getElementById('btnResetModal').addEventListener('click', function () {
         mRouteTypeFilter.value = 'all';
         mFullDirection.value = 'soverato-pizzo';
@@ -536,7 +530,7 @@ document.addEventListener('DOMContentLoaded', function () {
         hideModalErrors();
     });
 
-    // Nasconde errori alla chiusura del modal
+    
     document.getElementById('filterModal').addEventListener('hidden.bs.modal', hideModalErrors);
 });
 </script>

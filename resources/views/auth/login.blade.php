@@ -1,17 +1,17 @@
 <x-guest-layout>
 
-    {{-- Titolo --}}
+    
     <h2 class="auth-title">Bentornato!</h2>
     <p class="auth-subtitle">Accedi al tuo account CoastTrack per continuare.</p>
 
-    {{-- Session Status --}}
+    
     @if (session('status'))
         <div class="alert alert-success auth-alert" role="alert">
             <i class="fa-solid fa-circle-check me-2"></i>{{ session('status') }}
         </div>
     @endif
 
-    {{-- Errori generali --}}
+    
     @if ($errors->any() && !$errors->has('email') && !$errors->has('password'))
         <div class="alert alert-danger auth-alert" role="alert">
             <i class="fa-solid fa-triangle-exclamation me-2"></i>{{ $errors->first() }}
@@ -21,7 +21,7 @@
     <form method="POST" action="{{ route('login') }}">
         @csrf
 
-        {{-- Email --}}
+        
         <div class="mb-3">
             <label for="email" class="form-label auth-label">Email</label>
             <input
@@ -44,7 +44,7 @@
             @enderror
         </div>
 
-        {{-- Password --}}
+        
         <div class="mb-3">
             <label for="password" class="form-label auth-label">Password</label>
             <input
@@ -63,7 +63,7 @@
             @enderror
         </div>
 
-        {{-- Ricordami --}}
+        
         <div class="mb-4">
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" name="remember" id="remember_me">
@@ -73,14 +73,14 @@
             </div>
         </div>
 
-        {{-- Azioni --}}
+        
         <div class="d-grid mt-4">
             <button type="submit" class="btn btn-auth-primary w-100">
                 <i class="fa-solid fa-right-to-bracket me-2"></i>Accedi
             </button>
         </div>
 
-        {{-- Registrazione --}}
+        
         <hr class="auth-divider">
         <p class="text-center mb-0" style="font-size: 0.875rem; color: var(--bs-secondary-color);">
             Non hai un account?

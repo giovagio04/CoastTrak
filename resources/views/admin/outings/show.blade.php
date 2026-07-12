@@ -152,7 +152,6 @@
 </div>
 @endif
 
-<!-- Modale Rifiuto -->
 @if($outing->type == 'user' && $outing->status == 'pending')
 <div class="modal fade" id="rejectModal" tabindex="-1">
     <div class="modal-dialog">
@@ -180,7 +179,6 @@
 </div>
 @endif
 
-<!-- Modale Annullamento -->
 @if($outing->status == 'published')
 <div class="modal fade" id="cancelModal" tabindex="-1">
     <div class="modal-dialog">

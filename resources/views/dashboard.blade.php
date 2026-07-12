@@ -5,7 +5,6 @@
     <h2 class="fw-bold">Gestione Uscite</h2>
 </div>
 
-{{-- Toast server-side (successo / errore sessione) --}}
 @if(session('success') || session('error') || $errors->any())
 <div class="position-fixed top-0 end-0 p-3" style="z-index: 1100;">
     @if(session('success'))
@@ -45,15 +44,13 @@
 @endif
 
 <div class="row g-4">
-    <!-- Le Mie Partecipazioni -->
+    
     <div class="col-lg-8 col-md-7">
         <div class="card shadow-sm border-0">
             <div class="card-header bg-transparent pt-4 pb-3 border-bottom-0">
                 <h5 class="fw-bold mb-3"><i class="fa-solid fa-list-check text-primary"></i> Le mie uscite</h5>
 
-                {{-- ============================================================
-                     Barra filtri
-                ============================================================ --}}
+                
                 @php
                     $activeFilters = array_filter([
                         request('start_location'),
@@ -154,7 +151,7 @@
                                         <td>
                                             @if($req->outing->date >= now() && in_array($req->outing->status, ['published']))
                                                 @if($req->outing->organizer_id !== auth()->id())
-                                                    {{-- Mostro "Annulla" solo se la partecipazione non è già stata revocata (es. a seguito di un ban) --}}
+                                                    
                                                     @if(in_array($req->status, ['accepted', 'pending']))
                                                         <form action="{{ route('participations.destroy', $req->id) }}" method="POST" onsubmit="return confirm('Sicuro di voler annullare la tua partecipazione?');">
                                                             @csrf
@@ -162,7 +159,7 @@
                                                             <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-xmark"></i> Annulla</button>
                                                         </form>
                                                     @else
-                                                        {{-- Partecipazione già revocata (es. per ban): nessuna azione disponibile --}}
+                                                        
                                                         <span class="text-muted small">—</span>
                                                     @endif
                                                 @else
@@ -207,7 +204,7 @@
         </div>
     </div>
 
-    <!-- Gestione Organizzazione Uscite -->
+    
     <div class="col-lg-4 col-md-5">
         <div class="card shadow-sm border-0">
             <div class="card-body p-4">
@@ -223,7 +220,7 @@
 
                 <div class="mt-4">
                     @if(!auth()->user()->hasBirthDate())
-                        {{-- Data di nascita mancante --}}
+                        
                         <button class="btn btn-secondary w-100 py-2 fw-semibold shadow-sm" disabled style="cursor: not-allowed; opacity: 0.65;">
                             <i class="fa-solid fa-lock me-1"></i> Proponi un'uscita
                         </button>
@@ -238,7 +235,7 @@
                             </span>
                         </div>
                     @elseif(auth()->user()->date_of_birth->diffInYears(now()) < 18)
-                        {{-- Minorenne --}}
+                        
                         <button class="btn btn-secondary w-100 py-2 fw-semibold shadow-sm" disabled style="cursor: not-allowed; opacity: 0.65;">
                             <i class="fa-solid fa-lock me-1"></i> Proponi un'uscita
                         </button>
@@ -275,15 +272,11 @@
     </div>
 </div>
 
-
-{{-- ============================================================
-     MODAL Filtri Avanzati – Dashboard
-============================================================ --}}
 <div class="modal fade" id="dashFilterModal" tabindex="-1" aria-labelledby="dashFilterModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content border-0 shadow-lg" style="border-radius: 16px; overflow: hidden;">
 
-            <!-- Header -->
+            
             <div class="modal-header border-bottom px-4 py-3">
                 <h5 class="modal-title fw-bold d-flex align-items-center gap-2" id="dashFilterModalLabel">
                     <i class="fa-solid fa-sliders text-primary"></i> Filtri Avanzati
@@ -291,10 +284,10 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Chiudi"></button>
             </div>
 
-            <!-- Body -->
+            
             <div class="modal-body px-4 py-3">
 
-                <!-- Banner errori client-side -->
+                
                 <div id="dashModalErrorBanner" class="d-none mb-3 rounded-3 p-3" style="background: #fff3cd; border-left: 4px solid #f59e0b;">
                     <div class="d-flex align-items-start gap-2">
                         <i class="fa-solid fa-triangle-exclamation mt-1" style="color: #d97706;"></i>
@@ -305,7 +298,7 @@
                     </div>
                 </div>
 
-                <!-- Tipo Percorso (Completo o Personalizzato) -->
+                
                 <div class="mb-4">
                     <p class="fw-bold mb-2 d-flex align-items-center gap-2">
                         <i class="fa-solid fa-route text-info"></i> Tipo di Percorso
@@ -317,7 +310,7 @@
                     </select>
                 </div>
 
-                <!-- Direzione Cammino Completo -->
+                
                 <div class="mb-4" id="sectionFullDirection" style="display: none;">
                     <p class="fw-bold mb-2 d-flex align-items-center gap-2">
                         <i class="fa-solid fa-arrow-right-arrow-left text-primary"></i> Direzione
@@ -328,9 +321,9 @@
                     </select>
                 </div>
 
-                <!-- Tappe Cammino Personalizzato -->
+                
                 <div id="sectionCustomRoute" style="display: none;">
-                    <!-- Partenza -->
+                    
                     <div class="mb-4">
                         <p class="fw-bold mb-2 d-flex align-items-center gap-2">
                             <i class="fa-solid fa-flag text-warning"></i> Partenza
@@ -346,7 +339,7 @@
 
                     <hr class="my-2">
 
-                    <!-- Arrivo -->
+                    
                     <div class="mb-4">
                         <p class="fw-bold mb-2 d-flex align-items-center gap-2">
                             <i class="fa-solid fa-location-dot text-danger"></i> Arrivo
@@ -363,7 +356,7 @@
 
                 <hr class="my-2">
 
-                <!-- Tipo Uscita -->
+                
                 <div class="mb-4">
                     <p class="fw-bold mb-2 d-flex align-items-center gap-2">
                         <i class="fa-solid fa-layer-group text-primary"></i> Tipo Uscita
@@ -377,7 +370,7 @@
 
                 <hr class="my-2">
 
-                <!-- Difficoltà -->
+                
                 <div class="mb-4">
                     <p class="fw-bold mb-2 d-flex align-items-center gap-2">
                         <i class="fa-solid fa-mountain-sun text-warning"></i> Difficoltà
@@ -392,7 +385,7 @@
 
                 <hr class="my-2">
 
-                <!-- Stato Uscita -->
+                
                 <div class="mb-4">
                     <p class="fw-bold mb-2 d-flex align-items-center gap-2">
                         <i class="fa-solid fa-circle-half-stroke text-secondary"></i> Stato Uscita
@@ -409,7 +402,7 @@
 
                 <hr class="my-2">
 
-                <!-- Ruolo -->
+                
                 <div class="mb-4">
                     <p class="fw-bold mb-2 d-flex align-items-center gap-2">
                         <i class="fa-solid fa-user-tag text-info"></i> Il mio ruolo
@@ -423,7 +416,7 @@
 
                 <hr class="my-2">
 
-                <!-- Periodo -->
+                
                 <div class="mb-4">
                     <p class="fw-bold mb-2 d-flex align-items-center gap-2">
                         <i class="fa-solid fa-calendar-days text-success"></i> Periodo
@@ -442,7 +435,7 @@
 
                 <hr class="my-2">
 
-                <!-- Solo posti disponibili -->
+                
                 <div class="mb-2">
                     <div class="form-check form-switch d-flex align-items-center gap-2 py-2">
                         <input class="form-check-input" type="checkbox" role="switch"
@@ -455,9 +448,9 @@
                     <p class="text-muted small mb-0 ms-1">Mostra solo le uscite che non hanno ancora raggiunto il numero massimo di partecipanti.</p>
                 </div>
 
-            </div><!-- /modal-body -->
+            </div>
 
-            <!-- Footer -->
+            
             <div class="modal-footer border-top px-4 py-3 d-flex justify-content-between">
                 <button type="button" class="btn btn-outline-secondary" id="dashBtnReset">
                     Azzera Filtri
@@ -490,7 +483,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
 
-    // Elementi del modal
+    
     const mRouteTypeFilter = document.getElementById('mRouteTypeFilter');
     const sectionFullDirection = document.getElementById('sectionFullDirection');
     const mFullDirection = document.getElementById('mFullDirection');
@@ -505,7 +498,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const mDateTo       = document.getElementById('mDateTo');
     const mAvailableOnly = document.getElementById('mAvailableOnly');
 
-    // Campi hidden del form
+    
     const hRouteTypeFilter = document.getElementById('hRouteTypeFilter');
     const hFullDirection = document.getElementById('hFullDirection');
     const hStart         = document.getElementById('hStart');
@@ -538,7 +531,7 @@ document.addEventListener('DOMContentLoaded', function () {
     mRouteTypeFilter.addEventListener('change', toggleRouteSections);
     mStart.addEventListener('change', disableSelectedLocation);
     
-    // Inizializzazione
+    
     toggleRouteSections();
     disableSelectedLocation();
     const hType          = document.getElementById('hType');
@@ -549,7 +542,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const hDateTo        = document.getElementById('hDateTo');
     const hAvailableOnly = document.getElementById('hAvailableOnly');
 
-    // Banner errori
+    
     const errorBanner = document.getElementById('dashModalErrorBanner');
     const errorList   = document.getElementById('dashModalErrorList');
 
@@ -581,16 +574,16 @@ document.addEventListener('DOMContentLoaded', function () {
         const dateToStr   = mDateTo.value;
         let errors = [];
 
-        // Costruisce la data odierna (senza orario)
+        
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
-        // Controllo 1: partenza e arrivo diversi
+        
         if (mRouteTypeFilter.value === 'custom' && startLoc && endLoc && startLoc.toLowerCase() === endLoc.toLowerCase()) {
             errors.push('La località di partenza e quella di arrivo devono essere diverse.');
         }
 
-        // Controllo 2: lunghezza massima località
+        
         if (mRouteTypeFilter.value === 'custom') {
             if (startLoc.length > 100) {
                 errors.push('La località di partenza non può superare i 100 caratteri.');
@@ -600,7 +593,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // Controllo 3: Data Da – non precedente ad oggi
+        
         if (dateFromStr) {
             const dateFrom = new Date(dateFromStr);
             if (dateFrom < today) {
@@ -608,7 +601,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // Controllo 4: Data A – non precedente ad oggi
+        
         if (dateToStr) {
             const dateTo = new Date(dateToStr);
             if (dateTo < today) {
@@ -616,7 +609,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // Controllo 5: Data Da ≤ Data A
+        
         if (dateFromStr && dateToStr && new Date(dateFromStr) > new Date(dateToStr)) {
             errors.push('La data di inizio non può essere successiva alla data di fine.');
         }
@@ -624,7 +617,7 @@ document.addEventListener('DOMContentLoaded', function () {
         return errors;
     }
 
-    // Applica Filtri
+    
     document.getElementById('dashBtnApply').addEventListener('click', function () {
         const errors = validate();
         if (errors.length > 0) {
@@ -638,7 +631,7 @@ document.addEventListener('DOMContentLoaded', function () {
         let finalEnd = mEnd.value.trim();
         let finalFullDirection = mFullDirection.value;
 
-        // Auto-switch a completo se custom route corrisponde a un cammino completo
+        
         if (finalRouteType === 'custom') {
             if (finalStart === 'Soverato' && finalEnd === 'Pizzo') {
                 finalRouteType = 'full';
@@ -663,7 +656,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('dashFilterForm').submit();
     });
 
-    // Azzera Filtri
+    
     document.getElementById('dashBtnReset').addEventListener('click', function () {
         mRouteTypeFilter.value = 'all';
         mFullDirection.value = 'soverato-pizzo';
@@ -681,16 +674,16 @@ document.addEventListener('DOMContentLoaded', function () {
         hideModalErrors();
     });
 
-    // Nasconde errori alla chiusura del modal
+    
     document.getElementById('dashFilterModal').addEventListener('hidden.bs.modal', hideModalErrors);
 
-    // Auto-dismiss dei toast server-side dopo 5 secondi
+    
     document.querySelectorAll('.toast').forEach(function (toastEl) {
         const bsToast = new bootstrap.Toast(toastEl, { delay: 5000 });
         bsToast.show();
     });
 
-    // Se ci sono errori server-side sui filtri, riapri automaticamente il modal
+    
     @if($errors->any())
     const dashModal = new bootstrap.Modal(document.getElementById('dashFilterModal'));
     dashModal.show();

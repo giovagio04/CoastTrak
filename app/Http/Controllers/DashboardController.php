@@ -8,12 +8,12 @@ class DashboardController extends Controller
 {
     public function __invoke(Request $request)
     {
-        // Se l'utente è admin, lo rimando direttamente alla sua area
+        
         if (auth()->user()->role === 'admin') {
             return redirect()->route('admin.outings.index');
         }
 
-        // Validazione dei filtri
+        
         $request->validate([
             'route_type_filter' => 'nullable|in:all,full,custom',
             'full_direction'  => 'nullable|string',
@@ -53,27 +53,27 @@ class DashboardController extends Controller
             ->with(['outing.organizer'])
             ->whereHas('outing');
 
-        // Filtro Tipo
+        
         if ($request->filled('type') && $request->type !== 'all') {
             $query->whereHas('outing', fn($q) => $q->where('type', $request->type));
         }
 
-        // Filtro Difficoltà
+        
         if ($request->filled('difficulty') && $request->difficulty !== 'all') {
             $query->whereHas('outing', fn($q) => $q->where('difficulty', $request->difficulty));
         }
 
-        // Filtro Stato uscita
+        
         if ($request->filled('status') && $request->status !== 'all') {
             $query->whereHas('outing', fn($q) => $q->where('status', $request->status));
         }
 
-        // Filtro Data Da
+        
         if ($request->filled('date_from')) {
             $query->whereHas('outing', fn($q) => $q->whereDate('date', '>=', $request->date_from));
         }
 
-        // Filtro Data A
+        
         if ($request->filled('date_to')) {
             $query->whereHas('outing', fn($q) => $q->whereDate('date', '<=', $request->date_to));
         }
@@ -100,7 +100,7 @@ class DashboardController extends Controller
                 $query->whereHas('outing', fn($q) => $q->where('end_location', $request->end_location));
             }
         } else {
-            // Retrocompatibilità
+            
             if ($request->filled('start_location')) {
                 $start = $request->start_location;
                 $query->whereHas('outing', function ($q) use ($start) {
@@ -126,7 +126,7 @@ class DashboardController extends Controller
             }
         }
 
-        // Filtro Solo posti disponibili
+        
         if ($request->boolean('available_only')) {
             $query->whereHas('outing', function ($q) {
                 $q->whereRaw('(
@@ -136,7 +136,7 @@ class DashboardController extends Controller
             });
         }
 
-        // Filtro Ruolo (organizzatore / partecipante)
+        
         if ($request->filled('role') && $request->role !== 'all') {
             if ($request->role === 'organizer') {
                 $query->whereHas('outing', fn($q) => $q->where('organizer_id', $userId));
@@ -145,7 +145,7 @@ class DashboardController extends Controller
             }
         }
 
-        // Ordino per stato e data usando un join per poter ordinare lato DB e usare la paginazione
+        
         $participations = $query->join('outings', 'participation_requests.outing_id', '=', 'outings.id')
             ->orderByRaw("
                 CASE outings.status
@@ -158,7 +158,7 @@ class DashboardController extends Controller
                 END
             ")
             ->orderBy('outings.date', 'desc')
-            ->select('participation_requests.*') // select solo le colonne originali per evitare conflitti
+            ->select('participation_requests.*') 
             ->paginate(10)
             ->withQueryString();
 

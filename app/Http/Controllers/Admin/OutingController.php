@@ -16,7 +16,7 @@ class OutingController extends Controller
 
         $outing->update(['status' => 'published']);
 
-        // Iscrivo automaticamente l'organizzatore all'uscita appena approvata
+        
         if ($outing->organizer_id) {
             \App\Models\ParticipationRequest::updateOrCreate(
                 [
@@ -28,7 +28,7 @@ class OutingController extends Controller
                 ]
             );
 
-            // Notifico l'organizzatore dell'approvazione
+            
             $outing->organizer->notify(new \App\Notifications\SimpleNotification(
                 'Proposta di cammino approvata',
                 "La tua proposta per il cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} è stata approvata dall'amministratore.",
@@ -44,7 +44,7 @@ class OutingController extends Controller
             return back()->with('error', 'Questa uscita non può essere rifiutata.');
         }
 
-        // Valido la lunghezza della motivazione
+        
         $request->validate(['reason' => 'nullable|string|max:2000']);
 
         $reason = $request->input('reason');
@@ -75,7 +75,7 @@ class OutingController extends Controller
             return back()->with('error', 'Questa uscita è già annullata.');
         }
 
-        // Valido la lunghezza della motivazione
+        
         $request->validate(['reason' => 'nullable|string|max:2000']);
 
         $reason = $request->input('reason');
@@ -89,7 +89,7 @@ class OutingController extends Controller
             'notes' => $notes
         ]);
 
-        // Notifico tutti gli iscritti accettati dell'annullamento
+        
         $participants = $outing->participationRequests()->where('status', 'accepted')->with('user')->get();
         foreach ($participants as $participant) {
             if ($participant->user) {
@@ -104,10 +104,9 @@ class OutingController extends Controller
         return back()->with('success', 'Uscita annullata con successo.');
     }
 
-
     public function index(Request $request)
     {
-        // Valido i filtri prima di usarli nella query
+        
         $request->validate([
             'type'   => 'nullable|in:official,user',
             'status' => 'nullable|in:pending,published,concluded,cancelled,rejected',
@@ -115,12 +114,12 @@ class OutingController extends Controller
 
         $query = Outing::with(['participationRequests']);
 
-        // Filtro per Tipo
+        
         if ($request->filled('type')) {
             $query->where('type', $request->type);
         }
 
-        // Filtro per Stato
+        
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
@@ -167,7 +166,7 @@ class OutingController extends Controller
                 $validated['end_location'] = 'Soverato';
             }
         } else {
-            // Se seleziona personalizzato ma mette estremi completi, consideralo completo
+            
             if (
                 ($validated['start_location'] === 'Soverato' && $validated['end_location'] === 'Pizzo') ||
                 ($validated['start_location'] === 'Pizzo' && $validated['end_location'] === 'Soverato')
@@ -181,7 +180,7 @@ class OutingController extends Controller
         unset($validated['full_direction']);
 
         $validated['type'] = 'official';
-        $validated['status'] = 'published'; // Le uscite ufficiali sono pubblicate direttamente
+        $validated['status'] = 'published'; 
 
         Outing::create($validated);
 
@@ -210,7 +209,7 @@ class OutingController extends Controller
             'status'          => 'required|in:pending,published,concluded,cancelled,rejected',
         ]);
 
-        // Blocco la transizione di stato per uscite già concluse
+        
         if ($outing->status === 'concluded' && $validated['status'] !== 'concluded') {
             return back()->withErrors(['status' => 'Non puoi modificare lo stato di un\'uscita già conclusa.']);
         }
@@ -244,7 +243,7 @@ class OutingController extends Controller
 
     public function destroy(Outing $outing)
     {
-        // Prima di eliminare, notifico tutti i partecipanti iscritti
+        
         $participants = $outing->participationRequests()->where('status', 'accepted')->with('user')->get();
         foreach ($participants as $participant) {
             if ($participant->user) {

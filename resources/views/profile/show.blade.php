@@ -18,11 +18,11 @@
 @endif
 
 <div class="row g-4">
-    <!-- Riquadro Sinistro: Informazioni Profilo (col-md-8) -->
+    
     <div class="col-md-8">
         <div class="card shadow-sm border-0 h-100 position-relative">
             @if($user->id === auth()->id())
-            <!-- Pennino e Ingranaggio in alto a sinistra -->
+            
             <div class="position-absolute top-0 start-0 m-3 d-flex gap-2">
                 <a href="#" class="text-muted hover-primary" data-bs-toggle="modal" data-bs-target="#editProfileModal" title="Modifica Profilo" style="transition: color 0.2s;">
                     <i class="fa-solid fa-pen-to-square fa-lg text-primary"></i>
@@ -35,7 +35,7 @@
             
             <div class="card-body p-4">
                 <div class="row align-items-center mb-4 mt-3">
-                    <!-- Immagine Profilo -->
+                    
                     <div class="col-md-4 text-center border-end">
                         @if($user->profile_photo_path)
                             <img src="{{ asset('storage/' . $user->profile_photo_path) }}" alt="Profile Photo" class="rounded-circle img-thumbnail mb-3" style="width: 150px; height: 150px; object-fit: cover;">
@@ -46,7 +46,7 @@
                         @endif
                     </div>
                     
-                    <!-- Dati Utente -->
+                    
                     <div class="col-md-8 ps-md-4">
                         <div class="mb-3">
                             <span class="text-muted small fw-bold text-uppercase">Nome e Cognome</span>
@@ -66,7 +66,7 @@
                     </div>
                 </div>
 
-                <!-- Descrizione (Bio) -->
+                
                 <div class="mb-2 border-top pt-3">
                     <span class="text-muted small fw-bold text-uppercase">Descrizione (Bio)</span>
                     <p class="text-body mt-2 text-justify" style="white-space: pre-wrap;">{{ $user->bio ?: 'Nessuna descrizione inserita.' }}</p>
@@ -75,7 +75,7 @@
         </div>
     </div>
 
-    <!-- Riquadro Destro: Credenziale Digitale (col-md-4) -->
+    
     <div class="col-md-4">
         <div class="card shadow-sm border-0 h-100">
             <div class="card-body text-center p-4">
@@ -101,7 +101,7 @@
 </div>
 
 @if($user->id === auth()->id())
-<!-- Modal di Modifica Profilo -->
+
 <div class="modal fade" id="editProfileModal" tabindex="-1" aria-labelledby="editProfileModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content border-0 shadow">
@@ -117,7 +117,7 @@
                 
                 <div class="modal-body p-4">
                     <div class="row g-4">
-                        <!-- Immagine Profilo -->
+                        
                         <div class="col-md-4 text-center border-end">
                             <div class="position-relative d-inline-block mb-3" id="profile_photo_container">
                                 <img src="{{ $user->profile_photo_path ? asset('storage/' . $user->profile_photo_path) : '' }}" 

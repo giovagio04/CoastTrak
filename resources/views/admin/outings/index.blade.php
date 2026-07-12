@@ -19,7 +19,7 @@
         </div>
     </div>
 
-    <!-- Modal Filtri -->
+    
     <div class="modal fade" id="filterModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -126,7 +126,7 @@
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     document.getElementById('btnResetAdminFilters').addEventListener('click', function () {
-        // Svuota i select del modal senza navigare via
+        
         var modalEl = document.getElementById('filterModal');
         modalEl.querySelector('[name="type"]').value   = '';
         modalEl.querySelector('[name="status"]').value = '';

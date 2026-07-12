@@ -6,11 +6,11 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'CoastTrack') }}</title>
 
-    <!-- Bootstrap 5 CSS -->
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome -->
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
+    
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
 
     <script>
@@ -28,7 +28,7 @@
             flex-direction: column;
         }
 
-        /* Dark mode variables */
+        
         html[data-bs-theme="dark"] {
             --bs-body-bg: #121416;
             --bs-body-color: #e9ecef;
@@ -39,7 +39,7 @@
             --bs-border-color-translucent: rgba(255, 255, 255, 0.08);
         }
 
-        /* Sfondo con pattern o gradiente */
+        
         .auth-wrapper {
             min-height: 100vh;
             display: flex;
@@ -51,7 +51,7 @@
             overflow: hidden;
         }
 
-        /* Decorazioni di sfondo */
+        
         .auth-wrapper::before {
             content: '';
             position: absolute;
@@ -83,7 +83,7 @@
             z-index: 1;
         }
 
-        /* Intestazione brand */
+        
         .auth-brand {
             text-align: center;
             margin-bottom: 28px;
@@ -109,7 +109,7 @@
             font-size: 1.8rem;
         }
 
-        /* Card principale */
+        
         .auth-box {
             background-color: var(--bs-body-bg);
             border-radius: 20px;
@@ -124,7 +124,7 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        /* Titolo form */
+        
         .auth-title {
             font-size: 1.5rem;
             font-weight: 800;
@@ -138,7 +138,7 @@
             margin-bottom: 28px;
         }
 
-        /* Campi input */
+        
         .auth-label {
             font-weight: 600;
             font-size: 0.875rem;
@@ -178,7 +178,7 @@
             box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.10);
         }
 
-        /* Bottone primario */
+        
         .btn-auth-primary {
             background-color: #ff6b35;
             color: white;
@@ -204,7 +204,7 @@
             transform: translateY(0);
         }
 
-        /* Link secondari */
+        
         .auth-link {
             color: #ff6b35;
             font-weight: 600;
@@ -229,13 +229,13 @@
             text-decoration: underline;
         }
 
-        /* Divisore */
+        
         .auth-divider {
             border-color: var(--bs-border-color-translucent);
             margin: 24px 0;
         }
 
-        /* Checkbox personalizzata */
+        
         .form-check-input:checked {
             background-color: #2e8b57;
             border-color: #2e8b57;
@@ -251,7 +251,7 @@
             color: var(--bs-secondary-color);
         }
 
-        /* Bottone toggle tema */
+        
         .theme-toggle {
             position: fixed;
             top: 20px;
@@ -275,7 +275,7 @@
             color: var(--bs-body-color);
         }
 
-        /* Alert errori sessione */
+        
         .auth-alert {
             border-radius: 12px;
             font-size: 0.875rem;
@@ -291,7 +291,6 @@
 </head>
 <body>
 
-<!-- Toggle Tema -->
 <button class="theme-toggle" id="themeToggle" title="Cambia tema">
     <i id="themeIcon" class="fa-solid fa-moon"></i>
 </button>
@@ -299,7 +298,7 @@
 <div class="auth-wrapper">
     <div class="auth-card">
 
-        <!-- Brand -->
+        
         <div class="auth-brand">
             <a href="{{ url('/') }}">
                 <i class="fa-solid fa-person-hiking brand-icon"></i>
@@ -307,7 +306,7 @@
             </a>
         </div>
 
-        <!-- Contenuto Form -->
+        
         <div class="auth-box">
             {{ $slot }}
         </div>
@@ -315,7 +314,6 @@
     </div>
 </div>
 
-<!-- Bootstrap 5 JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>

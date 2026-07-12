@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoastTrack - Cammino Kalabria Coast to Coast</title>
-    <!-- Bootstrap 5 CSS -->
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome -->
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
+    
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script>
         (function () {
@@ -66,7 +66,7 @@
             transition: background-color 0.3s ease, color 0.3s ease;
         }
         
-        /* Navbar styling */
+        
         .navbar {
             background-color: var(--navbar-bg) !important;
             backdrop-filter: blur(10px);
@@ -92,7 +92,7 @@
             opacity: 1;
         }
 
-        /* Hero Section */
+        
         .hero {
             position: relative;
             height: 100vh;
@@ -149,7 +149,7 @@
             margin-bottom: 40px;
         }
         
-        /* Buttons */
+        
         .btn-custom {
             padding: 15px 40px;
             border-radius: 50px;
@@ -183,7 +183,7 @@
             transform: translateY(-3px);
         }
 
-        /* Feature Section */
+        
         .feature-section {
             padding: 120px 0;
             background-color: var(--bg-color);
@@ -215,7 +215,7 @@
         .feature-icon.icon-2 { color: var(--icon-2); }
         .feature-icon.icon-3 { color: var(--icon-3); }
         
-        /* Split Section */
+        
         .split-section {
             display: flex;
             align-items: stretch;
@@ -250,7 +250,7 @@
             transition: color 0.3s ease;
         }
         
-        /* Animations */
+        
         .fade-up {
             animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             opacity: 0;
@@ -267,7 +267,7 @@
             }
         }
 
-        /* Mobile tweaks */
+        
         @media (max-width: 768px) {
             .hero-title { font-size: 3rem; }
             .split-content { padding: 50px 30px; }

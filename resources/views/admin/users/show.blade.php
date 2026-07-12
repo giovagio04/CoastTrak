@@ -25,9 +25,9 @@
 @endif
 
 <div class="row g-4">
-    <!-- Colonna Sinistra: Info Profilo & Statistiche -->
+    
     <div class="col-lg-4">
-        <!-- Scheda Profilo -->
+        
         <div class="card shadow-sm border-0 mb-4 text-center p-4">
             <div class="card-body">
                 @if($user->profile_photo_path)
@@ -85,7 +85,7 @@
 
                 <hr class="my-3">
 
-                <!-- Statistiche Credenziali integrate -->
+                
                 <div class="bg-body-secondary rounded p-3 text-center mb-2">
                     <div class="text-warning mb-2">
                         <i class="fa-solid fa-medal fa-lg"></i> <strong class="text-body small">Credenziali Conseguite</strong>
@@ -128,9 +128,9 @@
         </div>
     </div>
 
-    <!-- Colonna Destra: Liste Dettagliate -->
+    
     <div class="col-lg-8">
-        <!-- Tabs Navigazione -->
+        
         <ul class="nav nav-pills mb-3 p-2 rounded shadow-sm gap-2" id="userTab" role="tablist" style="background-color: var(--bs-card-bg, #fff);">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active border-0" id="credentials-tab" data-bs-toggle="tab" data-bs-target="#credentials" type="button" role="tab">
@@ -149,9 +149,9 @@
             </li>
         </ul>
 
-        <!-- Contenuto Tabs -->
+        
         <div class="tab-content" id="userTabContent">
-            <!-- Tab Credenziali -->
+            
             <div class="tab-pane fade show active" id="credentials" role="tabpanel">
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
@@ -260,7 +260,7 @@
                 </div>
             </div>
 
-            <!-- Tab Iscrizioni (Richieste di Partecipazione) -->
+            
             <div class="tab-pane fade" id="participations" role="tabpanel">
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
@@ -312,7 +312,6 @@
     </div>
 </div>
 
-<!-- Modale Ban -->
 @if(!$user->is_banned && $user->role !== 'admin')
 <div class="modal fade" id="banModal" tabindex="-1" aria-labelledby="banModalLabel" aria-hidden="true">
     <div class="modal-dialog">

@@ -23,7 +23,7 @@ class ProfileUpdateRequest extends FormRequest
             ],
             'date_of_birth' => ['nullable', 'date', 'before_or_equal:' . now()->subYears(18)->format('Y-m-d'), 'after_or_equal:' . now()->subYears(100)->format('Y-m-d')],
             'bio' => ['nullable', 'string', 'max:1000'],
-            'profile_photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp', 'max:2048'], // validazione estensione e dimensione massima (2MB)
+            'profile_photo' => ['nullable', 'image', 'mimes:jpg,jpeg,png,gif,webp', 'max:2048'], 
             'remove_profile_photo' => ['nullable', 'boolean'],
         ];
     }

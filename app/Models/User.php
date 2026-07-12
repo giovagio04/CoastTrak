@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -10,14 +9,10 @@ use Illuminate\Notifications\Notifiable;
 
 class User extends Authenticatable
 {
-    /** @use HasFactory<UserFactory> */
+    
     use HasFactory, Notifiable;
 
-    /**
-     * 'role', 'is_banned' e 'ban_reason' sono esclusi intenzionalmente dal mass-assignment:
-     * vengono impostati solo tramite assegnazione diretta nei controller admin,
-     * così nessuno può fare privilege escalation via POST.
-     */
+    
     protected $fillable = [
         'name',
         'email',
@@ -36,9 +31,7 @@ class User extends Authenticatable
         ];
     }
 
-    /**
-     * Verifica se l'utente ha inserito la data di nascita.
-     */
+    
     public function hasBirthDate(): bool
     {
         return !is_null($this->date_of_birth);

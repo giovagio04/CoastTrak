@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CoastTrack - Cammino Kalabria Coast to Coast</title>
-    <!-- Bootstrap 5 CSS -->
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- FontAwesome -->
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
+    
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
     <script>
         (function () {
@@ -20,7 +20,7 @@
         body {
             font-family: 'Outfit', sans-serif;
             background-color: var(--bs-body-bg);
-            /* Aggiungiamo un padding-top per evitare che la navbar fissa copra il contenuto nelle pagine interne */
+            
             padding-top: 90px; 
         }
         
@@ -28,7 +28,7 @@
             background-color: #f8f9fa;
         }
         
-        /* Navbar styling coerente con la Home */
+        
         .navbar {
             background-color: var(--bs-body-bg) !important;
             backdrop-filter: blur(10px);
@@ -70,7 +70,7 @@
             color: #ff6b35 !important;
         }
 
-        /* Stili bottoni presi dalla Home */
+        
         .btn-custom {
             padding: 10px 25px;
             border-radius: 50px;
@@ -101,7 +101,7 @@
             transform: translateY(-2px);
         }
 
-        /* Cards coerenti */
+        
         .card {
             border: none;
             border-radius: 15px;
@@ -112,7 +112,7 @@
             border-radius: 15px 15px 0 0 !important;
         }
 
-        /* Dark mode overrides for cards and sections */
+        
         html[data-bs-theme="dark"] {
             --bs-body-bg: #121416;
             --bs-body-color: #e9ecef;
@@ -156,7 +156,7 @@
             --bs-table-border-color: rgba(255, 255, 255, 0.1);
         }
 
-        /* Footer coerente con la Home */
+        
         .footer {
             background-color: var(--bs-secondary-bg);
             color: var(--bs-body-color);
@@ -171,7 +171,7 @@
             transition: color 0.3s ease;
         }
 
-        /* Stili per il dropdown delle notifiche */
+        
         .notification-dropdown {
             width: 340px;
             border-radius: 16px !important;
@@ -408,7 +408,6 @@
     </div>
 </footer>
 
-<!-- Bootstrap 5 JS Bundle with Popper -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 @auth
@@ -418,7 +417,7 @@
             const list = document.getElementById('notificationList');
             const markAllBtn = document.getElementById('markAllReadBtn');
 
-            // Funzione per caricare le notifiche
+            
             function loadNotifications() {
                 fetch('{{ route("notifications.index") }}', {
                     headers: {
@@ -428,7 +427,7 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    // Aggiorna Badge
+                    
                     const badgeHeader = document.getElementById('notificationBadgeHeader');
                     if (data.unread_count > 0) {
                         badge.textContent = data.unread_count;
@@ -444,7 +443,7 @@
                         }
                     }
 
-                    // Svuota lista
+                    
                     list.innerHTML = '';
 
                     if (data.notifications.length === 0) {
@@ -479,7 +478,7 @@
                             <small class="text-muted" style="font-size: 0.7rem;">${n.created_at}</small>
                         `;
 
-                        // Gestione eliminazione singola
+                        
                         const deleteBtn = item.querySelector('.delete-notification-btn');
                         if (deleteBtn) {
                             deleteBtn.addEventListener('click', function (e) {
@@ -490,7 +489,7 @@
                             });
                         }
 
-                        // Interazioni click
+                        
                         const hasAction = !!n.action_url;
                         const isClickable = hasAction;
 
@@ -538,7 +537,7 @@
                 });
             }
 
-            // Segna come letta
+            
             function markAsRead(id) {
                 fetch(`/notifications/${id}/read`, {
                     method: 'POST',
@@ -556,7 +555,7 @@
                 });
             }
 
-            // Cancella singola notifica
+            
             function deleteNotification(id) {
                 fetch(`/notifications/${id}`, {
                     method: 'DELETE',
@@ -574,7 +573,7 @@
                 });
             }
 
-            // Segna tutte come lette
+            
             if (markAllBtn) {
                 markAllBtn.addEventListener('click', function (e) {
                     e.preventDefault();
@@ -596,7 +595,7 @@
                 });
             }
 
-            // Cancella tutte le notifiche
+            
             const deleteAllBtn = document.getElementById('deleteAllNotificationsBtn');
             if (deleteAllBtn) {
                 deleteAllBtn.addEventListener('click', function (e) {
@@ -621,10 +620,10 @@
                 });
             }
 
-            // Esegui
+            
             loadNotifications();
 
-            // Aggiorna ogni 60 secondi
+            
             setInterval(loadNotifications, 60000);
         });
     </script>

@@ -10,7 +10,7 @@ class UserOutingController extends Controller
 {
     public function create()
     {
-        // Verifica data di nascita e maggiore età
+        
         if (!auth()->user()->hasBirthDate()) {
             return redirect()->route('profile.show')
                 ->with('error', 'Devi inserire la tua data di nascita nel profilo prima di poter proporre un cammino.');
@@ -31,7 +31,7 @@ class UserOutingController extends Controller
 
     public function store(Request $request)
     {
-        // Verifica data di nascita e maggiore età
+        
         if (!auth()->user()->hasBirthDate()) {
             return redirect()->route('profile.show')
                 ->with('error', 'Devi inserire la tua data di nascita nel profilo prima di poter proporre un cammino.');
@@ -54,7 +54,7 @@ class UserOutingController extends Controller
             'meeting_point'   => 'required|string|max:255',
             'max_participants' => 'required|integer|min:2|max:15',
             'difficulty'      => 'required|in:facile,medio,difficile',
-            'notes'           => 'nullable|string|max:5000', // max 5000 caratteri per non intasare il DB
+            'notes'           => 'nullable|string|max:5000', 
         ]);
 
         if ($validated['route_type'] === 'standard') {
@@ -82,19 +82,19 @@ class UserOutingController extends Controller
         $validated['type'] = 'user';
         $validated['organizer_id'] = auth()->id();
         $validated['status'] = 'pending';
-        // Do 24 ore all'admin per valutare la proposta
+        
         $validated['approval_deadline'] = Carbon::now()->addHours(24);
 
         $outing = Outing::create($validated);
 
-        // Iscrivo automaticamente l'organizzatore all'uscita per renderla visibile nella sua dashboard (gestione uscite)
+        
         \App\Models\ParticipationRequest::create([
             'user_id' => auth()->id(),
             'outing_id' => $outing->id,
-            'status' => 'accepted', // L'organizzatore è implicitamente accettato, è l'uscita a essere 'pending'
+            'status' => 'accepted', 
         ]);
 
-        // Notifico tutti gli admin della nuova proposta
+        
         $admins = \App\Models\User::where('role', 'admin')->get();
         foreach ($admins as $admin) {
             $admin->notify(new \App\Notifications\SimpleNotification(
@@ -183,7 +183,7 @@ class UserOutingController extends Controller
             return back()->with('error', 'Questa uscita è già stata annullata.');
         }
 
-        // Valido la motivazione per non accettare testi troppo lunghi
+        
         $request->validate(['reason' => 'nullable|string|max:2000']);
 
         $reason = $request->input('reason');
@@ -197,7 +197,7 @@ class UserOutingController extends Controller
             'notes' => $notes
         ]);
 
-        // Avviso tutti i partecipanti confermati che l'uscita non si farà
+        
         $participants = $outing->participationRequests()
             ->where('status', 'accepted')
             ->where('user_id', '!=', $outing->organizer_id)
@@ -214,7 +214,7 @@ class UserOutingController extends Controller
             }
         }
 
-        // Informo gli admin che l'uscita è saltata
+        
         $admins = \App\Models\User::where('role', 'admin')->get();
         foreach ($admins as $admin) {
             $admin->notify(new \App\Notifications\SimpleNotification(

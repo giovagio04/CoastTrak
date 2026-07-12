@@ -27,16 +27,16 @@ class OutingController extends Controller
             'date_to.after_or_equal'      => 'La data di fine deve essere successiva o uguale alla data di inizio.',
         ]);
 
-        // Mostro solo le uscite pubblicate
+        
         $query = Outing::whereIn('status', ['published'])
             ->with(['organizer'])
             ->withCount(['participationRequests as accepted_count' => function ($q) {
                 $q->where('status', 'accepted');
             }]);
 
-        // Applica i filtri SOLO se l'utente è autenticato.
-        // Questo previene la "Data Inference" da parte di utenti guest
-        // che potrebbero manipolare i parametri dell'URL.
+        
+        
+        
         if (auth()->check()) {
             if ($request->filled('type') && $request->type !== 'all') {
                 $query->where('type', $request->type);
@@ -74,7 +74,7 @@ class OutingController extends Controller
                     $query->where('end_location', $request->end_location);
                 }
             } else {
-                // Retrocompatibilità
+                
                 if ($request->filled('start_location')) {
                     $start = $request->start_location;
                     $query->where(function ($q) use ($start) {
@@ -111,18 +111,18 @@ class OutingController extends Controller
 
         $outings = $query->orderBy('date', 'asc')->get();
 
-        // IDs delle uscite a cui l'utente loggato è iscritto (o è organizzatore/admin):
-        // serve nella view per decidere quale livello di dettaglio mostrare per ogni card.
+        
+        
         $enrolledOutingIds = collect();
         if (auth()->check()) {
             if (auth()->user()->role === 'admin') {
-                // L'admin vede tutto: usiamo tutti gli ID delle uscite caricate
+                
                 $enrolledOutingIds = $outings->pluck('id');
             } else {
                 $enrolledOutingIds = \App\Models\ParticipationRequest::where('user_id', auth()->id())
                     ->where('status', 'accepted')
                     ->pluck('outing_id');
-                // Aggiungo le uscite di cui è organizzatore
+                
                 $organizerIds = $outings->where('organizer_id', auth()->id())->pluck('id');
                 $enrolledOutingIds = $enrolledOutingIds->merge($organizerIds)->unique();
             }
@@ -134,7 +134,7 @@ class OutingController extends Controller
 
     public function show(Outing $outing)
     {
-        // Se l'uscita non è pubblica, solo admin o organizzatore possono vederla
+        
         if (!in_array($outing->status, ['published', 'concluded'])) {
             if (!auth()->check() || (auth()->user()->role !== 'admin' && $outing->organizer_id !== auth()->id())) {
                 abort(403, 'Accesso negato: l\'uscita non è ancora visibile al pubblico.');

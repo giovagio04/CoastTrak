@@ -18,8 +18,8 @@ class NotificationController extends Controller
                 $title = $notification->data['title'] ?? 'Notifica';
                 $actionUrl = $notification->data['action_url'] ?? null;
 
-                // Alcune notifiche non devono essere cliccabili (es. proposte approvate/rifiutate):
-                // in questi casi azzero l'action_url anche se fosse presente nel DB
+                
+                
                 $titleLower = strtolower($title);
                 if (
                     str_contains($titleLower, 'proposta di cammino approvata') ||

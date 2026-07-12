@@ -105,14 +105,14 @@ class UserController extends Controller
             'reason' => 'nullable|string|max:1000',
         ]);
 
-        // Uso l'assegnazione diretta invece di update() perché is_banned e ban_reason
-        // sono fuori dal $fillable per prevenire mass-assignment.
-        // Con update() verrebbero ignorati silenziosamente.
+        
+        
+        
         $user->is_banned  = true;
         $user->ban_reason = $request->reason;
         $user->save();
 
-        // Rimuovo l'utente da tutte le uscite future non ancora concluse
+        
         ParticipationRequest::where('user_id', $user->id)
             ->whereIn('status', ['accepted', 'pending'])
             ->whereHas('outing', function ($q) {
@@ -121,7 +121,7 @@ class UserController extends Controller
             })
             ->update(['status' => 'rejected']);
 
-        // Annullo anche le uscite che ha organizzato e non si sono ancora tenute
+        
         Outing::where('organizer_id', $user->id)
             ->whereIn('status', ['pending', 'published'])
             ->where('date', '>=', now()->toDateString())
@@ -132,7 +132,7 @@ class UserController extends Controller
 
     public function unban(User $user)
     {
-        // Stessa logica del ban: assegnazione diretta per aggirare $fillable
+        
         $user->is_banned  = false;
         $user->ban_reason = null;
         $user->save();

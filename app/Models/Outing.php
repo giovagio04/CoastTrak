@@ -29,20 +29,19 @@ class Outing extends Model
         'approval_deadline' => 'datetime'
     ];
 
-    // Ho rimosso i metodi startStage() e endStage() perché non servono più
+    
 
     public function organizer()
     {
         return $this->belongsTo(User::class, 'organizer_id');
     }
 
-
     public function participationRequests()
     {
         return $this->hasMany(ParticipationRequest::class);
     }
 
-    // Scope di query per filtrare per stato
+    
     public function scopePublished($query)
     {
         return $query->where('status', 'published');

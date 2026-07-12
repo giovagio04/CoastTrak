@@ -70,7 +70,7 @@
                 @endphp
 
                 @if($hasFullAccess)
-                {{-- LIVELLO 1: Iscritto / Organizzatore / Admin — vede tutti i dettagli --}}
+                
                 <div class="row g-4">
                     <div class="col-md-6">
                         <h5 class="fw-bold text-muted mb-3">Dettagli Logistici</h5>
@@ -186,7 +186,7 @@
                     @elseif($userRequest)
                         @if($userRequest->status == 'pending')
                             <div class="alert alert-info mb-3">Richiesta inviata. In attesa di approvazione.</div>
-                            {{-- Bottone annulla iscrizione per uscite future ancora pubblicabili --}}
+                            
                             @if($outing->date >= now() && $outing->status === 'published')
                                 <form action="{{ route('participations.destroy', $userRequest->id) }}" method="POST"
                                       onsubmit="return confirm('Sicuro di voler ritirare la tua richiesta di partecipazione?');">
@@ -199,7 +199,7 @@
                             @endif
                         @elseif($userRequest->status == 'accepted')
                             <div class="alert alert-success mb-3">Sei iscritto a questa uscita! <i class="fa-solid fa-check"></i></div>
-                            {{-- Bottone annulla iscrizione per uscite future ancora pubblicabili --}}
+                            
                             @if($outing->date >= now() && $outing->status === 'published')
                                 <form action="{{ route('participations.destroy', $userRequest->id) }}" method="POST"
                                       onsubmit="return confirm('Sicuro di voler annullare la tua partecipazione?');">
@@ -211,9 +211,9 @@
                                 </form>
                             @endif
                         @elseif($userRequest->status == 'rejected')
-                            {{-- Partecipazione revocata (es. per ban) --}}
+                            
                             @if($outing->date >= now() && $outing->status === 'published' && $acceptedCount < $outing->max_participants)
-                                {{-- L'uscita è ancora disponibile: offro la possibilità di re-iscriversi --}}
+                                
                                 <div class="alert alert-warning mb-3">
                                     <i class="fa-solid fa-circle-info me-1"></i> La tua partecipazione precedente era stata revocata. Puoi iscriverti nuovamente.
                                 </div>
@@ -224,7 +224,7 @@
                                     </button>
                                 </form>
                             @else
-                                {{-- Uscita non più disponibile o posti esauriti --}}
+                                
                                 <div class="alert alert-danger">
                                     <i class="fa-solid fa-ban me-1"></i> La tua partecipazione a questa uscita è stata revocata.
                                 </div>
@@ -234,7 +234,7 @@
                         <div class="alert alert-danger">Spiacenti, l'uscita ha raggiunto il limite massimo di partecipanti.</div>
                     @else
                         @if(!auth()->user()->hasBirthDate())
-                            {{-- Utente senza data di nascita: blocco con avviso --}}
+                            
                             <div class="alert alert-warning text-start">
                                 <i class="fa-solid fa-triangle-exclamation me-1"></i>
                                 <strong>Data di nascita mancante</strong><br>
@@ -244,7 +244,7 @@
                                 <i class="fa-solid fa-user-pen me-1"></i> Completa il profilo
                             </a>
                         @elseif(auth()->user()->date_of_birth->diffInYears(now()) < 18)
-                            {{-- Utente minorenne --}}
+                            
                             <div class="alert alert-danger text-start">
                                 <i class="fa-solid fa-ban me-1"></i>
                                 <strong>Età non sufficiente</strong><br>
@@ -269,7 +269,7 @@
         </div>
     </div>
 
-    {{-- Card Partecipanti: visibilità a 3 livelli --}}
+    
     <div class="card shadow-sm border-0 mt-4">
         <div class="card-body p-4">
             <h5 class="fw-bold mb-3"><i class="fa-solid fa-users text-success me-2"></i>Partecipanti Iscritti</h5>
@@ -288,12 +288,12 @@
                                 <i class="fa-solid fa-circle-user text-secondary me-2 fs-5"></i>
 
                                 @if(auth()->check())
-                                    {{-- Utente registrato: nome sempre cliccabile --}}
+                                    
                                     <a href="{{ route('profiles.show', $req->user->id) }}" class="text-decoration-none fw-bold text-dark" onmouseover="this.style.color='#0d6efd'" onmouseout="this.style.color='#212529'" style="transition: color 0.2s;">
                                         {{ $req->user->name }}
                                     </a>
                                 @else
-                                    {{-- Ospite: blurrato --}}
+                                    
                                     <span class="fw-bold" style="filter:blur(5px); user-select:none; pointer-events:none;">Utente Iscritto</span>
                                 @endif
                             </div>

@@ -9,11 +9,7 @@ use Illuminate\Support\Facades\Auth;
 
 class CheckBanned
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
+    
     public function handle(Request $request, Closure $next): Response
     {
         if (Auth::check() && Auth::user()->is_banned) {
@@ -24,9 +20,9 @@ class CheckBanned
             $request->session()->invalidate();
             $request->session()->regenerateToken();
 
-            // Se la richiesta è AJAX o JSON (tipo per le notifiche o per isriversi via fetch),
-            // non possiamo fare un redirect HTML normale. Quindi rimando subito un 403 in JSON
-            // senza far andare avanti la richiesta al controller.
+            
+            
+            
             if ($request->expectsJson() || $request->ajax()) {
                 return response()->json([
                     'error' => 'Account sospeso.',

@@ -219,6 +219,11 @@
                         <div class="alert alert-success">
                             <i class="fa-solid fa-user-tie"></i> Sei l'organizzatore di questa uscita!
                         </div>
+                        @if(in_array($outing->status, ['pending', 'published']))
+                            <a href="{{ route('user.outings.edit', $outing->id) }}" class="btn btn-outline-primary w-100 rounded-pill mt-2">
+                                <i class="fa-solid fa-pen-to-square me-1"></i> Modifica Uscita
+                            </a>
+                        @endif
                         @if($outing->status === 'published')
                             <button type="button" class="btn btn-danger w-100 rounded-pill mt-2" data-bs-toggle="modal" data-bs-target="#cancelOutingModal">
                                 <i class="fa-solid fa-ban"></i> Annulla Uscita

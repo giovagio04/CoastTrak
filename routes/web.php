@@ -38,6 +38,8 @@ Route::middleware('auth')->group(function () {
     // Gestione delle uscite proposte dagli utenti
     Route::get('/user/outings/create', [\App\Http\Controllers\UserOutingController::class, 'create'])->name('user.outings.create');
     Route::post('/user/outings', [\App\Http\Controllers\UserOutingController::class, 'store'])->name('user.outings.store');
+    Route::get('/user/outings/{outing}/edit', [\App\Http\Controllers\UserOutingController::class, 'edit'])->name('user.outings.edit');
+    Route::put('/user/outings/{outing}', [\App\Http\Controllers\UserOutingController::class, 'update'])->name('user.outings.update');
     Route::post('/user/outings/{outing}/cancel', [\App\Http\Controllers\UserOutingController::class, 'cancel'])->name('user.outings.cancel');
 
     // Gestione notifiche con rate limit a max 30 richieste/min

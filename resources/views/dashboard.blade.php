@@ -168,6 +168,9 @@
                                                 @else
                                                     <div class="d-flex flex-column align-items-center">
                                                         <span class="text-muted small mb-1"><i class="fa-solid fa-user-tie"></i> Organizzatore</span>
+                                                        @if($req->outing->status === 'published' || $req->outing->status === 'pending')
+                                                            <a href="{{ route('user.outings.edit', $req->outing->id) }}" class="btn btn-xs btn-outline-primary py-0 px-2 mb-1" style="font-size: 0.75rem;"><i class="fa-solid fa-pen-to-square"></i> Modifica</a>
+                                                        @endif
                                                         @if($req->outing->status === 'published')
                                                             <a href="{{ route('outings.show', $req->outing->id) }}" class="btn btn-xs btn-outline-danger py-0 px-2" style="font-size: 0.75rem;"><i class="fa-solid fa-ban"></i> Annulla</a>
                                                         @endif

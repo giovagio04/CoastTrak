@@ -2,23 +2,24 @@
 
 namespace App\Http\Controllers;
 
+use App\Traits\FiltersOutings;
 use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
+    use FiltersOutings;
+
     public function __invoke(Request $request)
     {
-        
         if (auth()->user()->role === 'admin') {
             return redirect()->route('admin.outings.index');
         }
 
-        
         $request->validate([
             'route_type_filter' => 'nullable|in:all,full,custom',
-            'full_direction'  => 'nullable|string',
-            'start_location'  => 'nullable|string|max:100',
-            'end_location'    => [
+            'full_direction'    => 'nullable|string',
+            'start_location'    => 'nullable|string|max:100',
+            'end_location'      => [
                 'nullable', 'string', 'max:100',
                 function ($attribute, $value, $fail) use ($request) {
                     if ($value && $request->filled('start_location') &&
@@ -53,80 +54,14 @@ class DashboardController extends Controller
             ->with(['outing.organizer'])
             ->whereHas('outing');
 
-        
-        if ($request->filled('type') && $request->type !== 'all') {
-            $query->whereHas('outing', fn($q) => $q->where('type', $request->type));
-        }
+        $query->whereHas('outing', function ($q) use ($request) {
+            $this->applyOutingFilters($q, $request);
+        });
 
-        
-        if ($request->filled('difficulty') && $request->difficulty !== 'all') {
-            $query->whereHas('outing', fn($q) => $q->where('difficulty', $request->difficulty));
-        }
-
-        
         if ($request->filled('status') && $request->status !== 'all') {
             $query->whereHas('outing', fn($q) => $q->where('status', $request->status));
         }
 
-        
-        if ($request->filled('date_from')) {
-            $query->whereHas('outing', fn($q) => $q->whereDate('date', '>=', $request->date_from));
-        }
-
-        
-        if ($request->filled('date_to')) {
-            $query->whereHas('outing', fn($q) => $q->whereDate('date', '<=', $request->date_to));
-        }
-
-        $routeType = $request->input('route_type_filter', 'all');
-
-        if ($routeType === 'full') {
-            $query->whereHas('outing', function ($q) use ($request) {
-                $q->where('is_full_trail', true);
-                if ($request->filled('full_direction')) {
-                    if ($request->full_direction === 'soverato-pizzo') {
-                        $q->where('start_location', 'Soverato')->where('end_location', 'Pizzo');
-                    } elseif ($request->full_direction === 'pizzo-soverato') {
-                        $q->where('start_location', 'Pizzo')->where('end_location', 'Soverato');
-                    }
-                }
-            });
-        } elseif ($routeType === 'custom') {
-            $query->whereHas('outing', fn($q) => $q->where('is_full_trail', false));
-            if ($request->filled('start_location')) {
-                $query->whereHas('outing', fn($q) => $q->where('start_location', $request->start_location));
-            }
-            if ($request->filled('end_location')) {
-                $query->whereHas('outing', fn($q) => $q->where('end_location', $request->end_location));
-            }
-        } else {
-            
-            if ($request->filled('start_location')) {
-                $start = $request->start_location;
-                $query->whereHas('outing', function ($q) use ($start) {
-                    $q->where('start_location', 'LIKE', '%' . $start . '%')
-                      ->orWhere(function ($sq) use ($start) {
-                          if (stripos('Soverato', $start) !== false || stripos('Cammino Completo', $start) !== false) {
-                              $sq->where('is_full_trail', true);
-                          }
-                      });
-                });
-            }
-
-            if ($request->filled('end_location')) {
-                $end = $request->end_location;
-                $query->whereHas('outing', function ($q) use ($end) {
-                    $q->where('end_location', 'LIKE', '%' . $end . '%')
-                      ->orWhere(function ($sq) use ($end) {
-                          if (stripos('Pizzo', $end) !== false || stripos('Cammino Completo', $end) !== false) {
-                              $sq->where('is_full_trail', true);
-                          }
-                      });
-                });
-            }
-        }
-
-        
         if ($request->boolean('available_only')) {
             $query->whereHas('outing', function ($q) {
                 $q->whereRaw('(
@@ -136,7 +71,6 @@ class DashboardController extends Controller
             });
         }
 
-        
         if ($request->filled('role') && $request->role !== 'all') {
             if ($request->role === 'organizer') {
                 $query->whereHas('outing', fn($q) => $q->where('organizer_id', $userId));
@@ -145,7 +79,6 @@ class DashboardController extends Controller
             }
         }
 
-        
         $participations = $query->join('outings', 'participation_requests.outing_id', '=', 'outings.id')
             ->orderByRaw("
                 CASE outings.status
@@ -158,7 +91,7 @@ class DashboardController extends Controller
                 END
             ")
             ->orderBy('outings.date', 'desc')
-            ->select('participation_requests.*') 
+            ->select('participation_requests.*')
             ->paginate(10)
             ->withQueryString();
 

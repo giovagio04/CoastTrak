@@ -12,16 +12,6 @@ class UserController extends Controller
 {
     public function index(Request $request)
     {
-        $query = User::where('role', 'user');
-
-        if ($request->filled('search')) {
-            $search = $request->search;
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%");
-            });
-        }
-
         $request->validate([
             'search'          => 'nullable|string|max:255',
             'min_trails'      => 'nullable|integer|min:0|max:100',
@@ -32,6 +22,16 @@ class UserController extends Controller
             'birth_from'      => 'nullable|date',
             'birth_to'        => 'nullable|date|after_or_equal:birth_from',
         ]);
+
+        $query = User::where('role', 'user');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('email', 'like', "%{$search}%");
+            });
+        }
 
         if ($request->filled('min_trails')) {
             $minTrails = $request->min_trails;
@@ -76,7 +76,7 @@ class UserController extends Controller
         }
 
         $users = $query->orderBy('created_at', 'desc')->paginate(10)->withQueryString();
-        
+
         return view('admin.users.index', compact('users'));
     }
 
@@ -89,7 +89,7 @@ class UserController extends Controller
             },
             'participationRequests.outing' => function ($q) {
                 $q->orderBy('date', 'desc');
-            }
+            },
         ]);
 
         return view('admin.users.show', compact('user'));
@@ -105,14 +105,10 @@ class UserController extends Controller
             'reason' => 'nullable|string|max:1000',
         ]);
 
-        
-        
-        
         $user->is_banned  = true;
         $user->ban_reason = $request->reason;
         $user->save();
 
-        
         ParticipationRequest::where('user_id', $user->id)
             ->whereIn('status', ['accepted', 'pending'])
             ->whereHas('outing', function ($q) {
@@ -121,7 +117,6 @@ class UserController extends Controller
             })
             ->update(['status' => 'rejected']);
 
-        
         Outing::where('organizer_id', $user->id)
             ->whereIn('status', ['pending', 'published'])
             ->where('date', '>=', now()->toDateString())
@@ -132,7 +127,6 @@ class UserController extends Controller
 
     public function unban(User $user)
     {
-        
         $user->is_banned  = false;
         $user->ban_reason = null;
         $user->save();

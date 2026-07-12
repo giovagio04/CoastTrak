@@ -3,14 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\Outing;
+use App\Traits\ResolvesOutingRoute;
 use Illuminate\Http\Request;
 use Carbon\Carbon;
 
 class UserOutingController extends Controller
 {
+    use ResolvesOutingRoute;
+
     public function create()
     {
-        
         if (!auth()->user()->hasBirthDate()) {
             return redirect()->route('profile.show')
                 ->with('error', 'Devi inserire la tua data di nascita nel profilo prima di poter proporre un cammino.');
@@ -31,14 +33,14 @@ class UserOutingController extends Controller
 
     public function store(Request $request)
     {
-        
         if (!auth()->user()->hasBirthDate()) {
             return redirect()->route('profile.show')
                 ->with('error', 'Devi inserire la tua data di nascita nel profilo prima di poter proporre un cammino.');
         }
 
         if (auth()->user()->date_of_birth->diffInYears(now()) < 18) {
-            abort(403, 'Devi avere almeno 18 anni per proporre un cammino.');
+            return redirect()->route('dashboard')
+                ->with('error', 'Devi avere almeno 18 anni per proporre un cammino.');
         }
 
         if (!auth()->user()->canCreateOuting()) {
@@ -46,55 +48,32 @@ class UserOutingController extends Controller
         }
 
         $validated = $request->validate([
-            'route_type'      => 'required|in:standard,custom',
-            'full_direction'  => 'required_if:route_type,standard|nullable|in:soverato-pizzo,pizzo-soverato',
-            'start_location'  => 'required_if:route_type,custom|nullable|string|max:255',
-            'end_location'    => 'required_if:route_type,custom|nullable|string|max:255|different:start_location',
-            'date'            => 'required|date|after:today|before_or_equal:+3 years',
-            'meeting_point'   => 'required|string|max:255',
+            'route_type'       => 'required|in:standard,custom',
+            'full_direction'   => 'required_if:route_type,standard|nullable|in:soverato-pizzo,pizzo-soverato',
+            'start_location'   => 'required_if:route_type,custom|nullable|string|max:255',
+            'end_location'     => 'required_if:route_type,custom|nullable|string|max:255|different:start_location',
+            'date'             => 'required|date|after:today|before_or_equal:+3 years',
+            'meeting_point'    => 'required|string|max:255',
             'max_participants' => 'required|integer|min:2|max:15',
-            'difficulty'      => 'required|in:facile,medio,difficile',
-            'notes'           => 'nullable|string|max:5000', 
+            'difficulty'       => 'required|in:facile,medio,difficile',
+            'notes'            => 'nullable|string|max:5000',
         ]);
 
-        if ($validated['route_type'] === 'standard') {
-            $validated['is_full_trail'] = true;
-            if ($validated['full_direction'] === 'soverato-pizzo') {
-                $validated['start_location'] = 'Soverato';
-                $validated['end_location'] = 'Pizzo';
-            } else {
-                $validated['start_location'] = 'Pizzo';
-                $validated['end_location'] = 'Soverato';
-            }
-        } else {
-            if (
-                ($validated['start_location'] === 'Soverato' && $validated['end_location'] === 'Pizzo') ||
-                ($validated['start_location'] === 'Pizzo' && $validated['end_location'] === 'Soverato')
-            ) {
-                $validated['is_full_trail'] = true;
-            } else {
-                $validated['is_full_trail'] = false;
-            }
-        }
-        unset($validated['route_type']);
-        unset($validated['full_direction']);
+        $validated = $this->resolveRouteData($validated);
 
-        $validated['type'] = 'user';
-        $validated['organizer_id'] = auth()->id();
-        $validated['status'] = 'pending';
-        
+        $validated['type']              = 'user';
+        $validated['organizer_id']      = auth()->id();
+        $validated['status']            = 'pending';
         $validated['approval_deadline'] = Carbon::now()->addHours(24);
 
         $outing = Outing::create($validated);
 
-        
         \App\Models\ParticipationRequest::create([
-            'user_id' => auth()->id(),
+            'user_id'   => auth()->id(),
             'outing_id' => $outing->id,
-            'status' => 'accepted', 
+            'status'    => 'accepted',
         ]);
 
-        
         $admins = \App\Models\User::where('role', 'admin')->get();
         foreach ($admins as $admin) {
             $admin->notify(new \App\Notifications\SimpleNotification(
@@ -145,27 +124,7 @@ class UserOutingController extends Controller
             'notes'            => 'nullable|string|max:5000',
         ]);
 
-        if ($validated['route_type'] === 'standard') {
-            $validated['is_full_trail'] = true;
-            if ($validated['full_direction'] === 'soverato-pizzo') {
-                $validated['start_location'] = 'Soverato';
-                $validated['end_location']   = 'Pizzo';
-            } else {
-                $validated['start_location'] = 'Pizzo';
-                $validated['end_location']   = 'Soverato';
-            }
-        } else {
-            if (
-                ($validated['start_location'] === 'Soverato' && $validated['end_location'] === 'Pizzo') ||
-                ($validated['start_location'] === 'Pizzo' && $validated['end_location'] === 'Soverato')
-            ) {
-                $validated['is_full_trail'] = true;
-            } else {
-                $validated['is_full_trail'] = false;
-            }
-        }
-        unset($validated['route_type']);
-        unset($validated['full_direction']);
+        $validated = $this->resolveRouteData($validated);
 
         $outing->update($validated);
 
@@ -179,25 +138,23 @@ class UserOutingController extends Controller
             abort(403, 'Non hai i permessi per annullare questo cammino.');
         }
 
-        if ($outing->status === 'cancelled') {
-            return back()->with('error', 'Questa uscita è già stata annullata.');
+        if (in_array($outing->status, ['cancelled', 'concluded', 'rejected'])) {
+            return back()->with('error', 'Questa uscita non può essere annullata nel suo stato attuale.');
         }
 
-        
         $request->validate(['reason' => 'nullable|string|max:2000']);
 
         $reason = $request->input('reason');
-        $notes = $outing->notes;
+        $notes  = $outing->notes;
         if ($reason) {
             $notes = $notes ? $notes . "\n\n[Motivazione Annullamento]: " . $reason : "[Motivazione Annullamento]: " . $reason;
         }
 
         $outing->update([
             'status' => 'cancelled',
-            'notes' => $notes
+            'notes'  => $notes,
         ]);
 
-        
         $participants = $outing->participationRequests()
             ->where('status', 'accepted')
             ->where('user_id', '!=', $outing->organizer_id)
@@ -209,18 +166,17 @@ class UserOutingController extends Controller
                 $participant->user->notify(new \App\Notifications\SimpleNotification(
                     'Cammino annullato dall\'organizzatore',
                     "L'organizzatore ha annullato il cammino '{$outing->stage_name}' del {$outing->date->format('d/m/Y')} a cui eri iscritto." . ($reason ? " Motivazione: {$reason}" : ""),
-                    null 
+                    null
                 ));
             }
         }
 
-        
         $admins = \App\Models\User::where('role', 'admin')->get();
         foreach ($admins as $admin) {
             $admin->notify(new \App\Notifications\SimpleNotification(
                 'Cammino tra utenti annullato dall\'organizzatore',
                 "L'organizzatore '" . auth()->user()->name . "' ha annullato il cammino '" . $outing->stage_name . "' del " . $outing->date->format('d/m/Y') . "." . ($reason ? " Motivazione: {$reason}" : ""),
-                null 
+                null
             ));
         }
 

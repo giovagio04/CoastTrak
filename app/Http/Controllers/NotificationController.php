@@ -23,11 +23,8 @@ class NotificationController extends Controller
                 $titleLower = strtolower($title);
                 if (
                     str_contains($titleLower, 'proposta di cammino approvata') ||
-                    str_contains($titleLower, 'proposta di cammina approvata') ||
                     str_contains($titleLower, 'proposta di cammino rifiutata') ||
-                    str_contains($titleLower, 'proposta di cammina rifiutata') ||
-                    str_contains($titleLower, 'cammino annullato dall\'amministratore') ||
-                    str_contains($titleLower, 'cammino annullato da amministratore')
+                    str_contains($titleLower, 'cammino annullato dall\'amministratore')
                 ) {
                     $actionUrl = null;
                 }
